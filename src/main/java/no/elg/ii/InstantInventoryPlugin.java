@@ -46,7 +46,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @PluginDescriptor(
     name = "Instant Inventory",
     description = "Improve the experience with using the inventory by predicting what an action will do client side.",
-    tags = {"inventory", "drop", "improvement", "overlay"}
+    tags = {"inventory", "qol", "improvement", "overlay", "instant", "client"}
 )
 public class InstantInventoryPlugin extends Plugin {
 
