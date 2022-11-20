@@ -42,12 +42,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-@Slf4j
-@PluginDescriptor(
-    name = "Instant Inventory",
-    description = "Improve the experience with using the inventory by predicting what an action will do client side.",
-    tags = {"inventory", "qol", "improvement", "overlay", "instant", "client"}
-)
+@PluginDescriptor(name = "Instant Inventory")
 public class InstantInventoryPlugin extends Plugin {
 
   public static final String DROP_OPTION = "Drop";

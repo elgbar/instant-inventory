@@ -41,7 +41,6 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
-@Slf4j
 class InstantInventoryOverlay extends WidgetItemOverlay {
 
   private final ItemManager itemManager;
