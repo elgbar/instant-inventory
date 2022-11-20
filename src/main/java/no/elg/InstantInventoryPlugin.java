@@ -46,6 +46,7 @@ public class InstantInventoryPlugin extends Plugin {
   protected void startUp() {
     overlayManager.add(overlay);
     System.out.println("Start up, adding overlay");
+    Arrays.fill(hide,-1);
   }
 
   @Override
@@ -53,22 +54,22 @@ public class InstantInventoryPlugin extends Plugin {
     overlayManager.remove(overlay);
   }
 
-  public boolean[] hide = new boolean[28];
+  public int[] hide = new int[28];
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     if (config.enableDrop() && "Drop".equals(event.getMenuOption())) {
       Widget widget = event.getWidget();
       if (widget != null) {
-        System.out.println("hide "+widget.getIndex());
-        hide[widget.getIndex()] = true;
+        System.out.println("hide "+widget.getIndex()+"(item id) "+event.getItemId());
+        hide[widget.getIndex()] = event.getItemId();
       }
     }
   }
 
-  @Subscribe
-  public void onGameTick(final GameTick event) {
-    Arrays.fill(hide, false);
-    
-  }
+//  @Subscribe
+//  public void onGameTick(final GameTick event) {
+//    Arrays.fill(hide, false);
+//
+//  }
 }
