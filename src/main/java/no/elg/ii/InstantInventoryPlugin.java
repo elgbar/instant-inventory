@@ -13,8 +13,10 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
 @PluginDescriptor(
@@ -25,25 +27,49 @@ import net.runelite.client.plugins.PluginDescriptor;
 public class InstantInventoryPlugin extends Plugin {
 
   public static final String DROP_OPTION = "Drop";
+  public static final String CLEAN_OPTION = "Clean";
   public static final int INVENTORY_SIZE = 28;
   public static final int INVALID_ITEM_ID = -1;
-  private static final Widget[] EMPTY_WIDGET = new Widget[0];
-  public int[] hide = new int[INVENTORY_SIZE];
+  public static final Widget[] EMPTY_WIDGET = new Widget[0];
+  public int[] dropped = new int[INVENTORY_SIZE];
+  public int[] cleaned = new int[INVENTORY_SIZE];
 
   @Inject
   private Client client;
 
+  @Inject
+  private InstantInventoryConfig config;
+
+  @Inject
+  private InstantInventoryOverlay overlay;
+
+  @Inject
+  private OverlayManager overlayManager;
+
   @Override
   protected void startUp() {
-    Arrays.fill(hide, INVALID_ITEM_ID);
+    Arrays.fill(dropped, INVALID_ITEM_ID);
+    overlayManager.add(overlay);
+  }
+
+  @Override
+  protected void shutDown()
+  {
+    overlayManager.remove(overlay);
   }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
-    if (DROP_OPTION.equals(event.getMenuOption())) {
-      Widget widget = event.getWidget();
-      if (widget != null) {
-        hide[widget.getIndex()] = event.getItemId();
+    Widget widget = event.getWidget();
+    if (widget != null) {
+      String menuOption = event.getMenuOption();
+      int index = widget.getIndex();
+      int itemId = event.getItemId();
+
+      if (config.instantDrop() && DROP_OPTION.equals(menuOption)) {
+        dropped[index] = itemId;
+      } else if (config.instantClean() && CLEAN_OPTION.equals(menuOption)) {
+        cleaned[index] = itemId;
       }
     }
   }
@@ -57,7 +83,7 @@ public class InstantInventoryPlugin extends Plugin {
   public void onBeforeRender(BeforeRender beforeRender) {
     Widget[] inventoryWidgetItem = inventoryItems();
     for (int index = 0; index < inventoryWidgetItem.length; index++) {
-      int hideIndex = hide[index];
+      int hideIndex = dropped[index];
       if (hideIndex == INVALID_ITEM_ID) {
         continue;
       }
@@ -75,10 +101,24 @@ public class InstantInventoryPlugin extends Plugin {
   public void onGameTick(GameTick tick) {
     Widget[] inventoryWidgets = inventoryItems();
     for (int index = 0; index < inventoryWidgets.length; index++) {
-      int hideIndex = hide[index];
-      if (hideIndex != INVALID_ITEM_ID && hideIndex != inventoryWidgets[index].getItemId()) {
-        hide[index] = INVALID_ITEM_ID;
-      }
+      int currentItemId = inventoryWidgets[index].getItemId();
+      testAndReset(dropped, index, currentItemId);
+      testAndReset(cleaned, index, currentItemId);
+    }
+  }
+
+  @Subscribe
+  public void onConfigChanged(ConfigChanged configChanged)
+  {
+    if (configChanged.getGroup().equals(InstantInventoryConfig.GROUP))
+    {
+      overlay.invalidateCache();
+    }
+  }
+
+  private static void testAndReset(int[] items, int index, int currentItemId) {
+    if (items[index] != INVALID_ITEM_ID && items[index] != currentItemId) {
+      items[index] = INVALID_ITEM_ID;
     }
   }
 

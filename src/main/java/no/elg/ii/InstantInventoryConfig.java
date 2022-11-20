@@ -1,28 +1,30 @@
 package no.elg.ii;
 
+import static no.elg.ii.InstantInventoryConfig.GROUP;
+
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("instant-inventory")
+@ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {
-
+  String GROUP = "instant-inventory";
   @ConfigItem(
       keyName = "instantDrop",
-      name = "Instant Drop",
-      description = "Hide dropped items client-side"
+      name = "Drop",
+      description = "Hide dropped items from the inventory instantly"
   )
   default boolean instantDrop() {
     return true;
   }
 
-//	@ConfigItem(
-//			keyName = "instantBank",
-//			name = "Instant Bank",
-//			description = "Move items in and out the back (seemingly) quicker"
-//	)
-//	default boolean instantDeposit()
-//	{
-//		return true;
-//	}
+	@ConfigItem(
+			keyName = "instantClean",
+			name = "Clean Herb",
+			description = "Show the clean herb instantly"
+	)
+	default boolean instantClean()
+	{
+		return true;
+	}
 }
