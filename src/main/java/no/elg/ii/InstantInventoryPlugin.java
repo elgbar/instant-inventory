@@ -1,4 +1,4 @@
-package no.elg;
+package no.elg.ii;
 
 import com.google.inject.Provides;
 import java.util.Arrays;
