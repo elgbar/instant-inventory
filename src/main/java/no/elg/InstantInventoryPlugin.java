@@ -17,7 +17,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
 @Slf4j
-
 @PluginDescriptor(
     name = "Instant Inventory",
     description = "Improve the experience with using the inventory by predicting what an action will do client side.",
@@ -25,9 +24,9 @@ import net.runelite.client.plugins.PluginDescriptor;
 )
 public class InstantInventoryPlugin extends Plugin {
 
+  public static final String DROP_OPTION = "Drop";
   public static final int INVENTORY_SIZE = 28;
   public static final int INVALID_ITEM_ID = -1;
-
   private static final Widget[] EMPTY_WIDGET = new Widget[0];
   public int[] hide = new int[INVENTORY_SIZE];
 
@@ -39,10 +38,9 @@ public class InstantInventoryPlugin extends Plugin {
     Arrays.fill(hide, INVALID_ITEM_ID);
   }
 
-
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
-    if ("Drop".equals(event.getMenuOption())) {
+    if (DROP_OPTION.equals(event.getMenuOption())) {
       Widget widget = event.getWidget();
       if (widget != null) {
         hide[widget.getIndex()] = event.getItemId();
@@ -56,7 +54,7 @@ public class InstantInventoryPlugin extends Plugin {
    *  the ClientTick event) the item would be visible for a single frame.
    */
   @Subscribe
-  public void onBeforeRender(BeforeRender beforeRender){
+  public void onBeforeRender(BeforeRender beforeRender) {
     Widget[] inventoryWidgetItem = inventoryItems();
     for (int index = 0; index < inventoryWidgetItem.length; index++) {
       int hideIndex = hide[index];
@@ -64,14 +62,14 @@ public class InstantInventoryPlugin extends Plugin {
         continue;
       }
       Widget widget = inventoryWidgetItem[index];
-      if(!widget.isSelfHidden()){
+      if (!widget.isSelfHidden()) {
         widget.setHidden(true);
       }
     }
   }
 
   /* (non-javadoc)
-   * When a dropped item is no longer in the inventory, unmark it as hidden
+   * When a dropped item is no longer in the inventory, unmark it as being hidden
    */
   @Subscribe
   public void onGameTick(GameTick tick) {
@@ -85,8 +83,8 @@ public class InstantInventoryPlugin extends Plugin {
   }
 
   /**
-   *
-   * @return An array of items in the players inventory, or an empty inventory if there is no inventory widget
+   * @return An array of items in the players inventory, or an empty inventory if there is no
+   * inventory widget
    */
   @Nonnull
   private Widget[] inventoryItems() {
@@ -101,5 +99,4 @@ public class InstantInventoryPlugin extends Plugin {
   InstantInventoryConfig provideConfig(ConfigManager configManager) {
     return configManager.getConfig(InstantInventoryConfig.class);
   }
-
 }
