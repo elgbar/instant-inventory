@@ -88,11 +88,6 @@ public class InstantInventoryPlugin extends Plugin {
     components.clear();
   }
 
-  @Subscribe
-  public void onConfigChanged(ConfigChanged configChanged) {
-    updateAllComponentStatus();
-  }
-
   /**
    * Make sure all components are in its correct state
    */
@@ -164,6 +159,13 @@ public class InstantInventoryPlugin extends Plugin {
   public void onGameStateChanged(GameStateChanged event) {
     for (InstantInventoryComponent component : components) {
       component.reset();
+    }
+  }
+
+  @Subscribe
+  public void onConfigChanged(ConfigChanged configChanged) {
+    if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
+      updateAllComponentStatus();
     }
   }
 
