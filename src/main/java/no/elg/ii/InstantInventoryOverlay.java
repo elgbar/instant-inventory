@@ -34,7 +34,6 @@ import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ItemID;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetItem;
