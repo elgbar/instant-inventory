@@ -100,7 +100,7 @@ public class InstantInventoryPlugin extends Plugin {
    * Make sure a feature is in its correct state, that is disabled when disabled in the config and
    * vice versa
    *
-   * @param feature         The feature to check
+   * @param feature           The feature to check
    * @param isEnabledInConfig Whether the feature is currently enable in the config
    */
   private void updateFeatureStatus(Feature feature,
