@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import net.runelite.api.Client;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -88,6 +89,16 @@ public class InstantInventoryPlugin extends Plugin {
       for (InstantInventoryComponent component : components) {
         component.getState().validateState(index, currentItemId);
       }
+    }
+  }
+
+  /* (non-javadoc)
+   * Reset components when the state change as we do not want to operate on stale data
+   */
+  @Subscribe
+  public void onGameStateChanged(GameStateChanged event) {
+    for (InstantInventoryComponent component : components) {
+      component.reset();
     }
   }
 
