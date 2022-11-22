@@ -71,8 +71,7 @@ public class InstantInventoryPlugin extends Plugin {
   }
 
   @Override
-  protected void shutDown()
-  {
+  protected void shutDown() {
     overlayManager.remove(overlay);
   }
 
@@ -126,10 +125,8 @@ public class InstantInventoryPlugin extends Plugin {
   }
 
   @Subscribe
-  public void onConfigChanged(ConfigChanged configChanged)
-  {
-    if (configChanged.getGroup().equals(InstantInventoryConfig.GROUP))
-    {
+  public void onConfigChanged(ConfigChanged configChanged) {
+    if (configChanged.getGroup().equals(InstantInventoryConfig.GROUP)) {
       overlay.invalidateCache();
     }
   }

@@ -32,7 +32,9 @@ import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {
+
   String GROUP = "instant-inventory";
+
   @ConfigItem(
       keyName = "instantDrop",
       name = "Drop",
@@ -42,13 +44,12 @@ public interface InstantInventoryConfig extends Config {
     return true;
   }
 
-	@ConfigItem(
-			keyName = "instantClean",
-			name = "Clean Herb",
-			description = "Show the clean herb instantly"
-	)
-	default boolean instantClean()
-	{
-		return true;
-	}
+  @ConfigItem(
+      keyName = "instantClean",
+      name = "Clean Herb",
+      description = "Show the clean herb instantly"
+  )
+  default boolean instantClean() {
+    return true;
+  }
 }
