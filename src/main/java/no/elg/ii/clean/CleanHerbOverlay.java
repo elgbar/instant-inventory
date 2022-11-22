@@ -24,18 +24,13 @@
  */
 package no.elg.ii.clean;
 
-import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.util.HashMap;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import net.runelite.api.ItemID;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
@@ -73,12 +68,13 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
     }
 
     Rectangle bounds = widgetItem.getCanvasBounds();
-    int cleanItemId = GRIMY_CONVERTER.getOrDefault(itemId, INVALID_ITEM_ID);
-    if (cleanItemId == INVALID_ITEM_ID) {
+    HerbInfo cleanItemId = HerbInfo.HERBS.getOrDefault(itemId, null);
+    if (cleanItemId == null) {
       return;
     }
 
-    Image item = itemManager.getImage(cleanItemId, widgetItem.getQuantity(), false);
+    Image item = itemManager.getImage(cleanItemId.getCleanItemId(), widgetItem.getQuantity(),
+        false);
     graphics.drawImage(item, (int) bounds.getX(), (int) bounds.getY(), null);
   }
 
@@ -86,33 +82,4 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
     fillCache.invalidateAll();
   }
 
-  /**
-   * Map of {@link ItemID} from grimy herbs to cleaned herbs
-   */
-  public static Map<Integer, Integer> GRIMY_CONVERTER = new HashMap<>();
-
-  static {
-    GRIMY_CONVERTER.put(ItemID.GRIMY_GUAM_LEAF, ItemID.GUAM_LEAF);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_MARRENTILL, ItemID.MARRENTILL);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_TARROMIN, ItemID.TARROMIN);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_HARRALANDER, ItemID.HARRALANDER);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_RANARR_WEED, ItemID.RANARR_WEED);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_IRIT_LEAF, ItemID.IRIT_LEAF);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_AVANTOE, ItemID.AVANTOE);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_KWUARM, ItemID.KWUARM);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_CADANTINE, ItemID.CADANTINE);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_DWARF_WEED, ItemID.DWARF_WEED);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_TORSTOL, ItemID.TORSTOL);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_SNAKE_WEED, ItemID.SNAKE_WEED);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_ARDRIGAL, ItemID.ARDRIGAL);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_SITO_FOIL, ItemID.SITO_FOIL);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_VOLENCIA_MOSS, ItemID.VOLENCIA_MOSS);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_ROGUES_PURSE, ItemID.ROGUES_PURSE);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_LANTADYME, ItemID.LANTADYME);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_TOADFLAX, ItemID.TOADFLAX);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_SNAPDRAGON, ItemID.SNAPDRAGON);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_NOXIFER, ItemID.NOXIFER);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_GOLPAR, ItemID.GOLPAR);
-    GRIMY_CONVERTER.put(ItemID.GRIMY_BUCHU_LEAF, ItemID.BUCHU_LEAF);
-  }
 }

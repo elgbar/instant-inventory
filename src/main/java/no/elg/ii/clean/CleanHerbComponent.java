@@ -4,6 +4,8 @@ package no.elg.ii.clean;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import net.runelite.api.Client;
+import net.runelite.api.Skill;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -23,6 +25,8 @@ public class CleanHerbComponent implements InstantInventoryComponent {
   private OverlayManager overlayManager;
   @Inject
   private InstantInventoryConfig config;
+  @Inject
+  private Client client;
 
   private final InventoryState state = new InventoryState();
 
@@ -43,7 +47,17 @@ public class CleanHerbComponent implements InstantInventoryComponent {
     if (widget != null) {
       String menuOption = event.getMenuOption();
       if (config.instantDrop() && CLEAN_OPTION.equals(menuOption)) {
-        state.setItemId(widget.getIndex(), event.getItemId());
+        int itemId = event.getItemId();
+        HerbInfo herbInfo = HerbInfo.HERBS.get(itemId);
+        if (herbInfo == null) {
+          return;
+        }
+
+        //TODO test with spicy stew (brown) by reducing the boosted level
+        int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
+        if (herbloreLevel >= herbInfo.getMinLevel()) {
+          state.setItemId(widget.getIndex(), itemId);
+        }
       }
     }
   }
