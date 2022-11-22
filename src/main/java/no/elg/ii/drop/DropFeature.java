@@ -9,13 +9,13 @@ import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.InstantInventoryComponent;
+import no.elg.ii.Feature;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.InventoryState;
 
 @Singleton
-public class DropComponent implements InstantInventoryComponent {
+public class DropFeature implements Feature {
 
   public static final String DROP_OPTION = "Drop";
   private final InventoryState state = new InventoryState();

@@ -8,8 +8,8 @@ import net.runelite.api.events.GameTick;
  * Hold the state of the players inventory. The state is checked every server tick in
  * {@link InstantInventoryPlugin#onGameTick(GameTick)}
  * <p>
- * A {@link InstantInventoryComponent} uses this class to handle how to render the changes on the
- * client. Typically, a component will modify the rendering of a given item in the inventory of the
+ * A {@link Feature} uses this class to handle how to render the changes on the
+ * client. Typically, a feature will modify the rendering of a given item in the inventory of the
  * player when the {@link #getItemId(int)} is different to {@link #INVALID_ITEM_ID}.
  */
 @EqualsAndHashCode

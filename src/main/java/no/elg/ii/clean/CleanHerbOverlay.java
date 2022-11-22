@@ -45,7 +45,7 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
   @Inject
   private InstantInventoryConfig config;
   @Inject
-  private CleanHerbComponent clean;
+  private CleanHerbFeature clean;
 
   private final Cache<Long, Image> fillCache;
 

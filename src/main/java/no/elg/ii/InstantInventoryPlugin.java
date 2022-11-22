@@ -41,8 +41,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import no.elg.ii.clean.CleanHerbComponent;
-import no.elg.ii.drop.DropComponent;
+import no.elg.ii.clean.CleanHerbFeature;
+import no.elg.ii.drop.DropFeature;
 
 @PluginDescriptor(name = "Instant Inventory")
 public class InstantInventoryPlugin extends Plugin {
@@ -55,18 +55,18 @@ public class InstantInventoryPlugin extends Plugin {
   public static AtomicInteger tickCounter = new AtomicInteger(0);
 
   /**
-   * The currently loaded components
+   * The currently loaded features
    */
-  public final Set<InstantInventoryComponent> components = new HashSet<>();
+  public final Set<Feature> features = new HashSet<>();
 
   @Inject
   private Client client;
 
   @Inject
-  private DropComponent dropComponent;
+  private DropFeature dropFeature;
 
   @Inject
-  private CleanHerbComponent cleanHerbComponent;
+  private CleanHerbFeature cleanHerbFeature;
 
   @Inject
   private EventBus eventBus;
@@ -76,65 +76,65 @@ public class InstantInventoryPlugin extends Plugin {
 
   @Override
   protected void startUp() {
-    updateAllComponentStatus();
+    updateAllFeatureStatus();
   }
 
   @Override
   protected void shutDown() {
-    // Disable all components when the plugin shuts down
-    for (InstantInventoryComponent component : components) {
-      disableComponent(component);
+    // Disable all features when the plugin shuts down
+    for (Feature feature : features) {
+      disableFeature(feature);
     }
-    components.clear();
+    features.clear();
   }
 
   /**
-   * Make sure all components are in its correct state
+   * Make sure all features are in its correct state
    */
-  private void updateAllComponentStatus() {
-    updateComponentStatus(dropComponent, config.instantDrop());
-    updateComponentStatus(cleanHerbComponent, config.instantClean());
+  private void updateAllFeatureStatus() {
+    updateFeatureStatus(dropFeature, config.instantDrop());
+    updateFeatureStatus(cleanHerbFeature, config.instantClean());
   }
 
   /**
-   * Make sure a component is in its correct state, that is disabled when disabled in the config and
+   * Make sure a feature is in its correct state, that is disabled when disabled in the config and
    * vice versa
    *
-   * @param component         The component to check
-   * @param isEnabledInConfig Whether the component is currently enable in the config
+   * @param feature         The feature to check
+   * @param isEnabledInConfig Whether the feature is currently enable in the config
    */
-  private void updateComponentStatus(InstantInventoryComponent component,
+  private void updateFeatureStatus(Feature feature,
       boolean isEnabledInConfig) {
-    boolean wasEnabled = components.contains(component);
+    boolean wasEnabled = features.contains(feature);
     if (!wasEnabled && isEnabledInConfig) {
-      enableComponent(component);
+      enableFeature(feature);
     } else if (wasEnabled && !isEnabledInConfig) {
-      disableComponent(component);
+      disableFeature(feature);
     }
   }
 
   /**
-   * Enable a component, meaning it is listing to events and generally acting as a mini-plugin
+   * Enable a feature, meaning it is listing to events and generally acting as a mini-plugin
    *
-   * @param component The component to enable
+   * @param feature The feature to enable
    */
-  private void enableComponent(InstantInventoryComponent component) {
-    eventBus.register(component);
-    components.add(component);
-    component.onEnable();
-    component.reset();
+  private void enableFeature(Feature feature) {
+    eventBus.register(feature);
+    features.add(feature);
+    feature.onEnable();
+    feature.reset();
   }
 
   /**
-   * Disable a component, it will no longer receive events
+   * Disable a feature, it will no longer receive events
    *
-   * @param component The component to disable
+   * @param feature The feature to disable
    */
-  private void disableComponent(InstantInventoryComponent component) {
-    eventBus.unregister(component);
-    components.remove(component);
-    component.onDisable();
-    component.reset();
+  private void disableFeature(Feature feature) {
+    eventBus.unregister(feature);
+    features.remove(feature);
+    feature.onDisable();
+    feature.reset();
   }
 
   /* (non-javadoc)
@@ -146,26 +146,26 @@ public class InstantInventoryPlugin extends Plugin {
     Widget[] inventoryWidgets = inventoryItems();
     for (int index = 0; index < inventoryWidgets.length; index++) {
       int currentItemId = inventoryWidgets[index].getItemId();
-      for (InstantInventoryComponent component : components) {
-        component.getState().validateState(index, currentItemId);
+      for (Feature feature : features) {
+        feature.getState().validateState(index, currentItemId);
       }
     }
   }
 
   /* (non-javadoc)
-   * Reset components when the state change as we do not want to operate on stale data
+   * Reset features when the state change as we do not want to operate on stale data
    */
   @Subscribe
   public void onGameStateChanged(GameStateChanged event) {
-    for (InstantInventoryComponent component : components) {
-      component.reset();
+    for (Feature feature : features) {
+      feature.reset();
     }
   }
 
   @Subscribe
   public void onConfigChanged(ConfigChanged configChanged) {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
-      updateAllComponentStatus();
+      updateAllFeatureStatus();
     }
   }
 

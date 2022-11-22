@@ -10,12 +10,12 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayManager;
-import no.elg.ii.InstantInventoryComponent;
+import no.elg.ii.Feature;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InventoryState;
 
 @Singleton
-public class CleanHerbComponent implements InstantInventoryComponent {
+public class CleanHerbFeature implements Feature {
 
   public static final String CLEAN_OPTION = "Clean";
 
