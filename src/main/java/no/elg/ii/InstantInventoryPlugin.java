@@ -25,7 +25,6 @@
 package no.elg.ii;
 
 import com.google.inject.Provides;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,7 +36,9 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.clean.CleanHerbComponent;
@@ -46,35 +47,99 @@ import no.elg.ii.drop.DropComponent;
 @PluginDescriptor(name = "Instant Inventory")
 public class InstantInventoryPlugin extends Plugin {
 
-  public static final int INVENTORY_SIZE = 28;
-  public static final int INVALID_ITEM_ID = -1;
   public static final Widget[] EMPTY_WIDGET = new Widget[0];
 
+  /**
+   * Statically available and thread-safe tick counter
+   */
   public static AtomicInteger tickCounter = new AtomicInteger(0);
 
+  /**
+   * The currently loaded components
+   */
   public final Set<InstantInventoryComponent> components = new HashSet<>();
 
   @Inject
   private Client client;
 
   @Inject
-  private DropComponent drop;
+  private DropComponent dropComponent;
 
   @Inject
-  private CleanHerbComponent clean;
+  private CleanHerbComponent cleanHerbComponent;
+
+  @Inject
+  private EventBus eventBus;
+
+  @Inject
+  private InstantInventoryConfig config;
 
   @Override
   protected void startUp() {
-    components.addAll(Arrays.asList(drop, clean));
-    components.forEach(InstantInventoryComponent::reset);
-    components.forEach(InstantInventoryComponent::startUp);
+    updateAllComponentStatus();
   }
 
   @Override
   protected void shutDown() {
-    components.forEach(InstantInventoryComponent::shutDown);
-    components.forEach(InstantInventoryComponent::reset);
+    // Disable all components when the plugin shuts down
+    for (InstantInventoryComponent component : components) {
+      disableComponent(component);
+    }
     components.clear();
+  }
+
+  @Subscribe
+  public void onConfigChanged(ConfigChanged configChanged) {
+    updateAllComponentStatus();
+  }
+
+  /**
+   * Make sure all components are in its correct state
+   */
+  private void updateAllComponentStatus() {
+    updateComponentStatus(dropComponent, config.instantDrop());
+    updateComponentStatus(cleanHerbComponent, config.instantClean());
+  }
+
+  /**
+   * Make sure a component is in its correct state, that is disabled when disabled in the config and
+   * vice versa
+   *
+   * @param component         The component to check
+   * @param isEnabledInConfig Whether the component is currently enable in the config
+   */
+  private void updateComponentStatus(InstantInventoryComponent component,
+      boolean isEnabledInConfig) {
+    boolean wasEnabled = components.contains(component);
+    if (!wasEnabled && isEnabledInConfig) {
+      enableComponent(component);
+    } else if (wasEnabled && !isEnabledInConfig) {
+      disableComponent(component);
+    }
+  }
+
+  /**
+   * Enable a component, meaning it is listing to events and generally acting as a mini-plugin
+   *
+   * @param component The component to enable
+   */
+  private void enableComponent(InstantInventoryComponent component) {
+    eventBus.register(component);
+    components.add(component);
+    component.onEnable();
+    component.reset();
+  }
+
+  /**
+   * Disable a component, it will no longer receive events
+   *
+   * @param component The component to disable
+   */
+  private void disableComponent(InstantInventoryComponent component) {
+    eventBus.unregister(component);
+    components.remove(component);
+    component.onDisable();
+    component.reset();
   }
 
   /* (non-javadoc)

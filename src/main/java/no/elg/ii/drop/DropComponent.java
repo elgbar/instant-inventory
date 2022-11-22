@@ -1,6 +1,6 @@
 package no.elg.ii.drop;
 
-import static no.elg.ii.InstantInventoryPlugin.INVALID_ITEM_ID;
+import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

@@ -24,7 +24,7 @@
  */
 package no.elg.ii.clean;
 
-import static no.elg.ii.InstantInventoryPlugin.INVALID_ITEM_ID;
+import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -38,8 +38,6 @@ import javax.inject.Singleton;
 import net.runelite.api.ItemID;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetItem;
-import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 import no.elg.ii.InstantInventoryConfig;
@@ -84,11 +82,8 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
     graphics.drawImage(item, (int) bounds.getX(), (int) bounds.getY(), null);
   }
 
-  @Subscribe
-  public void onConfigChanged(ConfigChanged configChanged) {
-    if (configChanged.getGroup().equals(InstantInventoryConfig.GROUP)) {
-      fillCache.invalidateAll();
-    }
+  public void invalidateCache() {
+    fillCache.invalidateAll();
   }
 
   /**

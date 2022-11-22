@@ -27,13 +27,14 @@ public class CleanHerbComponent implements InstantInventoryComponent {
   private final InventoryState state = new InventoryState();
 
   @Override
-  public void startUp() {
+  public void onEnable() {
     overlayManager.add(overlay);
   }
 
   @Override
-  public void shutDown() {
+  public void onDisable() {
     overlayManager.remove(overlay);
+    overlay.invalidateCache();
   }
 
   @Subscribe
