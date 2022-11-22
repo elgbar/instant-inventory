@@ -26,114 +26,68 @@ package no.elg.ii;
 
 import com.google.inject.Provides;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import net.runelite.api.Client;
-import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.overlay.OverlayManager;
+import no.elg.ii.clean.CleanHerbComponent;
+import no.elg.ii.drop.DropComponent;
 
 @PluginDescriptor(name = "Instant Inventory")
 public class InstantInventoryPlugin extends Plugin {
 
-  public static final String DROP_OPTION = "Drop";
-  public static final String CLEAN_OPTION = "Clean";
   public static final int INVENTORY_SIZE = 28;
   public static final int INVALID_ITEM_ID = -1;
   public static final Widget[] EMPTY_WIDGET = new Widget[0];
-  public int[] dropped = new int[INVENTORY_SIZE];
-  public int[] cleaned = new int[INVENTORY_SIZE];
+
+  public static AtomicInteger tickCounter = new AtomicInteger(0);
+
+  public final Set<InstantInventoryComponent> components = new HashSet<>();
 
   @Inject
   private Client client;
 
   @Inject
-  private InstantInventoryConfig config;
+  private DropComponent drop;
 
   @Inject
-  private InstantInventoryOverlay overlay;
-
-  @Inject
-  private OverlayManager overlayManager;
+  private CleanHerbComponent clean;
 
   @Override
   protected void startUp() {
-    Arrays.fill(dropped, INVALID_ITEM_ID);
-    overlayManager.add(overlay);
+    components.addAll(Arrays.asList(drop, clean));
+    components.forEach(InstantInventoryComponent::reset);
+    components.forEach(InstantInventoryComponent::startUp);
   }
 
   @Override
   protected void shutDown() {
-    overlayManager.remove(overlay);
-  }
-
-  @Subscribe
-  public void onMenuOptionClicked(final MenuOptionClicked event) {
-    Widget widget = event.getWidget();
-    if (widget != null) {
-      String menuOption = event.getMenuOption();
-      int index = widget.getIndex();
-      int itemId = event.getItemId();
-
-      if (config.instantDrop() && DROP_OPTION.equals(menuOption)) {
-        dropped[index] = itemId;
-      } else if (config.instantClean() && CLEAN_OPTION.equals(menuOption)) {
-        cleaned[index] = itemId;
-      }
-    }
+    components.forEach(InstantInventoryComponent::shutDown);
+    components.forEach(InstantInventoryComponent::reset);
+    components.clear();
   }
 
   /* (non-javadoc)
-   * Make sure the item in the slot is hidden, the client sets it as non-hidden each tick (?)
-   *  or so. This must be done before the client is rendered otherwise (such as if we were to use
-   *  the ClientTick event) the item would be visible for a single frame.
+   * When an item is different longer in the inventory, unmark it as being hidden
    */
   @Subscribe
-  public void onBeforeRender(BeforeRender beforeRender) {
-    Widget[] inventoryWidgetItem = inventoryItems();
-    for (int index = 0; index < inventoryWidgetItem.length; index++) {
-      int hideIndex = dropped[index];
-      if (hideIndex == INVALID_ITEM_ID) {
-        continue;
-      }
-      Widget widget = inventoryWidgetItem[index];
-      if (!widget.isSelfHidden()) {
-        widget.setHidden(true);
-      }
-    }
-  }
-
-  /* (non-javadoc)
-   * When a dropped item is no longer in the inventory, unmark it as being hidden
-   */
-  @Subscribe
-  public void onGameTick(GameTick tick) {
+  public void onGameTick(GameTick event) {
+    tickCounter.set(client.getTickCount());
     Widget[] inventoryWidgets = inventoryItems();
     for (int index = 0; index < inventoryWidgets.length; index++) {
       int currentItemId = inventoryWidgets[index].getItemId();
-      testAndReset(dropped, index, currentItemId);
-      testAndReset(cleaned, index, currentItemId);
-    }
-  }
-
-  @Subscribe
-  public void onConfigChanged(ConfigChanged configChanged) {
-    if (configChanged.getGroup().equals(InstantInventoryConfig.GROUP)) {
-      overlay.invalidateCache();
-    }
-  }
-
-  private static void testAndReset(int[] items, int index, int currentItemId) {
-    if (items[index] != INVALID_ITEM_ID && items[index] != currentItemId) {
-      items[index] = INVALID_ITEM_ID;
+      for (InstantInventoryComponent component : components) {
+        component.getState().validateState(index, currentItemId);
+      }
     }
   }
 
@@ -142,7 +96,7 @@ public class InstantInventoryPlugin extends Plugin {
    * inventory widget
    */
   @Nonnull
-  private Widget[] inventoryItems() {
+  public Widget[] inventoryItems() {
     Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
     if (inventory != null) {
       return inventory.getDynamicChildren();

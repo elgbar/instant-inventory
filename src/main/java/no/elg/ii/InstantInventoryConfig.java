@@ -37,8 +37,8 @@ public interface InstantInventoryConfig extends Config {
 
   @ConfigItem(
       keyName = "instantDrop",
-      name = "Drop",
-      description = "Hide dropped items from the inventory instantly"
+      name = "Drop Instantly",
+      description = "Drop items from the inventory instantly"
   )
   default boolean instantDrop() {
     return true;
@@ -46,8 +46,8 @@ public interface InstantInventoryConfig extends Config {
 
   @ConfigItem(
       keyName = "instantClean",
-      name = "Clean Herb",
-      description = "Show the clean herb instantly"
+      name = "Clean Herbs Instantly",
+      description = "Show the cleaned herb instantly"
   )
   default boolean instantClean() {
     return true;

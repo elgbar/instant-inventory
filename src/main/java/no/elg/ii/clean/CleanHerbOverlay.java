@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package no.elg.ii;
+package no.elg.ii.clean;
 
 import static no.elg.ii.InstantInventoryPlugin.INVALID_ITEM_ID;
 
@@ -34,18 +34,62 @@ import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import net.runelite.api.ItemID;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetItem;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import no.elg.ii.InstantInventoryConfig;
 
-class InstantInventoryOverlay extends WidgetItemOverlay {
+@Singleton
+public class CleanHerbOverlay extends WidgetItemOverlay {
 
-  private final ItemManager itemManager;
-  private final InstantInventoryPlugin plugin;
-  private final InstantInventoryConfig config;
+  @Inject
+  private ItemManager itemManager;
+  @Inject
+  private InstantInventoryConfig config;
+  @Inject
+  private CleanHerbComponent clean;
+
   private final Cache<Long, Image> fillCache;
+
+  {
+    showOnInterfaces(WidgetID.INVENTORY_GROUP_ID);
+    fillCache = CacheBuilder.newBuilder()
+        .concurrencyLevel(1)
+        .maximumSize(32)
+        .build();
+  }
+
+  @Override
+  public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
+    if (!config.instantClean()) {
+      return;
+    }
+    int index = widgetItem.getWidget().getIndex();
+    if (clean.getState().isInvalid(index)) {
+      return;
+    }
+
+    Rectangle bounds = widgetItem.getCanvasBounds();
+    int cleanItemId = GRIMY_CONVERTER.getOrDefault(itemId, INVALID_ITEM_ID);
+    if (cleanItemId == INVALID_ITEM_ID) {
+      return;
+    }
+
+    Image item = itemManager.getImage(cleanItemId, widgetItem.getQuantity(), false);
+    graphics.drawImage(item, (int) bounds.getX(), (int) bounds.getY(), null);
+  }
+
+  @Subscribe
+  public void onConfigChanged(ConfigChanged configChanged) {
+    if (configChanged.getGroup().equals(InstantInventoryConfig.GROUP)) {
+      fillCache.invalidateAll();
+    }
+  }
 
   /**
    * Map of {@link ItemID} from grimy herbs to cleaned herbs
@@ -75,49 +119,5 @@ class InstantInventoryOverlay extends WidgetItemOverlay {
     GRIMY_CONVERTER.put(ItemID.GRIMY_NOXIFER, ItemID.NOXIFER);
     GRIMY_CONVERTER.put(ItemID.GRIMY_GOLPAR, ItemID.GOLPAR);
     GRIMY_CONVERTER.put(ItemID.GRIMY_BUCHU_LEAF, ItemID.BUCHU_LEAF);
-  }
-
-  @Inject
-  private InstantInventoryOverlay(ItemManager itemManager, InstantInventoryPlugin plugin,
-      InstantInventoryConfig config) {
-    this.itemManager = itemManager;
-    this.plugin = plugin;
-    this.config = config;
-    showOnEquipment();
-    showOnInventory();
-    showOnInterfaces(
-        WidgetID.CHAMBERS_OF_XERIC_STORAGE_UNIT_INVENTORY_GROUP_ID,
-        WidgetID.CHAMBERS_OF_XERIC_STORAGE_UNIT_PRIVATE_GROUP_ID,
-        WidgetID.CHAMBERS_OF_XERIC_STORAGE_UNIT_SHARED_GROUP_ID,
-        WidgetID.GRAVESTONE_GROUP_ID
-    );
-    fillCache = CacheBuilder.newBuilder()
-        .concurrencyLevel(1)
-        .maximumSize(32)
-        .build();
-  }
-
-  @Override
-  public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
-    if (!config.instantClean()) {
-      return;
-    }
-    int index = widgetItem.getWidget().getIndex();
-    if (index == INVALID_ITEM_ID || plugin.cleaned[index] == INVALID_ITEM_ID) {
-      return;
-    }
-
-    Rectangle bounds = widgetItem.getCanvasBounds();
-    int cleanItemId = GRIMY_CONVERTER.getOrDefault(itemId, INVALID_ITEM_ID);
-    if (cleanItemId == INVALID_ITEM_ID) {
-      return;
-    }
-
-    Image item = itemManager.getImage(cleanItemId, widgetItem.getQuantity(), false);
-    graphics.drawImage(item, (int) bounds.getX(), (int) bounds.getY(), null);
-  }
-
-  void invalidateCache() {
-    fillCache.invalidateAll();
   }
 }
