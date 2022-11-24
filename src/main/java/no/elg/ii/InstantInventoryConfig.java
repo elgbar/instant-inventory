@@ -25,6 +25,8 @@
 package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryConfig.GROUP;
+import static no.elg.ii.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.drop.DropFeature.DROP_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -36,7 +38,7 @@ public interface InstantInventoryConfig extends Config {
   String GROUP = "instant-inventory";
 
   @ConfigItem(
-      keyName = "instantDrop",
+      keyName = DROP_CONFIG_KEY,
       name = "Drop Instantly",
       description = "Drop items from the inventory instantly"
   )
@@ -45,7 +47,7 @@ public interface InstantInventoryConfig extends Config {
   }
 
   @ConfigItem(
-      keyName = "instantClean",
+      keyName = CLEAN_CONFIG_KEY,
       name = "Clean Herbs Instantly",
       description = "Show the cleaned herb instantly"
   )

@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -44,6 +45,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.clean.CleanHerbFeature;
 import no.elg.ii.drop.DropFeature;
 
+@Slf4j
 @PluginDescriptor(name = "Instant Inventory")
 public class InstantInventoryPlugin extends Plugin {
 
@@ -119,6 +121,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature The feature to enable
    */
   private void enableFeature(Feature feature) {
+    log.info("Enabling " + feature.getConfigKey());
     eventBus.register(feature);
     features.add(feature);
     feature.onEnable();
@@ -131,6 +134,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature The feature to disable
    */
   private void disableFeature(Feature feature) {
+    log.info("Disabling " + feature.getConfigKey());
     eventBus.unregister(feature);
     features.remove(feature);
     feature.onDisable();

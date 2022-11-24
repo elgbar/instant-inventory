@@ -41,6 +41,7 @@ import no.elg.ii.InventoryState;
 public class CleanHerbFeature implements Feature {
 
   public static final String CLEAN_OPTION = "Clean";
+  public static final String CLEAN_CONFIG_KEY = "instantClean";
 
   @Inject
   private CleanHerbOverlay overlay;
@@ -89,5 +90,11 @@ public class CleanHerbFeature implements Feature {
   @Nonnull
   public InventoryState getState() {
     return state;
+  }
+
+  @Nonnull
+  @Override
+  public String getConfigKey() {
+    return CLEAN_CONFIG_KEY;
   }
 }

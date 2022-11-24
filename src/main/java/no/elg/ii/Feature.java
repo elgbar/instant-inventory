@@ -41,6 +41,9 @@ public interface Feature {
   @Nonnull
   InventoryState getState();
 
+  @Nonnull
+  String getConfigKey();
+
   /**
    * Method run when this feature is loaded in, either on {@link Plugin#startUp()} or when
    * {@link ConfigChanged} and this feature is enabled in the config and not already loaded.

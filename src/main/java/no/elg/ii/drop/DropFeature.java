@@ -42,6 +42,7 @@ import no.elg.ii.InventoryState;
 public class DropFeature implements Feature {
 
   public static final String DROP_OPTION = "Drop";
+  public static final String DROP_CONFIG_KEY = "instantDrop";
   private final InventoryState state = new InventoryState();
 
   @Inject
@@ -82,6 +83,12 @@ public class DropFeature implements Feature {
         state.setItemId(widget.getIndex(), event.getItemId());
       }
     }
+  }
+
+  @Nonnull
+  @Override
+  public String getConfigKey() {
+    return DROP_CONFIG_KEY;
   }
 
   @Nonnull
