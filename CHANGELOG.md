@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Removed
+
+---
+
+## 1.0.1 - 2022-11-24
+
+## [Unreleased]
+
+### Changed
+
 * Rewrite most of the plugin to easier be able to add additional features
 * When a feature is disabled, events will no longer be listened to
 * Update plugin description
@@ -22,8 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * When trying to clean a herb you do not have the level to clean, the cleaned herb would be shown
   anyway
 * Failing to drop an item would indefinitely hide it
-
-### Removed
 
 ---
 
