@@ -25,6 +25,7 @@
 package no.elg.ii;
 
 import com.google.inject.Provides;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -84,10 +85,10 @@ public class InstantInventoryPlugin extends Plugin {
   @Override
   protected void shutDown() {
     // Disable all features when the plugin shuts down
-    for (Feature feature : features) {
+    HashSet<Feature> copy = new HashSet<>(features);
+    for (Feature feature : copy) {
       disableFeature(feature);
     }
-    features.clear();
   }
 
   /**
