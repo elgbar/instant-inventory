@@ -26,6 +26,7 @@ package no.elg.ii;
 
 import java.util.Arrays;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.GameTick;
 
 /**
@@ -37,6 +38,7 @@ import net.runelite.api.events.GameTick;
  * {@link #getItemId(int)} is different to {@link #INVALID_ITEM_ID}.
  */
 @EqualsAndHashCode
+@Slf4j
 public class InventoryState {
 
   /**
@@ -89,10 +91,18 @@ public class InventoryState {
 
   /**
    * @param index The index of the item to test
-   * @return Whether the {@code index} and the item at the given index is valid
+   * @return Whether the {@code index} and the item at the given index is invalid
    */
   public boolean isInvalid(int index) {
-    return index == INVALID_ITEM_ID || items[index] == INVALID_ITEM_ID;
+    return index < 0 || index >= items.length || items[index] == INVALID_ITEM_ID;
+  }
+
+  /**
+   * @param index The index of the item to test
+   * @return Whether the {@code index} and the item at the given index is a valid itemID
+   */
+  public boolean isValid(int index) {
+    return !isInvalid(index);
   }
 
   /**
@@ -125,16 +135,22 @@ public class InventoryState {
    */
   public void validateState(int index, int currentItemId) {
     int itemId = getItemId(index);
-    boolean itemChanged = itemId != INVALID_ITEM_ID && itemId != currentItemId;
-    if (itemChanged) {
+    // Item at index changed so we must reset the state
+    if (itemId != INVALID_ITEM_ID && itemId != currentItemId) {
+      log.debug("Item at index {} changed from item id {} to {}, resetting the item", index, itemId,
+          currentItemId);
       resetState(index);
+      return;
     }
 
+    // The item at the given index have not changes in some time, we reset to
     int modifiedTick = getModifiedTick(index);
-    boolean timedOut =
-        modifiedTick != NOT_MODIFIED
-            && InstantInventoryPlugin.tickCounter.get() - modifiedTick >= MAX_UNMODIFIED_TICKS;
-    if (timedOut) {
+    int ticksSinceModified = InstantInventoryPlugin.tickCounter.get() - modifiedTick;
+    log.debug("Item at index {} has not changed in {} tick, resetting the item", index,
+        ticksSinceModified);
+    if (modifiedTick != NOT_MODIFIED && ticksSinceModified >= MAX_UNMODIFIED_TICKS) {
+      log.warn("Item at index {} has not changed in {} tick, resetting the item", index,
+          ticksSinceModified);
       resetState(index);
     }
   }

@@ -24,14 +24,14 @@
  */
 package no.elg.ii.drop;
 
-import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.Feature;
 import no.elg.ii.InstantInventoryConfig;
@@ -39,6 +39,7 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.InventoryState;
 
 @Singleton
+@Slf4j
 public class DropFeature implements Feature {
 
   public static final String DROP_OPTION = "Drop";
@@ -51,6 +52,9 @@ public class DropFeature implements Feature {
   @Inject
   private InstantInventoryPlugin plugin;
 
+  @Inject
+  private ClientThread clientThread;
+
   /* (non-javadoc)
    * Make sure the item in the slot is hidden, the client sets it as non-hidden each tick (?)
    *  or so. This must be done before the client is rendered otherwise (such as if we were to use
@@ -58,29 +62,41 @@ public class DropFeature implements Feature {
    */
   @Subscribe
   public void onBeforeRender(BeforeRender beforeRender) {
-    if (config.instantDrop()) {
-      Widget[] inventoryWidgetItem = plugin.inventoryItems();
-      for (int index = 0; index < inventoryWidgetItem.length; index++) {
-        int hideIndex = state.getItemId(index);
-        if (hideIndex == INVALID_ITEM_ID) {
-          continue;
-        }
-        Widget widget = inventoryWidgetItem[index];
-        if (!widget.isSelfHidden()) {
-          widget.setHidden(true);
-        }
-      }
-    }
+    updateHiddenStatus();
   }
 
+  @Override
+  public void reset() {
+    getState().resetAll();
+    clientThread.invoke(this::updateHiddenStatus);
+  }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
-      if (config.instantDrop() && DROP_OPTION.equals(menuOption)) {
+      if (DROP_OPTION.equals(menuOption)) {
+        log.debug("Dropped item at index {}", widget.getIndex());
         state.setItemId(widget.getIndex(), event.getItemId());
+      }
+    }
+  }
+
+  private void updateHiddenStatus(){
+    Widget[] inventoryWidgetItem = plugin.inventoryItems();
+    for (int index = 0; index < inventoryWidgetItem.length; index++) {
+
+      //Only hide the item when the state has been set to a valid item id
+      boolean shouldBeHidden = state.isValid(index);
+
+      Widget widget = inventoryWidgetItem[index];
+      if (shouldBeHidden && !widget.isSelfHidden()) {
+        log.debug("Hiding item at index {}", index);
+        widget.setHidden(true);
+      } else if (!shouldBeHidden && widget.isSelfHidden()) {
+        log.debug("Showing item at index {}", index);
+        widget.setHidden(false);
       }
     }
   }
