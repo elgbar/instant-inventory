@@ -48,7 +48,7 @@ public class InventoryState {
   /**
    * Maximum number of ticks an item should be displayed as something else
    */
-  public static final int MAX_UNMODIFIED_TICKS = 5;
+  public static final int MAX_UNMODIFIED_TICKS = 2;
 
   public static final int INVENTORY_SIZE = 28;
   public static final int INVALID_ITEM_ID = -1;
