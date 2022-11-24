@@ -62,6 +62,11 @@ public class CleanHerbFeature implements Feature {
   @Override
   public void onDisable() {
     overlayManager.remove(overlay);
+  }
+
+  @Override
+  public void reset() {
+    Feature.super.reset();
     overlay.invalidateCache();
   }
 

@@ -68,6 +68,7 @@ public class DropFeature implements Feature {
   @Override
   public void reset() {
     getState().resetAll();
+    Feature.super.reset();
     clientThread.invoke(this::updateHiddenStatus);
   }
 

@@ -149,9 +149,10 @@ public class InstantInventoryPlugin extends Plugin {
   public void onGameTick(GameTick event) {
     tickCounter.set(client.getTickCount());
     Widget[] inventoryWidgets = inventoryItems();
+    HashSet<Feature> copy = new HashSet<>(features);
     for (int index = 0; index < inventoryWidgets.length; index++) {
       int currentItemId = inventoryWidgets[index].getItemId();
-      for (Feature feature : features) {
+      for (Feature feature : copy) {
         feature.getState().validateState(index, currentItemId);
       }
     }
@@ -162,7 +163,9 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameStateChanged(GameStateChanged event) {
-    for (Feature feature : features) {
+    log.info("Resetting features as the GameState changed to {}", event.getGameState());
+    HashSet<Feature> copy = new HashSet<>(features);
+    for (Feature feature : copy) {
       feature.reset();
     }
   }
