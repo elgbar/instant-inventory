@@ -19,8 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 1.0.1 - 2022-11-24
 
-## [Unreleased]
-
 ### Changed
 
 * Rewrite most of the plugin to easier be able to add additional features
