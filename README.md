@@ -22,3 +22,9 @@ Cleaning and dropping items with the plugin enabled (left) and disabled (right).
 ## Changelog
 
 See [the changelog file](./CHANGELOG.md)
+
+## Future features
+
+* Instant swap equipment
+    * Hide as dropped if the eq slot is empty
+    * Swap with current equipped item if there is something in the slot (and you can equip it) 

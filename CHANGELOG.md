@@ -19,7 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* When trying to clean a herb you do not have the level to clean, the cleaned herb would be shown anyway
+* When trying to clean a herb you do not have the level to clean, the cleaned herb would be shown
+  anyway
+* Failing to drop an item would indefinitely hide it
 
 ### Removed
 
