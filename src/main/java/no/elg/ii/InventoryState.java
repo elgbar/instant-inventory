@@ -56,7 +56,6 @@ public class InventoryState {
   private final int[] items = new int[INVENTORY_SIZE];
   private final int[] modified = new int[INVENTORY_SIZE];
 
-
   public InventoryState() {
     resetAll();
   }

@@ -25,7 +25,6 @@
 package no.elg.ii;
 
 import com.google.inject.Provides;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -106,8 +105,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature           The feature to check
    * @param isEnabledInConfig Whether the feature is currently enable in the config
    */
-  private void updateFeatureStatus(Feature feature,
-      boolean isEnabledInConfig) {
+  private void updateFeatureStatus(Feature feature, boolean isEnabledInConfig) {
     boolean wasEnabled = features.contains(feature);
     if (!wasEnabled && isEnabledInConfig) {
       enableFeature(feature);

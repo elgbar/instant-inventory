@@ -34,7 +34,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.Feature;
-import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.InventoryState;
 
@@ -45,9 +44,6 @@ public class DropFeature implements Feature {
   public static final String DROP_OPTION = "Drop";
   public static final String DROP_CONFIG_KEY = "instantDrop";
   private final InventoryState state = new InventoryState();
-
-  @Inject
-  private InstantInventoryConfig config;
 
   @Inject
   private InstantInventoryPlugin plugin;
@@ -84,7 +80,7 @@ public class DropFeature implements Feature {
     }
   }
 
-  private void updateHiddenStatus(){
+  private void updateHiddenStatus() {
     Widget[] inventoryWidgetItem = plugin.inventoryItems();
     for (int index = 0; index < inventoryWidgetItem.length; index++) {
 
