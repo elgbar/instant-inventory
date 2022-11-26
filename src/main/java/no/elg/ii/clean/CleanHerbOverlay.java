@@ -24,6 +24,7 @@
  */
 package no.elg.ii.clean;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.awt.Graphics2D;
@@ -35,19 +36,19 @@ import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
-import no.elg.ii.InstantInventoryConfig;
 
 @Singleton
 public class CleanHerbOverlay extends WidgetItemOverlay {
 
   @Inject
-  private ItemManager itemManager;
+  @VisibleForTesting
+  ItemManager itemManager;
   @Inject
-  private InstantInventoryConfig config;
-  @Inject
-  private CleanHerbFeature clean;
+  @VisibleForTesting
+  CleanHerbFeature clean;
 
-  private final Cache<Long, Image> fillCache;
+  @VisibleForTesting
+  Cache<Long, Image> fillCache;
 
   {
     showOnInterfaces(WidgetID.INVENTORY_GROUP_ID);
@@ -59,9 +60,6 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
 
   @Override
   public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
-    if (!config.instantClean()) {
-      return;
-    }
     int index = widgetItem.getWidget().getIndex();
     if (clean.getState().isInvalid(index)) {
       return;
@@ -81,5 +79,4 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
   public void invalidateCache() {
     fillCache.invalidateAll();
   }
-
 }

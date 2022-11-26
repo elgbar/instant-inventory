@@ -24,6 +24,7 @@
  */
 package no.elg.ii;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,22 +60,24 @@ public class InstantInventoryPlugin extends Plugin {
   /**
    * The currently loaded features
    */
-  public final Set<Feature> features = new HashSet<>();
 
+  @VisibleForTesting
+  protected final Set<Feature> features = new HashSet<>();
   @Inject
-  private Client client;
-
+  @VisibleForTesting
+  protected Client client;
   @Inject
-  private DropFeature dropFeature;
-
+  @VisibleForTesting
+  protected EventBus eventBus;
   @Inject
-  private CleanHerbFeature cleanHerbFeature;
-
+  @VisibleForTesting
+  protected InstantInventoryConfig config;
   @Inject
-  private EventBus eventBus;
-
+  @VisibleForTesting
+  protected DropFeature dropFeature;
   @Inject
-  private InstantInventoryConfig config;
+  @VisibleForTesting
+  protected CleanHerbFeature cleanHerbFeature;
 
   @Override
   protected void startUp() {
@@ -93,7 +96,8 @@ public class InstantInventoryPlugin extends Plugin {
   /**
    * Make sure all features are in its correct state
    */
-  private void updateAllFeatureStatus() {
+  @VisibleForTesting
+  protected void updateAllFeatureStatus() {
     updateFeatureStatus(dropFeature, config.instantDrop());
     updateFeatureStatus(cleanHerbFeature, config.instantClean());
   }
@@ -105,8 +109,10 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature           The feature to check
    * @param isEnabledInConfig Whether the feature is currently enable in the config
    */
-  private void updateFeatureStatus(Feature feature, boolean isEnabledInConfig) {
+  @VisibleForTesting
+  void updateFeatureStatus(Feature feature, boolean isEnabledInConfig) {
     boolean wasEnabled = features.contains(feature);
+
     if (!wasEnabled && isEnabledInConfig) {
       enableFeature(feature);
     } else if (wasEnabled && !isEnabledInConfig) {
@@ -119,7 +125,8 @@ public class InstantInventoryPlugin extends Plugin {
    *
    * @param feature The feature to enable
    */
-  private void enableFeature(Feature feature) {
+  @VisibleForTesting
+  void enableFeature(Feature feature) {
     log.info("Enabling " + feature.getConfigKey());
     eventBus.register(feature);
     features.add(feature);
@@ -132,7 +139,8 @@ public class InstantInventoryPlugin extends Plugin {
    *
    * @param feature The feature to disable
    */
-  private void disableFeature(Feature feature) {
+  @VisibleForTesting
+  void disableFeature(Feature feature) {
     log.info("Disabling " + feature.getConfigKey());
     eventBus.unregister(feature);
     features.remove(feature);

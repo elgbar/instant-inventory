@@ -24,6 +24,7 @@
  */
 package no.elg.ii.clean;
 
+import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,7 +35,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.Feature;
-import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InventoryState;
 
 @Singleton
@@ -44,13 +44,14 @@ public class CleanHerbFeature implements Feature {
   public static final String CLEAN_CONFIG_KEY = "instantClean";
 
   @Inject
-  private CleanHerbOverlay overlay;
+  @VisibleForTesting
+  public CleanHerbOverlay overlay;
   @Inject
-  private OverlayManager overlayManager;
+  @VisibleForTesting
+  public OverlayManager overlayManager;
   @Inject
-  private InstantInventoryConfig config;
-  @Inject
-  private Client client;
+  @VisibleForTesting
+  public Client client;
 
   private final InventoryState state = new InventoryState();
 
@@ -75,14 +76,13 @@ public class CleanHerbFeature implements Feature {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
-      if (config.instantDrop() && CLEAN_OPTION.equals(menuOption)) {
+      if (CLEAN_OPTION.equals(menuOption)) {
         int itemId = event.getItemId();
         HerbInfo herbInfo = HerbInfo.HERBS.get(itemId);
         if (herbInfo == null) {
           return;
         }
 
-        //TODO test with spicy stew (brown) by reducing the boosted level
         int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
         if (herbloreLevel >= herbInfo.getMinLevel()) {
           state.setItemId(widget.getIndex(), itemId);

@@ -24,6 +24,7 @@
  */
 package no.elg.ii.drop;
 
+import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,10 +47,12 @@ public class DropFeature implements Feature {
   private final InventoryState state = new InventoryState();
 
   @Inject
-  private InstantInventoryPlugin plugin;
+  @VisibleForTesting
+  public InstantInventoryPlugin plugin;
 
   @Inject
-  private ClientThread clientThread;
+  @VisibleForTesting
+  public ClientThread clientThread;
 
   /* (non-javadoc)
    * Make sure the item in the slot is hidden, the client sets it as non-hidden each tick (?)
@@ -63,7 +66,6 @@ public class DropFeature implements Feature {
 
   @Override
   public void reset() {
-    getState().resetAll();
     Feature.super.reset();
     clientThread.invoke(this::updateHiddenStatus);
   }
@@ -80,7 +82,8 @@ public class DropFeature implements Feature {
     }
   }
 
-  private void updateHiddenStatus() {
+  @VisibleForTesting
+  protected void updateHiddenStatus() {
     Widget[] inventoryWidgetItem = plugin.inventoryItems();
     for (int index = 0; index < inventoryWidgetItem.length; index++) {
 
