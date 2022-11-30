@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* The number of ticks an item is hidden is customizable
-
 ### Changed
 
 * Move feature toggling config items into their own config section
@@ -21,7 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## 1.0.1 - 2022-11-24
+## 1.0.1 - 2022-11-30
+
+## Added
+
+* The number of ticks an item is hidden is customizable
 
 ### Changed
 
