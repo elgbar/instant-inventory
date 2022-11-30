@@ -53,7 +53,8 @@ public class CleanHerbFeature implements Feature {
   @VisibleForTesting
   public Client client;
 
-  private final InventoryState state = new InventoryState();
+  @Inject
+  private InventoryState state;
 
   @Override
   public void onEnable() {
@@ -85,7 +86,7 @@ public class CleanHerbFeature implements Feature {
 
         int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
         if (herbloreLevel >= herbInfo.getMinLevel()) {
-          state.setItemId(widget.getIndex(), itemId);
+          getState().setItemId(widget.getIndex(), itemId);
         }
       }
     }

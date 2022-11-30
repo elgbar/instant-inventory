@@ -66,4 +66,21 @@ public interface InstantInventoryConfig extends Config {
   default boolean instantClean() {
     return true;
   }
+
+  @ConfigItem(
+      keyName = "maxUnmodifiedTicks",
+      name = "Max Unmodified Ticks",
+      description =
+          "How many game ticks (0.6s) an item should be displayed as something else before being reverted back."
+              + "<p>"
+              + "<p>If this is zero the item will always flicker back into existence,"
+              + "<p>when this is 1 items will occasionally flicker back into view when the servers are unstable,"
+              + "<p>and when this is 2+ flickering rarely happens (i.e., only when the server lags)."
+              + "<p>"
+              + "<p>When in PvP or Bossing it is recommended to set this to 1.",
+      position = 100
+  )
+  default int maxUnmodifiedTicks() {
+    return InventoryState.MAX_UNMODIFIED_TICKS;
+  }
 }

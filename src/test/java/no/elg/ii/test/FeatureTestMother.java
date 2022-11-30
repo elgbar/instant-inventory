@@ -14,11 +14,9 @@ import net.runelite.client.config.ConfigItem;
 import no.elg.ii.Feature;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InventoryState;
-import no.elg.ii.ResetStaticMother;
 import org.junit.Test;
 
-public abstract class FeatureTestMother<T extends Feature> extends ResetStaticMother {
-
+public abstract class FeatureTestMother<T extends Feature> {
 
   public abstract T createNewInstance();
 

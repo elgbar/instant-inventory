@@ -24,9 +24,12 @@
  */
 package no.elg.ii;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
+import javax.inject.Inject;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 
 /**
@@ -48,7 +51,7 @@ public class InventoryState {
   /**
    * Maximum number of ticks an item should be displayed as something else
    */
-  public static final int MAX_UNMODIFIED_TICKS = 2;
+  public static final int MAX_UNMODIFIED_TICKS = 1;
 
   public static final int INVENTORY_SIZE = 28;
   public static final int INVALID_ITEM_ID = -1;
@@ -56,7 +59,16 @@ public class InventoryState {
   private final int[] items = new int[INVENTORY_SIZE];
   private final int[] modified = new int[INVENTORY_SIZE];
 
-  public InventoryState() {
+  @VisibleForTesting
+  InstantInventoryConfig config;
+
+  @VisibleForTesting
+  Client client;
+
+  @Inject
+  public InventoryState(InstantInventoryConfig config, Client client) {
+    this.config = config;
+    this.client = client;
     resetAll();
   }
 
@@ -67,7 +79,7 @@ public class InventoryState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setItemId(int index, int itemId) {
-    modified[index] = InstantInventoryPlugin.tickCounter.get();
+    modified[index] = client.getTickCount();
     items[index] = itemId;
   }
 
@@ -144,10 +156,10 @@ public class InventoryState {
 
     // The item at the given index have not changes in some time, we reset to
     int modifiedTick = getModifiedTick(index);
-    int ticksSinceModified = InstantInventoryPlugin.tickCounter.get() - modifiedTick;
+    int ticksSinceModified = client.getTickCount() - modifiedTick;
     log.debug("Item at index {} has not changed in {} tick, resetting the item", index,
         ticksSinceModified);
-    if (modifiedTick != NOT_MODIFIED && ticksSinceModified >= MAX_UNMODIFIED_TICKS) {
+    if (modifiedTick != NOT_MODIFIED && ticksSinceModified >= config.maxUnmodifiedTicks()) {
       log.warn("Item at index {} has not changed in {} tick, resetting the item", index,
           ticksSinceModified);
       resetState(index);

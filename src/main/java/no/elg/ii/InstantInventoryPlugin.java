@@ -28,7 +28,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -53,28 +52,27 @@ public class InstantInventoryPlugin extends Plugin {
   public static final Widget[] EMPTY_WIDGET = new Widget[0];
 
   /**
-   * Statically available and thread-safe tick counter
-   */
-  public static AtomicInteger tickCounter = new AtomicInteger(0);
-
-  /**
    * The currently loaded features
    */
-
   @VisibleForTesting
   protected final Set<Feature> features = new HashSet<>();
+
   @Inject
   @VisibleForTesting
   protected Client client;
+
   @Inject
   @VisibleForTesting
   protected EventBus eventBus;
+
   @Inject
   @VisibleForTesting
   protected InstantInventoryConfig config;
+
   @Inject
   @VisibleForTesting
   protected DropFeature dropFeature;
+
   @Inject
   @VisibleForTesting
   protected CleanHerbFeature cleanHerbFeature;
@@ -153,7 +151,6 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameTick(GameTick event) {
-    tickCounter.set(client.getTickCount());
     Widget[] inventoryWidgets = inventoryItems();
     HashSet<Feature> copy = new HashSet<>(features);
     for (int index = 0; index < inventoryWidgets.length; index++) {

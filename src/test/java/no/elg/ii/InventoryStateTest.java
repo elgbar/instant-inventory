@@ -7,17 +7,26 @@ import static no.elg.ii.InventoryState.NOT_MODIFIED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
+import net.runelite.api.Client;
 import org.junit.Before;
 import org.junit.Test;
 
-public class InventoryStateTest extends ResetStaticMother {
+public class InventoryStateTest {
 
   private InventoryState inventoryState;
+  private InstantInventoryConfig config;
+  private Client client;
 
   @Before
   public void setUp() {
-    inventoryState = new InventoryState();
+    config = spy(new InstantInventoryConfig() {
+    });
+    client = mock(Client.class);
+    inventoryState = new InventoryState(config, client);
   }
 
   private void setAllIndexes(int itemId) {
@@ -53,7 +62,7 @@ public class InventoryStateTest extends ResetStaticMother {
 
   @Test
   public void resetAll_makesAllIndexesInvalid() {
-    InstantInventoryPlugin.tickCounter.set(1);
+    doReturn(1).when(client).getTickCount();
     setAllIndexes(2);
 
     for (int i = 0; i < INVENTORY_SIZE; i++) {
@@ -71,7 +80,7 @@ public class InventoryStateTest extends ResetStaticMother {
 
   @Test
   public void validateState_differentItemIdFromCurrent_resets() {
-    InstantInventoryPlugin.tickCounter.set(2);
+    doReturn(2).when(client).getTickCount();
     int index = 0;
     inventoryState.setItemId(index, 1);
 
@@ -85,16 +94,53 @@ public class InventoryStateTest extends ResetStaticMother {
   }
 
   @Test
-  public void validateState_timeout_resets() {
+  public void validateState_timeout_resets_default_is_2() {
     int index = 0;
     inventoryState.setItemId(index, 1);
 
     assertEquals(1, inventoryState.getItemId(0));
     assertEquals(0, inventoryState.getModifiedTick(0));
 
-    InstantInventoryPlugin.tickCounter.set(MAX_UNMODIFIED_TICKS);
+    doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
 
     inventoryState.validateState(index, 1);
+
+    assertEquals(INVALID_ITEM_ID, inventoryState.getItemId(0));
+    assertEquals(NOT_MODIFIED, inventoryState.getModifiedTick(0));
+  }
+
+  @Test
+  public void validateState_timeout_resets_not_before_configurable_ticks() {
+    int index = 0;
+    int itemId = 1;
+    doReturn(MAX_UNMODIFIED_TICKS + 1).when(config).maxUnmodifiedTicks();
+    inventoryState.setItemId(index, itemId);
+
+    assertEquals(itemId, inventoryState.getItemId(0));
+    assertEquals(0, inventoryState.getModifiedTick(0));
+
+    doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
+
+    inventoryState.validateState(index, itemId);
+
+    assertEquals(itemId, inventoryState.getItemId(0));
+    assertEquals(0, inventoryState.getModifiedTick(0));
+  }
+
+  @Test
+  public void validateState_timeout_resets_customizable_time() {
+    int index = 0;
+    int itemId = 1;
+    int maxUnmodifiedTicks = MAX_UNMODIFIED_TICKS + 1;
+    doReturn(maxUnmodifiedTicks).when(config).maxUnmodifiedTicks();
+    inventoryState.setItemId(index, itemId);
+
+    assertEquals(itemId, inventoryState.getItemId(0));
+    assertEquals(0, inventoryState.getModifiedTick(0));
+
+    doReturn(maxUnmodifiedTicks).when(client).getTickCount();
+
+    inventoryState.validateState(index, itemId);
 
     assertEquals(INVALID_ITEM_ID, inventoryState.getItemId(0));
     assertEquals(NOT_MODIFIED, inventoryState.getModifiedTick(0));
@@ -125,5 +171,4 @@ public class InventoryStateTest extends ResetStaticMother {
     assertEquals(1, inventoryState.getItemId(0));
     assertEquals(0, inventoryState.getModifiedTick(0));
   }
-
 }

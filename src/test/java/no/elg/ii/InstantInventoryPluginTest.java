@@ -28,7 +28,7 @@ import no.elg.ii.test.TestSetup;
 import org.junit.Before;
 import org.junit.Test;
 
-public class InstantInventoryPluginTest extends ResetStaticMother {
+public class InstantInventoryPluginTest {
 
   private InstantInventoryPlugin plugin;
   private DropFeature dropFeature;
@@ -43,15 +43,21 @@ public class InstantInventoryPluginTest extends ResetStaticMother {
     doReturn(EMPTY_WIDGET).when(plugin).inventoryItems();
     plugin.eventBus = eventBus = mock(EventBus.class);
     plugin.client = client = mock(Client.class);
-    instantInventoryConfig = mock(InstantInventoryConfig.class);
+    instantInventoryConfig = spy(new InstantInventoryConfig() {
+    });
     doReturn(true).when(instantInventoryConfig).instantDrop();
     doReturn(true).when(instantInventoryConfig).instantClean();
     plugin.config = instantInventoryConfig;
 
-    plugin.dropFeature = dropFeature = spy(TestSetup.createNewDropFeature());
+    plugin.dropFeature = dropFeature = TestSetup.createNewDropFeature();
     dropFeature.plugin = plugin;
 
-    plugin.cleanHerbFeature = cleanHerbFeature = spy(TestSetup.createNewCleanHerbFeature());
+    plugin.cleanHerbFeature = cleanHerbFeature = TestSetup.createNewCleanHerbFeature();
+
+    Client client = mock(Client.class);
+    InventoryState inventoryState = new InventoryState(instantInventoryConfig, client);
+    doReturn(inventoryState).when(dropFeature).getState();
+    doReturn(inventoryState).when(cleanHerbFeature).getState();
   }
 
   @Test
@@ -157,19 +163,6 @@ public class InstantInventoryPluginTest extends ResetStaticMother {
     doReturn(null).when(client).getWidget(any());
     doCallRealMethod().when(plugin).inventoryItems();
     assertSame(EMPTY_WIDGET, plugin.inventoryItems());
-  }
-
-  @Test
-  public void onGameTick_setStaticTickCounterToClientTick() {
-
-    assertEquals(0, InstantInventoryPlugin.tickCounter.get());
-    doReturn(5).when(client).getTickCount();
-    plugin.onGameTick(new GameTick());
-    assertEquals(5, InstantInventoryPlugin.tickCounter.get());
-
-    doReturn(2).when(client).getTickCount();
-    plugin.onGameTick(new GameTick());
-    assertEquals(2, InstantInventoryPlugin.tickCounter.get());
   }
 
   @Test

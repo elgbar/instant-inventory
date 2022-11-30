@@ -44,7 +44,8 @@ public class DropFeature implements Feature {
 
   public static final String DROP_OPTION = "Drop";
   public static final String DROP_CONFIG_KEY = "instantDrop";
-  private final InventoryState state = new InventoryState();
+  @Inject
+  private InventoryState state;
 
   @Inject
   @VisibleForTesting
@@ -77,7 +78,7 @@ public class DropFeature implements Feature {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
         log.debug("Dropped item at index {}", widget.getIndex());
-        state.setItemId(widget.getIndex(), event.getItemId());
+        getState().setItemId(widget.getIndex(), event.getItemId());
       }
     }
   }
@@ -88,7 +89,7 @@ public class DropFeature implements Feature {
     for (int index = 0; index < inventoryWidgetItem.length; index++) {
 
       //Only hide the item when the state has been set to a valid item id
-      boolean shouldBeHidden = state.isValid(index);
+      boolean shouldBeHidden = getState().isValid(index);
 
       Widget widget = inventoryWidgetItem[index];
       if (shouldBeHidden && !widget.isSelfHidden()) {

@@ -19,11 +19,10 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
 import no.elg.ii.InventoryState;
-import no.elg.ii.ResetStaticMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
 
-public class CleanHerbOverlayTest extends ResetStaticMother {
+public class CleanHerbOverlayTest {
 
   @SuppressWarnings("unchecked")
   @Test

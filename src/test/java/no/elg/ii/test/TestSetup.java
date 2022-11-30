@@ -11,7 +11,9 @@ import java.util.function.BooleanSupplier;
 import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.ui.overlay.OverlayManager;
+import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
+import no.elg.ii.InventoryState;
 import no.elg.ii.clean.CleanHerbFeature;
 import no.elg.ii.clean.CleanHerbOverlay;
 import no.elg.ii.drop.DropFeature;
@@ -20,19 +22,28 @@ import org.mockito.stubbing.Answer;
 public class TestSetup {
 
   public static DropFeature createNewDropFeature() {
-    DropFeature dropFeature = spy(new DropFeature());
-    dropFeature.clientThread = TestSetup.mockedClientThread();
-    InstantInventoryPlugin plugin = dropFeature.plugin = mock(InstantInventoryPlugin.class);
+    DropFeature feature = spy(new DropFeature());
+    feature.clientThread = TestSetup.mockedClientThread();
+    InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
     doReturn(EMPTY_WIDGET).when(plugin).inventoryItems();
-    return dropFeature;
+    InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {
+    }),
+        mock(Client.class));
+    doReturn(inventoryState).when(feature).getState();
+    return feature;
   }
 
   public static CleanHerbFeature createNewCleanHerbFeature() {
-    CleanHerbFeature cleanHerbFeature = new CleanHerbFeature();
-    cleanHerbFeature.overlayManager = mock(OverlayManager.class);
-    cleanHerbFeature.client = mock(Client.class);
-    cleanHerbFeature.overlay = mock(CleanHerbOverlay.class);
-    return cleanHerbFeature;
+    CleanHerbFeature feature = spy(new CleanHerbFeature());
+    feature.overlayManager = mock(OverlayManager.class);
+    feature.client = mock(Client.class);
+    feature.overlay = mock(CleanHerbOverlay.class);
+    InstantInventoryConfig config = spy(new InstantInventoryConfig() {
+    });
+
+    InventoryState inventoryState = new InventoryState(config, feature.client);
+    doReturn(inventoryState).when(feature).getState();
+    return feature;
   }
 
   public static ClientThread mockedClientThread() {

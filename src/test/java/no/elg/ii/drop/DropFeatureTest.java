@@ -7,13 +7,16 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
+import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.InventoryState;
 import no.elg.ii.test.FeatureTestMother;
@@ -94,7 +97,7 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
   public void stateResetWhenItemNotDropped() {
     int index = 1;
     int itemId = 2;
-    DropFeature dropFeature = createNewInstance();
+    DropFeature feature = createNewInstance();
 
     Widget widget = mock(Widget.class);
     doReturn(index).when(widget).getIndex();
@@ -104,21 +107,26 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     doReturn(itemId).when(menuEntry).getItemId();
     doReturn(widget).when(menuEntry).getWidget();
 
+    InstantInventoryConfig config = spy(new InstantInventoryConfig() {
+    });
+    Client client = mock(Client.class);
+    InventoryState inventoryState = new InventoryState(config, client);
+    doReturn(inventoryState).when(feature).getState();
+
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
 
-    assertEquals(0, InstantInventoryPlugin.tickCounter.get());
-    assertEquals(INVALID_ITEM_ID, dropFeature.getState().getItemId(index));
-    dropFeature.onMenuOptionClicked(event);
-    assertEquals(itemId, dropFeature.getState().getItemId(index));
+    assertEquals(INVALID_ITEM_ID, feature.getState().getItemId(index));
+    feature.onMenuOptionClicked(event);
+    assertEquals(itemId, feature.getState().getItemId(index));
 
-    dropFeature.getState().validateState(index, itemId);
+    feature.getState().validateState(index, itemId);
     assertEquals("State was reset when it should not have been", itemId,
-        dropFeature.getState().getItemId(index));
+        feature.getState().getItemId(index));
 
-    InstantInventoryPlugin.tickCounter.set(MAX_UNMODIFIED_TICKS);
-    dropFeature.getState().validateState(index, itemId);
+    doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
+    feature.getState().validateState(index, itemId);
     assertEquals("State was NOT reset when it should have been", INVALID_ITEM_ID,
-        dropFeature.getState().getItemId(index));
+        feature.getState().getItemId(index));
   }
 
   @Test
