@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="no.elg.ii.ExamplePluginTest" />
+    <option name="MAIN_CLASS_NAME" value="no.elg.ii.LivePluginTest" />
     <module name="instant-inventory.test" />
     <option name="VM_PARAMETERS" value="-ea" />
     <extension name="coverage">
