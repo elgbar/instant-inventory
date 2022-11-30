@@ -31,16 +31,26 @@ import static no.elg.ii.drop.DropFeature.DROP_CONFIG_KEY;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {
 
   String GROUP = "instant-inventory";
 
+  @ConfigSection(
+      name = "Features",
+      description = "Toggle different features of the plugin",
+      position = 0
+  )
+  String FEATURE_SECTION = "instant-inventory-features";
+
   @ConfigItem(
       keyName = DROP_CONFIG_KEY,
       name = "Drop Instantly",
-      description = "Drop items from the inventory instantly"
+      section = FEATURE_SECTION,
+      description = "Drop items from the inventory instantly",
+      position = 0
   )
   default boolean instantDrop() {
     return true;
@@ -48,8 +58,10 @@ public interface InstantInventoryConfig extends Config {
 
   @ConfigItem(
       keyName = CLEAN_CONFIG_KEY,
+      section = FEATURE_SECTION,
       name = "Clean Herbs Instantly",
-      description = "Show the cleaned herb instantly"
+      description = "Show the cleaned herb instantly",
+      position = 1
   )
   default boolean instantClean() {
     return true;
