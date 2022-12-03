@@ -5,7 +5,7 @@
     <option name="VM_PARAMETERS" value="-ea" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="no.elg.ii.clean.*" />
+        <option name="PATTERN" value="no.elg.ii.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
