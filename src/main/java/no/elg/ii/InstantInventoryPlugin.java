@@ -125,7 +125,7 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @VisibleForTesting
   void enableFeature(Feature feature) {
-    log.info("Enabling " + feature.getConfigKey());
+    log.debug("Enabling " + feature.getConfigKey());
     eventBus.register(feature);
     features.add(feature);
     feature.onEnable();
@@ -139,7 +139,7 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @VisibleForTesting
   void disableFeature(Feature feature) {
-    log.info("Disabling " + feature.getConfigKey());
+    log.debug("Disabling " + feature.getConfigKey());
     eventBus.unregister(feature);
     features.remove(feature);
     feature.onDisable();
@@ -166,7 +166,7 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameStateChanged(GameStateChanged event) {
-    log.info("Resetting features as the GameState changed to {}", event.getGameState());
+    log.debug("Resetting features as the GameState changed to {}", event.getGameState());
     HashSet<Feature> copy = new HashSet<>(features);
     for (Feature feature : copy) {
       feature.reset();

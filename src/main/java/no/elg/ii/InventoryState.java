@@ -157,10 +157,8 @@ public class InventoryState {
     // The item at the given index have not changes in some time, we reset to
     int modifiedTick = getModifiedTick(index);
     int ticksSinceModified = client.getTickCount() - modifiedTick;
-    log.debug("Item at index {} has not changed in {} tick, resetting the item", index,
-        ticksSinceModified);
     if (modifiedTick != NOT_MODIFIED && ticksSinceModified >= config.maxUnmodifiedTicks()) {
-      log.warn("Item at index {} has not changed in {} tick, resetting the item", index,
+      log.debug("Item at index {} has not changed in {} tick, resetting the item", index,
           ticksSinceModified);
       resetState(index);
     }
