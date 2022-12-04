@@ -22,8 +22,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package no.elg.ii.drop;
+package no.elg.ii.hide;
 
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -32,17 +33,18 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.HideFeature;
+import no.elg.ii.util.IndexedWidget;
 
 @Singleton
 @Slf4j
-public class DropFeature extends HideFeature {
+public class DepositFeature extends HideFeature {
 
-  public static final String DROP_OPTION = "Drop";
-  public static final String DROP_CONFIG_KEY = "instantDrop";
+  public static final String DEPOSIT_PREFIX_OPTION = "Deposit-";
+  public static final String DEPOSIT_CONFIG_KEY = "instantDeposit";
 
   @Override
   public void onEnable() {
-    showOnWidgets(WidgetInfo.INVENTORY);
+    showOnWidgets(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
   }
 
   @Subscribe
@@ -50,9 +52,24 @@ public class DropFeature extends HideFeature {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
-      if (DROP_OPTION.equals(menuOption)) {
-        log.debug("Dropped item at index {}", widget.getIndex());
-        getState().setItemId(widget.getIndex(), event.getItemId());
+      int eventItemId = event.getItemId();
+      if (menuOption != null && menuOption.startsWith(DEPOSIT_PREFIX_OPTION)) {
+        int toTake;
+        String substring = menuOption.substring(DEPOSIT_PREFIX_OPTION.length());
+        try {
+          toTake = Integer.parseInt(substring);
+        } catch (NumberFormatException e) {
+          log.debug("Failed to parse how many to deposit: " + menuOption
+              + " | tried to parse this as int: " + substring);
+          return;
+        }
+
+        Set<IndexedWidget> indexedWidgets = inventoryItems();
+        indexedWidgets.stream()
+            .filter(it -> it.getWidget().getItemId() == eventItemId)
+            .sorted()
+            .limit(toTake)
+            .forEach(w -> getState().setItemId(w.getIndex(), eventItemId));
       }
     }
   }
@@ -60,6 +77,6 @@ public class DropFeature extends HideFeature {
   @Nonnull
   @Override
   public String getConfigKey() {
-    return DROP_CONFIG_KEY;
+    return DEPOSIT_CONFIG_KEY;
   }
 }

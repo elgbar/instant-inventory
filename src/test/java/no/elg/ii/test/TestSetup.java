@@ -25,7 +25,7 @@ public class TestSetup {
     DropFeature feature = spy(new DropFeature());
     feature.clientThread = TestSetup.mockedClientThread();
     InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
-    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems();
+    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
     InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {
     }),
         mock(Client.class));

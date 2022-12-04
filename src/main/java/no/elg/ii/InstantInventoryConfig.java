@@ -27,6 +27,7 @@ package no.elg.ii;
 import static no.elg.ii.InstantInventoryConfig.GROUP;
 import static no.elg.ii.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
 import static no.elg.ii.drop.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -47,7 +48,7 @@ public interface InstantInventoryConfig extends Config {
 
   @ConfigItem(
       keyName = DROP_CONFIG_KEY,
-      name = "Drop Instantly",
+      name = "Drop Items Instantly",
       section = FEATURE_SECTION,
       description = "Drop items from the inventory instantly",
       position = 0
@@ -64,6 +65,17 @@ public interface InstantInventoryConfig extends Config {
       position = 1
   )
   default boolean instantClean() {
+    return true;
+  }
+
+  @ConfigItem(
+      keyName = DEPOSIT_CONFIG_KEY,
+      section = FEATURE_SECTION,
+      name = "Deposit Items Instantly",
+      description = "Deposit items into your bank instantly",
+      position = 2
+  )
+  default boolean instantDeposit() {
     return true;
   }
 

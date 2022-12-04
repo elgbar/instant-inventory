@@ -4,6 +4,7 @@ import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
 import static no.elg.ii.InventoryState.MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.drop.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -150,7 +151,7 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     InstantInventoryPlugin plugin = dropFeature.plugin;
     Widget widget = mock(Widget.class);
     Widget[] widgets = {widget};
-    doReturn(widgets).when(plugin).inventoryItems();
+    doReturn(widgets).when(plugin).inventoryItems(any());
 
     InventoryState state = dropFeature.getState();
     state.setItemId(index, shouldBeHidden ? 1 : INVALID_ITEM_ID);

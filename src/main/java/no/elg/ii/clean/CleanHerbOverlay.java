@@ -32,7 +32,6 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
@@ -51,7 +50,8 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
   Cache<Long, Image> fillCache;
 
   {
-    showOnInterfaces(WidgetID.INVENTORY_GROUP_ID);
+    showOnBank();
+    showOnInventory();
     fillCache = CacheBuilder.newBuilder()
         .concurrencyLevel(1)
         .maximumSize(32)

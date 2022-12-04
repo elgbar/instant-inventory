@@ -40,7 +40,7 @@ public class InstantInventoryPluginTest {
   @Before
   public void setUp() {
     plugin = spy(new InstantInventoryPlugin());
-    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems();
+    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
     plugin.eventBus = eventBus = mock(EventBus.class);
     plugin.client = client = mock(Client.class);
     instantInventoryConfig = spy(new InstantInventoryConfig() {
@@ -153,23 +153,23 @@ public class InstantInventoryPluginTest {
     Widget[] widgets = {mock(Widget.class)};
     doReturn(widgets).when(inventoryWidget).getDynamicChildren();
     doReturn(inventoryWidget).when(client).getWidget(WidgetInfo.INVENTORY);
-    doCallRealMethod().when(plugin).inventoryItems();
+    doCallRealMethod().when(plugin).inventoryItems(any());
 
-    assertSame(widgets, plugin.inventoryItems());
+    assertSame(widgets, plugin.inventoryItems(any()));
   }
 
   @Test
   public void inventoryItems_returns_empty_list_on_no_inventory() {
     doReturn(null).when(client).getWidget(any());
-    doCallRealMethod().when(plugin).inventoryItems();
-    assertSame(EMPTY_WIDGET, plugin.inventoryItems());
+    doCallRealMethod().when(plugin).inventoryItems(any());
+    assertSame(EMPTY_WIDGET, plugin.inventoryItems(any()));
   }
 
   @Test
   public void onGameTick_validatesEachItem() {
     Widget widget = mock(Widget.class);
     Widget[] widgets = {widget, widget, widget};
-    doReturn(widgets).when(plugin).inventoryItems();
+    doReturn(widgets).when(plugin).inventoryItems(any());
 
     InventoryState mockedState = mock(InventoryState.class);
     Feature a = mock(Feature.class);

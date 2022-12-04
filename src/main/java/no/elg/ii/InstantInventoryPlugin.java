@@ -44,6 +44,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.clean.CleanHerbFeature;
 import no.elg.ii.drop.DropFeature;
+import no.elg.ii.hide.DepositFeature;
 
 @Slf4j
 @PluginDescriptor(name = "Instant Inventory")
@@ -76,6 +77,9 @@ public class InstantInventoryPlugin extends Plugin {
   @Inject
   @VisibleForTesting
   protected CleanHerbFeature cleanHerbFeature;
+  @Inject
+  @VisibleForTesting
+  protected DepositFeature depositFeature;
 
   @Override
   protected void startUp() {
@@ -98,6 +102,7 @@ public class InstantInventoryPlugin extends Plugin {
   protected void updateAllFeatureStatus() {
     updateFeatureStatus(dropFeature, config.instantDrop());
     updateFeatureStatus(cleanHerbFeature, config.instantClean());
+    updateFeatureStatus(depositFeature, config.instantDeposit());
   }
 
   /**
@@ -151,7 +156,7 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameTick(GameTick event) {
-    Widget[] inventoryWidgets = inventoryItems();
+    Widget[] inventoryWidgets = inventoryItems(WidgetInfo.INVENTORY);
     HashSet<Feature> copy = new HashSet<>(features);
     for (int index = 0; index < inventoryWidgets.length; index++) {
       int currentItemId = inventoryWidgets[index].getItemId();
@@ -180,15 +185,20 @@ public class InstantInventoryPlugin extends Plugin {
     }
   }
 
+  public boolean isHidden(WidgetInfo widgetInfo) {
+    Widget widget = client.getWidget(widgetInfo);
+    return widget == null || widget.isHidden();
+  }
+
   /**
    * @return An array of items in the players inventory, or an empty inventory if there is no
    * inventory widget
    */
   @Nonnull
-  public Widget[] inventoryItems() {
-    Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
-    if (inventory != null) {
-      return inventory.getDynamicChildren();
+  public Widget[] inventoryItems(WidgetInfo widgetInfo) {
+    Widget widget = client.getWidget(widgetInfo);
+    if (widget != null) {
+      return widget.getDynamicChildren();
     }
     return EMPTY_WIDGET;
   }
