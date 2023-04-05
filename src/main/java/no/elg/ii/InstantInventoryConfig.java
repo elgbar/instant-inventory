@@ -95,6 +95,6 @@ public interface InstantInventoryConfig extends Config {
     position = 100
   )
   default int maxUnmodifiedTicks() {
-    return InventoryState.MAX_UNMODIFIED_TICKS;
+    return InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
   }
 }

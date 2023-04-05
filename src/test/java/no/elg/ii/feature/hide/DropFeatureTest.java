@@ -28,7 +28,7 @@
 package no.elg.ii.feature.hide;
 
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
-import static no.elg.ii.InventoryState.MAX_UNMODIFIED_TICKS;
+import static no.elg.ii.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -148,7 +148,7 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     assertEquals("State was reset when it should not have been", itemId,
       feature.getState().getItemId(index));
 
-    doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
+    doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
     feature.getState().validateState(index, itemId);
     assertEquals("State was NOT reset when it should have been", INVALID_ITEM_ID,
       feature.getState().getItemId(index));

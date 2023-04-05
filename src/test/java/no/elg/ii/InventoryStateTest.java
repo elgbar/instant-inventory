@@ -29,7 +29,7 @@ package no.elg.ii;
 
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
 import static no.elg.ii.InventoryState.INVENTORY_SIZE;
-import static no.elg.ii.InventoryState.MAX_UNMODIFIED_TICKS;
+import static no.elg.ii.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.InventoryState.NOT_MODIFIED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -128,7 +128,7 @@ public class InventoryStateTest {
     assertEquals(1, inventoryState.getItemId(0));
     assertEquals(0, inventoryState.getModifiedTick(0));
 
-    doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
+    doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
 
     inventoryState.validateState(index, 1);
 
@@ -140,13 +140,13 @@ public class InventoryStateTest {
   public void validateState_timeout_resets_not_before_configurable_ticks() {
     int index = 0;
     int itemId = 1;
-    doReturn(MAX_UNMODIFIED_TICKS + 1).when(config).maxUnmodifiedTicks();
+    doReturn(DEFAULT_MAX_UNMODIFIED_TICKS + 1).when(config).maxUnmodifiedTicks();
     inventoryState.setItemId(index, itemId);
 
     assertEquals(itemId, inventoryState.getItemId(0));
     assertEquals(0, inventoryState.getModifiedTick(0));
 
-    doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
+    doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
 
     inventoryState.validateState(index, itemId);
 
@@ -158,7 +158,7 @@ public class InventoryStateTest {
   public void validateState_timeout_resets_customizable_time() {
     int index = 0;
     int itemId = 1;
-    int maxUnmodifiedTicks = MAX_UNMODIFIED_TICKS + 1;
+    int maxUnmodifiedTicks = DEFAULT_MAX_UNMODIFIED_TICKS + 1;
     doReturn(maxUnmodifiedTicks).when(config).maxUnmodifiedTicks();
     inventoryState.setItemId(index, itemId);
 
