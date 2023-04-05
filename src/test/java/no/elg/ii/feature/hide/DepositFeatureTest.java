@@ -27,11 +27,11 @@
 
 package no.elg.ii.feature.hide;
 
+import static org.junit.Assert.assertFalse;
+
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
 
 public class DepositFeatureTest extends FeatureTestMother<DepositFeature> {
 

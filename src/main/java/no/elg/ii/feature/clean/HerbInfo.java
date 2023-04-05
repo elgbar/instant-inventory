@@ -34,9 +34,6 @@ import net.runelite.api.ItemID;
 @Data
 public class HerbInfo {
 
-  private final int cleanItemId;
-  private final int minLevel;
-
   /**
    * Map of {@link ItemID} from grimy herbs to cleaned herbs
    */
@@ -68,6 +65,9 @@ public class HerbInfo {
     HERBS.put(ItemID.GRIMY_BUCHU_LEAF, new HerbInfo(ItemID.BUCHU_LEAF, 52));
     HERBS.put(ItemID.GRIMY_NOXIFER, new HerbInfo(ItemID.NOXIFER, 60));
   }
+
+  private final int cleanItemId;
+  private final int minLevel;
 
 
 }

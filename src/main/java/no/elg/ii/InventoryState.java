@@ -29,8 +29,6 @@ package no.elg.ii;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -154,7 +152,7 @@ public class InventoryState {
     // Item at index changed so we must reset the state
     if (itemId != INVALID_ITEM_ID && itemId != currentItemId) {
       log.debug("Item at index {} changed from item id {} to {}, resetting the item", index, itemId,
-          currentItemId);
+        currentItemId);
       resetState(index);
       return;
     }
@@ -164,7 +162,7 @@ public class InventoryState {
     int ticksSinceModified = client.getTickCount() - modifiedTick;
     if (modifiedTick != NOT_MODIFIED && ticksSinceModified >= config.maxUnmodifiedTicks()) {
       log.debug("Item at index {} has not changed in {} tick, resetting the item", index,
-          ticksSinceModified);
+        ticksSinceModified);
       resetState(index);
     }
   }

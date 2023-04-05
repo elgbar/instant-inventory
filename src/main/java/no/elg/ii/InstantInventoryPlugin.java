@@ -44,10 +44,10 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.hide.DepositFeature;
+import no.elg.ii.feature.hide.DropFeature;
 
 @Slf4j
 @PluginDescriptor(name = "Instant Inventory")

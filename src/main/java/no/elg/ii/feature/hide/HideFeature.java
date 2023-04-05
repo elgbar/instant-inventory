@@ -28,8 +28,10 @@ package no.elg.ii.feature.hide;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
-
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -47,16 +49,14 @@ import no.elg.ii.util.IndexedWidget;
 @Slf4j
 public abstract class HideFeature implements Feature {
 
-  @Inject
-  private InventoryState state;
-
+  private final Set<WidgetInfo> widgets = new HashSet<>();
   @Inject
   public InstantInventoryPlugin plugin;
 
   @Inject
   public ClientThread clientThread;
-
-  private final Set<WidgetInfo> widgets = new HashSet<>();
+  @Inject
+  private InventoryState state;
 
   /* (non-javadoc)
    * Make sure the item in the slot is hidden, the client sets it as non-hidden each tick (?)

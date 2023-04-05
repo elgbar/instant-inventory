@@ -60,16 +60,16 @@ public class DepositFeature extends HideFeature {
           toTake = Integer.parseInt(substring);
         } catch (NumberFormatException e) {
           log.debug("Failed to parse how many to deposit: " + menuOption
-              + " | tried to parse this as int: " + substring);
+            + " | tried to parse this as int: " + substring);
           return;
         }
 
         Set<IndexedWidget> indexedWidgets = inventoryItems();
         indexedWidgets.stream()
-            .filter(it -> it.getWidget().getItemId() == eventItemId)
-            .sorted()
-            .limit(toTake)
-            .forEach(w -> getState().setItemId(w.getIndex(), eventItemId));
+          .filter(it -> it.getWidget().getItemId() == eventItemId)
+          .sorted()
+          .limit(toTake)
+          .forEach(w -> getState().setItemId(w.getIndex(), eventItemId));
       }
     }
   }

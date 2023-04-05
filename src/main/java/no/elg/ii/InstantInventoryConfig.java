@@ -28,8 +28,8 @@ package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryConfig.GROUP;
 import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
-import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static no.elg.ii.feature.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
+import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -42,57 +42,57 @@ public interface InstantInventoryConfig extends Config {
   String GROUP = "instant-inventory";
 
   @ConfigSection(
-      name = "Features",
-      description = "Toggle different features of the plugin",
-      position = 0
+    name = "Features",
+    description = "Toggle different features of the plugin",
+    position = 0
   )
   String FEATURE_SECTION = "instant-inventory-features";
 
   @ConfigItem(
-      keyName = DROP_CONFIG_KEY,
-      name = "Drop Items Instantly",
-      section = FEATURE_SECTION,
-      description = "Drop items from the inventory instantly",
-      position = 0
+    keyName = DROP_CONFIG_KEY,
+    name = "Drop Items Instantly",
+    section = FEATURE_SECTION,
+    description = "Drop items from the inventory instantly",
+    position = 0
   )
   default boolean instantDrop() {
     return true;
   }
 
   @ConfigItem(
-      keyName = CLEAN_CONFIG_KEY,
-      section = FEATURE_SECTION,
-      name = "Clean Herbs Instantly",
-      description = "Show the cleaned herb instantly",
-      position = 1
+    keyName = CLEAN_CONFIG_KEY,
+    section = FEATURE_SECTION,
+    name = "Clean Herbs Instantly",
+    description = "Show the cleaned herb instantly",
+    position = 1
   )
   default boolean instantClean() {
     return true;
   }
 
   @ConfigItem(
-      keyName = DEPOSIT_CONFIG_KEY,
-      section = FEATURE_SECTION,
-      name = "Deposit Items Instantly",
-      description = "Deposit items into your bank instantly",
-      position = 2
+    keyName = DEPOSIT_CONFIG_KEY,
+    section = FEATURE_SECTION,
+    name = "Deposit Items Instantly",
+    description = "Deposit items into your bank instantly",
+    position = 2
   )
   default boolean instantDeposit() {
     return true;
   }
 
   @ConfigItem(
-      keyName = "maxUnmodifiedTicks",
-      name = "Max Unmodified Ticks",
-      description =
-          "How many game ticks (0.6s) an item should be displayed as something else before being reverted back."
-              + "<p>"
-              + "<p>If this is zero the item will always flicker back into existence,"
-              + "<p>when this is 1 items will occasionally flicker back into view when the servers are unstable,"
-              + "<p>and when this is 2+ flickering rarely happens (i.e., only when the server lags)."
-              + "<p>"
-              + "<p>When in PvP or Bossing it is recommended to set this to 1.",
-      position = 100
+    keyName = "maxUnmodifiedTicks",
+    name = "Max Unmodified Ticks",
+    description =
+      "How many game ticks (0.6s) an item should be displayed as something else before being reverted back."
+        + "<p>"
+        + "<p>If this is zero the item will always flicker back into existence,"
+        + "<p>when this is 1 items will occasionally flicker back into view when the servers are unstable,"
+        + "<p>and when this is 2+ flickering rarely happens (i.e., only when the server lags)."
+        + "<p>"
+        + "<p>When in PvP or Bossing it is recommended to set this to 1.",
+    position = 100
   )
   default int maxUnmodifiedTicks() {
     return InventoryState.MAX_UNMODIFIED_TICKS;

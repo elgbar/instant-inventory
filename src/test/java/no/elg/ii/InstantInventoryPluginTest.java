@@ -28,7 +28,11 @@
 package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryPlugin.EMPTY_WIDGET;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -46,10 +50,10 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.events.ConfigChanged;
+import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
-import no.elg.ii.feature.Feature;
 import no.elg.ii.test.TestSetup;
 import org.junit.Before;
 import org.junit.Test;
@@ -219,7 +223,7 @@ public class InstantInventoryPluginTest {
     assertEquals(2, plugin.features.size());
 
     verify(mockedState, times(widgets.length * plugin.features.size())).validateState(anyInt(),
-        anyInt());
+      anyInt());
 
   }
 }

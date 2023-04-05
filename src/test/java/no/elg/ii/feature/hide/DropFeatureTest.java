@@ -27,19 +27,11 @@
 
 package no.elg.ii.feature.hide;
 
-import net.runelite.api.*;
-import net.runelite.api.events.*;
-import net.runelite.api.widgets.*;
-import no.elg.ii.*;
-import no.elg.ii.test.*;
-import org.junit.*;
-
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
 import static no.elg.ii.InventoryState.MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -47,6 +39,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import net.runelite.api.Client;
+import net.runelite.api.MenuEntry;
+import net.runelite.api.events.BeforeRender;
+import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.widgets.Widget;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.InstantInventoryPlugin;
+import no.elg.ii.InventoryState;
+import no.elg.ii.test.FeatureTestMother;
+import no.elg.ii.test.TestSetup;
+import org.junit.Test;
 
 public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 

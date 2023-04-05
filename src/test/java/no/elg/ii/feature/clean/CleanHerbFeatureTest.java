@@ -43,8 +43,6 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.clean.CleanHerbOverlay;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
@@ -120,7 +118,7 @@ public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
   }
 
   private void onMenuOptionClicked_test(int stateItemId, int itemId, boolean hasWidget,
-      String menuEntryOption, int level) {
+                                        String menuEntryOption, int level) {
     int index = 1;
     CleanHerbFeature feature = createNewInstance();
 

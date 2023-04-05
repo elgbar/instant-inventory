@@ -73,12 +73,13 @@ public class TestSetup {
     return feature;
   }
 
-  private static void setupCommonFeature(Feature feature, Client client){
-    InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {}), client);
+  private static void setupCommonFeature(Feature feature, Client client) {
+    InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {
+    }), client);
     doReturn(inventoryState).when(feature).getState();
   }
 
-  private static void setupHideFeature(HideFeature feature){
+  private static void setupHideFeature(HideFeature feature) {
     setupCommonFeature(feature, mock(Client.class));
     feature.clientThread = TestSetup.mockedClientThread();
     InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
@@ -96,9 +97,9 @@ public class TestSetup {
     doAnswer(runnableAnswer).when(clientThread).invokeLater(any(Runnable.class));
 
     doAnswer(it -> it.getArgument(0, BooleanSupplier.class).getAsBoolean()).when(clientThread)
-        .invoke(any(BooleanSupplier.class));
+      .invoke(any(BooleanSupplier.class));
     doAnswer(it -> it.getArgument(0, BooleanSupplier.class).getAsBoolean()).when(clientThread)
-        .invokeLater(any(BooleanSupplier.class));
+      .invokeLater(any(BooleanSupplier.class));
 
     return clientThread;
   }
