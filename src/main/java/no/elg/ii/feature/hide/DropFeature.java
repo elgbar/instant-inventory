@@ -41,8 +41,7 @@ public class DropFeature extends HideFeature {
   public static final String DROP_OPTION = "Drop";
   public static final String DROP_CONFIG_KEY = "instantDrop";
 
-  @Override
-  public void onEnable() {
+  {
     showOnWidgets(WidgetInfo.INVENTORY);
   }
 

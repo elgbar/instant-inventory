@@ -28,9 +28,8 @@ package no.elg.ii.feature.hide;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -95,15 +94,19 @@ public abstract class HideFeature implements Feature {
 
   @SuppressWarnings("UnstableApiUsage")
   protected Set<IndexedWidget> inventoryItems() {
+    if (widgets.isEmpty()) {
+      log.error("No widget added to hide feature " + this.getClass().getName());
+      return Collections.emptySet();
+    }
     return widgets.stream()
-        .map(it -> plugin.inventoryItems(it))
-        .flatMap(ws ->
-            Streams.mapWithIndex(
-                Arrays.stream(ws),
-                (from, index) -> new IndexedWidget((int) index, from)
-            )
+      .map(it -> plugin.inventoryItems(it))
+      .flatMap(ws ->
+        Streams.mapWithIndex(
+          Arrays.stream(ws),
+          (from, index) -> new IndexedWidget((int) index, from)
         )
-        .collect(Collectors.toSet());
+      )
+      .collect(Collectors.toSet());
   }
 
   @Nonnull
@@ -118,5 +121,10 @@ public abstract class HideFeature implements Feature {
 
   public void showOnWidgets(WidgetInfo... widgets) {
     this.widgets.addAll(Arrays.asList(widgets));
+  }
+
+  @VisibleForTesting
+  public Set<WidgetInfo> getWidgets() {
+    return widgets;
   }
 }

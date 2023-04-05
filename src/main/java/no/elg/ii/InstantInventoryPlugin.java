@@ -116,7 +116,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param isEnabledInConfig Whether the feature is currently enable in the config
    */
   @VisibleForTesting
-  void updateFeatureStatus(Feature feature, boolean isEnabledInConfig) {
+  void updateFeatureStatus(@Nonnull Feature feature, boolean isEnabledInConfig) {
     boolean wasEnabled = features.contains(feature);
 
     if (!wasEnabled && isEnabledInConfig) {
@@ -132,7 +132,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature The feature to enable
    */
   @VisibleForTesting
-  void enableFeature(Feature feature) {
+  void enableFeature(@Nonnull Feature feature) {
     log.debug("Enabling " + feature.getConfigKey());
     eventBus.register(feature);
     features.add(feature);
@@ -146,7 +146,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature The feature to disable
    */
   @VisibleForTesting
-  void disableFeature(Feature feature) {
+  void disableFeature(@Nonnull Feature feature) {
     log.debug("Disabling " + feature.getConfigKey());
     eventBus.unregister(feature);
     features.remove(feature);

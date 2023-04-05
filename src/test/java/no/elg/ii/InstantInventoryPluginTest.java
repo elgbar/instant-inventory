@@ -28,10 +28,7 @@
 package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryPlugin.EMPTY_WIDGET;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -50,6 +47,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.events.ConfigChanged;
 import no.elg.ii.feature.clean.CleanHerbFeature;
+import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.test.TestSetup;
@@ -61,6 +59,7 @@ public class InstantInventoryPluginTest {
   private InstantInventoryPlugin plugin;
   private DropFeature dropFeature;
   private CleanHerbFeature cleanHerbFeature;
+  private DepositFeature depositFeature;
   private InstantInventoryConfig instantInventoryConfig;
   private EventBus eventBus;
   private Client client;
@@ -75,26 +74,29 @@ public class InstantInventoryPluginTest {
     });
     doReturn(true).when(instantInventoryConfig).instantDrop();
     doReturn(true).when(instantInventoryConfig).instantClean();
+    doReturn(true).when(instantInventoryConfig).instantDeposit();
     plugin.config = instantInventoryConfig;
 
     plugin.dropFeature = dropFeature = TestSetup.createNewDropFeature();
-    dropFeature.plugin = plugin;
 
     plugin.cleanHerbFeature = cleanHerbFeature = TestSetup.createNewCleanHerbFeature();
+    plugin.depositFeature = depositFeature = TestSetup.createNewDepositFeature();
 
     Client client = mock(Client.class);
     InventoryState inventoryState = new InventoryState(instantInventoryConfig, client);
     doReturn(inventoryState).when(dropFeature).getState();
     doReturn(inventoryState).when(cleanHerbFeature).getState();
+    doReturn(inventoryState).when(depositFeature).getState();
   }
 
   @Test
   public void startUp_calls_updateAllFeatures() {
     plugin.startUp();
     verify(plugin).updateAllFeatureStatus();
-    assertEquals(2, plugin.features.size());
+    assertEquals(3, plugin.features.size());
     verify(dropFeature).onEnable();
     verify(cleanHerbFeature).onEnable();
+    verify(depositFeature).onEnable();
   }
 
   @Test
@@ -106,6 +108,7 @@ public class InstantInventoryPluginTest {
     assertTrue(plugin.features.isEmpty());
     verify(dropFeature).onDisable();
     verify(cleanHerbFeature).onDisable();
+    verify(depositFeature).onDisable();
   }
 
   @Test
@@ -152,7 +155,7 @@ public class InstantInventoryPluginTest {
   @Test
   public void onGameStateChanged_calls_nothing_on_incorrect_group() {
     plugin.startUp();
-    assertEquals(2, plugin.features.size());
+    assertEquals(3, plugin.features.size());
     plugin.onGameStateChanged(new GameStateChanged());
 
     verify(dropFeature, times(2)).reset();
@@ -181,9 +184,10 @@ public class InstantInventoryPluginTest {
     Widget[] widgets = {mock(Widget.class)};
     doReturn(widgets).when(inventoryWidget).getDynamicChildren();
     doReturn(inventoryWidget).when(client).getWidget(WidgetInfo.INVENTORY);
-    doCallRealMethod().when(plugin).inventoryItems(any());
+    doCallRealMethod().when(plugin).inventoryItems(WidgetInfo.INVENTORY);
 
-    assertSame(widgets, plugin.inventoryItems(any()));
+    assertArrayEquals(widgets, plugin.inventoryItems(WidgetInfo.INVENTORY));
+    assertSame(widgets, plugin.inventoryItems(WidgetInfo.INVENTORY));
   }
 
   @Test

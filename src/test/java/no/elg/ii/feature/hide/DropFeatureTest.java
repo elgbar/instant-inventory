@@ -27,10 +27,19 @@
 
 package no.elg.ii.feature.hide;
 
+import net.runelite.api.*;
+import net.runelite.api.events.*;
+import net.runelite.api.widgets.*;
+import no.elg.ii.*;
+import no.elg.ii.test.*;
+import org.junit.*;
+
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
 import static no.elg.ii.InventoryState.MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -38,19 +47,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import net.runelite.api.Client;
-import net.runelite.api.MenuEntry;
-import net.runelite.api.events.BeforeRender;
-import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.widgets.Widget;
-import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.InventoryState;
-import no.elg.ii.feature.hide.DropFeature;
-import no.elg.ii.test.FeatureTestMother;
-import no.elg.ii.test.TestSetup;
-import org.junit.Test;
 
 public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
@@ -77,10 +73,6 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     dropFeature.reset();
 
     verify(dropFeature).updateHiddenStatus();
-  }
-
-  @Test
-  public void name() {
   }
 
   @Test
@@ -150,18 +142,24 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     feature.getState().validateState(index, itemId);
     assertEquals("State was reset when it should not have been", itemId,
-        feature.getState().getItemId(index));
+      feature.getState().getItemId(index));
 
     doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
     feature.getState().validateState(index, itemId);
     assertEquals("State was NOT reset when it should have been", INVALID_ITEM_ID,
-        feature.getState().getItemId(index));
+      feature.getState().getItemId(index));
   }
 
   @Test
   public void configKey_is_CLEAN_CONFIG_KEY() {
     DropFeature feature = createNewInstance();
     assertEquals(DROP_CONFIG_KEY, feature.getConfigKey());
+  }
+
+  @Test
+  public void afterEnablingItWillBeShownOnSomeWidget() {
+    HideFeature dropFeature = createNewInstance();
+    assertFalse(dropFeature.getWidgets().isEmpty());
   }
 
   @Test
@@ -173,6 +171,7 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
   }
 
   private void testUpdateHiddenStatus(String name, boolean shouldBeHidden, boolean isSelfHidden) {
+    System.out.println(name);
     int index = 0;
     DropFeature dropFeature = createNewInstance();
 
@@ -189,7 +188,6 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     dropFeature.updateHiddenStatus();
 
-    System.out.println(name);
     verify(widget, times(shouldBeHidden == isSelfHidden ? 0 : 1)).setHidden(shouldBeHidden);
   }
 

@@ -43,8 +43,7 @@ public class DepositFeature extends HideFeature {
   public static final String DEPOSIT_PREFIX_OPTION = "Deposit-";
   public static final String DEPOSIT_CONFIG_KEY = "instantDeposit";
 
-  @Override
-  public void onEnable() {
+  {
     showOnWidgets(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
   }
 

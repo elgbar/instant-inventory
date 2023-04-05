@@ -41,36 +41,48 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.InventoryState;
+import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.clean.CleanHerbOverlay;
+import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
+import no.elg.ii.feature.hide.HideFeature;
 import org.mockito.stubbing.Answer;
 
 public class TestSetup {
-
-  public static DropFeature createNewDropFeature() {
-    DropFeature feature = spy(new DropFeature());
-    feature.clientThread = TestSetup.mockedClientThread();
-    InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
-    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
-    InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {
-    }),
-        mock(Client.class));
-    doReturn(inventoryState).when(feature).getState();
-    return feature;
-  }
 
   public static CleanHerbFeature createNewCleanHerbFeature() {
     CleanHerbFeature feature = spy(new CleanHerbFeature());
     feature.overlayManager = mock(OverlayManager.class);
     feature.client = mock(Client.class);
     feature.overlay = mock(CleanHerbOverlay.class);
-    InstantInventoryConfig config = spy(new InstantInventoryConfig() {
-    });
 
-    InventoryState inventoryState = new InventoryState(config, feature.client);
-    doReturn(inventoryState).when(feature).getState();
+    setupCommonFeature(feature, feature.client);
     return feature;
+  }
+
+  public static DropFeature createNewDropFeature() {
+    DropFeature feature = spy(new DropFeature());
+    setupHideFeature(feature);
+    return feature;
+  }
+
+  public static DepositFeature createNewDepositFeature() {
+    DepositFeature feature = spy(new DepositFeature());
+    setupHideFeature(feature);
+    return feature;
+  }
+
+  private static void setupCommonFeature(Feature feature, Client client){
+    InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {}), client);
+    doReturn(inventoryState).when(feature).getState();
+  }
+
+  private static void setupHideFeature(HideFeature feature){
+    setupCommonFeature(feature, mock(Client.class));
+    feature.clientThread = TestSetup.mockedClientThread();
+    InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
+    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
   }
 
   public static ClientThread mockedClientThread() {
