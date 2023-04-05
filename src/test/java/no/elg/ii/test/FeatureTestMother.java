@@ -38,7 +38,7 @@ import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Method;
 import net.runelite.client.config.ConfigItem;
-import no.elg.ii.Feature;
+import no.elg.ii.feature.Feature;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InventoryState;
 import org.junit.Test;

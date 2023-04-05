@@ -29,10 +29,13 @@ package no.elg.ii;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
+import no.elg.ii.feature.Feature;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in

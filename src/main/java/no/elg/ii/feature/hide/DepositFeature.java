@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.hide;
+package no.elg.ii.feature.hide;
 
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -34,7 +34,6 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.HideFeature;
 import no.elg.ii.util.IndexedWidget;
 
 @Singleton

@@ -25,13 +25,13 @@
  *
  */
 
-package no.elg.ii.clean;
+package no.elg.ii.feature.clean;
 
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.GRIMY_GUAM_LEAF;
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
-import static no.elg.ii.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
-import static no.elg.ii.clean.CleanHerbFeature.CLEAN_OPTION;
+import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_OPTION;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -43,6 +43,8 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
+import no.elg.ii.feature.clean.CleanHerbFeature;
+import no.elg.ii.feature.clean.CleanHerbOverlay;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;

@@ -25,11 +25,11 @@
  *
  */
 
-package no.elg.ii.drop;
+package no.elg.ii.feature.hide;
 
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
 import static no.elg.ii.InventoryState.MAX_UNMODIFIED_TICKS;
-import static no.elg.ii.drop.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -47,6 +47,7 @@ import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.InventoryState;
+import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;

@@ -24,54 +24,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.clean;
+package no.elg.ii.feature.hide;
 
-import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Singleton;
-import net.runelite.api.Client;
-import net.runelite.api.Skill;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.ui.overlay.OverlayManager;
-import no.elg.ii.Feature;
-import no.elg.ii.InventoryState;
 
 @Singleton
-public class CleanHerbFeature implements Feature {
+@Slf4j
+public class DropFeature extends HideFeature {
 
-  public static final String CLEAN_OPTION = "Clean";
-  public static final String CLEAN_CONFIG_KEY = "instantClean";
-
-  @Inject
-  @VisibleForTesting
-  public CleanHerbOverlay overlay;
-  @Inject
-  @VisibleForTesting
-  public OverlayManager overlayManager;
-  @Inject
-  @VisibleForTesting
-  public Client client;
-
-  @Inject
-  private InventoryState state;
+  public static final String DROP_OPTION = "Drop";
+  public static final String DROP_CONFIG_KEY = "instantDrop";
 
   @Override
   public void onEnable() {
-    overlayManager.add(overlay);
-  }
-
-  @Override
-  public void onDisable() {
-    overlayManager.remove(overlay);
-  }
-
-  @Override
-  public void reset() {
-    Feature.super.reset();
-    overlay.invalidateCache();
+    showOnWidgets(WidgetInfo.INVENTORY);
   }
 
   @Subscribe
@@ -79,30 +51,16 @@ public class CleanHerbFeature implements Feature {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
-      if (CLEAN_OPTION.equals(menuOption)) {
-        int itemId = event.getItemId();
-        HerbInfo herbInfo = HerbInfo.HERBS.get(itemId);
-        if (herbInfo == null) {
-          return;
-        }
-
-        int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
-        if (herbloreLevel >= herbInfo.getMinLevel()) {
-          getState().setItemId(widget.getIndex(), itemId);
-        }
+      if (DROP_OPTION.equals(menuOption)) {
+        log.debug("Dropped item at index {}", widget.getIndex());
+        getState().setItemId(widget.getIndex(), event.getItemId());
       }
     }
-  }
-
-  @Override
-  @Nonnull
-  public InventoryState getState() {
-    return state;
   }
 
   @Nonnull
   @Override
   public String getConfigKey() {
-    return CLEAN_CONFIG_KEY;
+    return DROP_CONFIG_KEY;
   }
 }

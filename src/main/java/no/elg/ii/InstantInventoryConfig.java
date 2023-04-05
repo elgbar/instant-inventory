@@ -27,9 +27,9 @@
 package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryConfig.GROUP;
-import static no.elg.ii.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
-import static no.elg.ii.drop.DropFeature.DROP_CONFIG_KEY;
-import static no.elg.ii.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
+import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.feature.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;

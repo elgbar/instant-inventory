@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.clean;
+package no.elg.ii.feature.clean;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -46,6 +46,8 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
 import no.elg.ii.InventoryState;
+import no.elg.ii.feature.clean.CleanHerbFeature;
+import no.elg.ii.feature.clean.CleanHerbOverlay;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
 

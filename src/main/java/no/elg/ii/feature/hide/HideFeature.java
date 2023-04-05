@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii;
+package no.elg.ii.feature.hide;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
@@ -40,6 +40,9 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
+import no.elg.ii.InstantInventoryPlugin;
+import no.elg.ii.InventoryState;
+import no.elg.ii.feature.Feature;
 import no.elg.ii.util.IndexedWidget;
 
 @Slf4j

@@ -41,9 +41,9 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.InventoryState;
-import no.elg.ii.clean.CleanHerbFeature;
-import no.elg.ii.clean.CleanHerbOverlay;
-import no.elg.ii.drop.DropFeature;
+import no.elg.ii.feature.clean.CleanHerbFeature;
+import no.elg.ii.feature.clean.CleanHerbOverlay;
+import no.elg.ii.feature.hide.DropFeature;
 import org.mockito.stubbing.Answer;
 
 public class TestSetup {

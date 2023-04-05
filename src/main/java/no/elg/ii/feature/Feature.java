@@ -24,12 +24,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii;
+package no.elg.ii.feature;
 
 
 import javax.annotation.Nonnull;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
+import no.elg.ii.InventoryState;
 
 /**
  * A feature of the instant inventory plugin. Features have a {@link #getState()} and modifies how
