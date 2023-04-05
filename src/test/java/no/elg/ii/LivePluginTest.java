@@ -32,8 +32,8 @@ import net.runelite.client.externalplugins.ExternalPluginManager;
 
 public class LivePluginTest {
 
+  @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    //noinspection unchecked
     ExternalPluginManager.loadBuiltin(InstantInventoryPlugin.class);
     RuneLite.main(args);
   }
