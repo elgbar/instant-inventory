@@ -11,11 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Move feature toggling config items into their own config section
-
 ### Fixed
 
 ### Removed
+
+---
+
+## 1.1.0 - 2023-04-11
+
+### Added
+
+* Instant deposit items into the bank
+
+### Changed
+
+* Move feature toggling config items into their own config section
+* Update copyright to 2023 and apply to all relevant files
 
 ---
 
