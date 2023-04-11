@@ -1,48 +1,50 @@
 plugins {
-    id 'java'
-    id 'jacoco'
+  id 'java'
+  id 'jacoco'
+  id "com.github.ben-manes.versions" version "0.46.0"
 }
 
 repositories {
-    mavenLocal()
-    maven {
-        url = 'https://repo.runelite.net'
-    }
-    mavenCentral()
+  mavenLocal()
+  maven {
+    url = 'https://repo.runelite.net'
+  }
+  mavenCentral()
 }
 
-def runeLiteVersion = 'latest.release'
+var runeLiteVersion = 'latest.release'
+var lombokVersion = '1.18.26'
 
 dependencies {
-    compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
+  compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
 
-    compileOnly 'org.projectlombok:lombok:1.18.20'
-    annotationProcessor 'org.projectlombok:lombok:1.18.20'
+  compileOnly "org.projectlombok:lombok:$lombokVersion"
+  annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
-    testImplementation 'junit:junit:4.13.1'
-    testImplementation 'org.mockito:mockito-core:3.1.0'
-    testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
-    testImplementation group: 'net.runelite', name: 'jshell', version: runeLiteVersion
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation 'org.mockito:mockito-core:5.2.0'
+  testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
+  testImplementation group: 'net.runelite', name: 'jshell', version: runeLiteVersion
 }
 
 group = 'no.elg'
-version = '1.0.1'
+version = '1.1.0-SNAPSHOT'
 sourceCompatibility = '1.8'
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+tasks.withType(JavaCompile).configureEach {
+  options.encoding = 'UTF-8'
 }
 
 test {
-    finalizedBy jacocoTestReport
+  finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = false
-        csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
-    }
+  dependsOn test
+  reports {
+    xml.required = false
+    csv.required = false
+    html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+  }
 }
 

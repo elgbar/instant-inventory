@@ -25,16 +25,21 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.util;
 
-import net.runelite.client.RuneLite;
-import net.runelite.client.externalplugins.ExternalPluginManager;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import net.runelite.api.widgets.Widget;
 
-public class LivePluginTest {
+@Data
+@AllArgsConstructor
+public class IndexedWidget implements Comparable<IndexedWidget> {
 
-  @SuppressWarnings("unchecked")
-  public static void main(String[] args) throws Exception {
-    ExternalPluginManager.loadBuiltin(InstantInventoryPlugin.class);
-    RuneLite.main(args);
+  int index;
+  Widget widget;
+
+  @Override
+  public int compareTo(IndexedWidget o) {
+    return Integer.compare(index, o.index);
   }
 }

@@ -25,16 +25,24 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.feature.hide;
 
-import net.runelite.client.RuneLite;
-import net.runelite.client.externalplugins.ExternalPluginManager;
+import static org.junit.Assert.assertFalse;
 
-public class LivePluginTest {
+import no.elg.ii.test.FeatureTestMother;
+import no.elg.ii.test.TestSetup;
+import org.junit.Test;
 
-  @SuppressWarnings("unchecked")
-  public static void main(String[] args) throws Exception {
-    ExternalPluginManager.loadBuiltin(InstantInventoryPlugin.class);
-    RuneLite.main(args);
+public class DepositFeatureTest extends FeatureTestMother<DepositFeature> {
+
+  @Override
+  public DepositFeature createNewInstance() {
+    return TestSetup.createNewDepositFeature();
+  }
+
+  @Test
+  public void afterEnablingItWillBeShownOnSomeWidget() {
+    HideFeature dropFeature = createNewInstance();
+    assertFalse(dropFeature.getWidgets().isEmpty());
   }
 }

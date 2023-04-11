@@ -1,10 +1,37 @@
-package no.elg.ii.clean;
+/*
+ * Copyright (c) 2023 Elg
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+package no.elg.ii.feature.clean;
 
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.GRIMY_GUAM_LEAF;
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
-import static no.elg.ii.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
-import static no.elg.ii.clean.CleanHerbFeature.CLEAN_OPTION;
+import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_OPTION;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -91,7 +118,7 @@ public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
   }
 
   private void onMenuOptionClicked_test(int stateItemId, int itemId, boolean hasWidget,
-      String menuEntryOption, int level) {
+                                        String menuEntryOption, int level) {
     int index = 1;
     CleanHerbFeature feature = createNewInstance();
 

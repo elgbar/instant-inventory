@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Elg
+ * Copyright (c) 2022-2023 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -7,20 +7,22 @@
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer.
+ *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 package no.elg.ii;
 
@@ -42,8 +44,10 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import no.elg.ii.clean.CleanHerbFeature;
-import no.elg.ii.drop.DropFeature;
+import no.elg.ii.feature.Feature;
+import no.elg.ii.feature.clean.CleanHerbFeature;
+import no.elg.ii.feature.hide.DepositFeature;
+import no.elg.ii.feature.hide.DropFeature;
 
 @Slf4j
 @PluginDescriptor(name = "Instant Inventory")
@@ -76,6 +80,9 @@ public class InstantInventoryPlugin extends Plugin {
   @Inject
   @VisibleForTesting
   protected CleanHerbFeature cleanHerbFeature;
+  @Inject
+  @VisibleForTesting
+  protected DepositFeature depositFeature;
 
   @Override
   protected void startUp() {
@@ -98,6 +105,7 @@ public class InstantInventoryPlugin extends Plugin {
   protected void updateAllFeatureStatus() {
     updateFeatureStatus(dropFeature, config.instantDrop());
     updateFeatureStatus(cleanHerbFeature, config.instantClean());
+    updateFeatureStatus(depositFeature, config.instantDeposit());
   }
 
   /**
@@ -108,7 +116,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param isEnabledInConfig Whether the feature is currently enable in the config
    */
   @VisibleForTesting
-  void updateFeatureStatus(Feature feature, boolean isEnabledInConfig) {
+  void updateFeatureStatus(@Nonnull Feature feature, boolean isEnabledInConfig) {
     boolean wasEnabled = features.contains(feature);
 
     if (!wasEnabled && isEnabledInConfig) {
@@ -124,7 +132,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature The feature to enable
    */
   @VisibleForTesting
-  void enableFeature(Feature feature) {
+  void enableFeature(@Nonnull Feature feature) {
     log.debug("Enabling " + feature.getConfigKey());
     eventBus.register(feature);
     features.add(feature);
@@ -138,7 +146,7 @@ public class InstantInventoryPlugin extends Plugin {
    * @param feature The feature to disable
    */
   @VisibleForTesting
-  void disableFeature(Feature feature) {
+  void disableFeature(@Nonnull Feature feature) {
     log.debug("Disabling " + feature.getConfigKey());
     eventBus.unregister(feature);
     features.remove(feature);
@@ -151,7 +159,7 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameTick(GameTick event) {
-    Widget[] inventoryWidgets = inventoryItems();
+    Widget[] inventoryWidgets = inventoryItems(WidgetInfo.INVENTORY);
     HashSet<Feature> copy = new HashSet<>(features);
     for (int index = 0; index < inventoryWidgets.length; index++) {
       int currentItemId = inventoryWidgets[index].getItemId();
@@ -180,15 +188,20 @@ public class InstantInventoryPlugin extends Plugin {
     }
   }
 
+  public boolean isHidden(WidgetInfo widgetInfo) {
+    Widget widget = client.getWidget(widgetInfo);
+    return widget == null || widget.isHidden();
+  }
+
   /**
    * @return An array of items in the players inventory, or an empty inventory if there is no
    * inventory widget
    */
   @Nonnull
-  public Widget[] inventoryItems() {
-    Widget inventory = client.getWidget(WidgetInfo.INVENTORY);
-    if (inventory != null) {
-      return inventory.getDynamicChildren();
+  public Widget[] inventoryItems(WidgetInfo widgetInfo) {
+    Widget widget = client.getWidget(widgetInfo);
+    if (widget != null) {
+      return widget.getDynamicChildren();
     }
     return EMPTY_WIDGET;
   }

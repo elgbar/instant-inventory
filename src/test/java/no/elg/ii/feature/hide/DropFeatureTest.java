@@ -1,9 +1,38 @@
-package no.elg.ii.drop;
+/*
+ * Copyright (c) 2023 Elg
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+package no.elg.ii.feature.hide;
 
 import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
-import static no.elg.ii.InventoryState.MAX_UNMODIFIED_TICKS;
-import static no.elg.ii.drop.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
+import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -48,10 +77,6 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     dropFeature.reset();
 
     verify(dropFeature).updateHiddenStatus();
-  }
-
-  @Test
-  public void name() {
   }
 
   @Test
@@ -121,18 +146,24 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     feature.getState().validateState(index, itemId);
     assertEquals("State was reset when it should not have been", itemId,
-        feature.getState().getItemId(index));
+      feature.getState().getItemId(index));
 
-    doReturn(MAX_UNMODIFIED_TICKS).when(client).getTickCount();
+    doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
     feature.getState().validateState(index, itemId);
     assertEquals("State was NOT reset when it should have been", INVALID_ITEM_ID,
-        feature.getState().getItemId(index));
+      feature.getState().getItemId(index));
   }
 
   @Test
   public void configKey_is_CLEAN_CONFIG_KEY() {
     DropFeature feature = createNewInstance();
     assertEquals(DROP_CONFIG_KEY, feature.getConfigKey());
+  }
+
+  @Test
+  public void afterEnablingItWillBeShownOnSomeWidget() {
+    HideFeature dropFeature = createNewInstance();
+    assertFalse(dropFeature.getWidgets().isEmpty());
   }
 
   @Test
@@ -144,13 +175,14 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
   }
 
   private void testUpdateHiddenStatus(String name, boolean shouldBeHidden, boolean isSelfHidden) {
+    System.out.println(name);
     int index = 0;
     DropFeature dropFeature = createNewInstance();
 
     InstantInventoryPlugin plugin = dropFeature.plugin;
     Widget widget = mock(Widget.class);
     Widget[] widgets = {widget};
-    doReturn(widgets).when(plugin).inventoryItems();
+    doReturn(widgets).when(plugin).inventoryItems(any());
 
     InventoryState state = dropFeature.getState();
     state.setItemId(index, shouldBeHidden ? 1 : INVALID_ITEM_ID);
@@ -160,7 +192,6 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     dropFeature.updateHiddenStatus();
 
-    System.out.println(name);
     verify(widget, times(shouldBeHidden == isSelfHidden ? 0 : 1)).setHidden(shouldBeHidden);
   }
 
