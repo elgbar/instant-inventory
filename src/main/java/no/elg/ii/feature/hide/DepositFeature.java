@@ -64,12 +64,19 @@ public class DepositFeature extends HideFeature {
           return;
         }
 
-        Set<IndexedWidget> indexedWidgets = inventoryItems();
-        indexedWidgets.stream()
-          .filter(it -> it.getWidget().getItemId() == eventItemId)
-          .sorted()
-          .limit(toTake)
-          .forEach(w -> getState().setItemId(w.getIndex(), eventItemId));
+        if (toTake >= widget.getItemQuantity()) {
+          log.debug("Hiding " + toTake + " items");
+          Set<IndexedWidget> indexedWidgets = inventoryItems();
+          indexedWidgets.stream()
+            .filter(it -> it.getWidget().getItemId() == eventItemId)
+            .sorted()
+            .limit(toTake)
+            .forEach(indexedWidget -> getState().setItemId(indexedWidget.getIndex(), eventItemId));
+        } else {
+          int quantity = widget.getItemQuantity() - toTake;
+          log.debug("Updating item quantity from " + widget.getItemQuantity() + " be " + quantity);
+          widget.setItemQuantity(quantity);
+        }
       }
     }
   }
