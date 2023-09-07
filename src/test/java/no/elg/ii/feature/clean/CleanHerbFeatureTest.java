@@ -29,10 +29,11 @@ package no.elg.ii.feature.clean;
 
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.GRIMY_GUAM_LEAF;
-import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
+import static no.elg.ii.inventory.InventorySlotState.INVALID_ITEM_ID;
 import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
 import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_OPTION;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -43,6 +44,7 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
+import no.elg.ii.inventory.InventorySlotState;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
@@ -117,8 +119,7 @@ public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
     onMenuOptionClicked_test(INVALID_ITEM_ID, GRIMY_GUAM_LEAF, true, CLEAN_OPTION, 1);
   }
 
-  private void onMenuOptionClicked_test(int stateItemId, int itemId, boolean hasWidget,
-                                        String menuEntryOption, int level) {
+  private void onMenuOptionClicked_test(int stateItemId, int itemId, boolean hasWidget, String menuEntryOption, int level) {
     int index = 1;
     CleanHerbFeature feature = createNewInstance();
 
@@ -134,8 +135,8 @@ public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
 
-    assertEquals(INVALID_ITEM_ID, feature.getState().getItemId(index));
+    assertFalse(feature.getState().getSlot(index).hasValidItemId());
     feature.onMenuOptionClicked(event);
-    assertEquals(stateItemId, feature.getState().getItemId(index));
+    assertEquals(stateItemId, feature.getState().getSlot(index).getItemId());
   }
 }

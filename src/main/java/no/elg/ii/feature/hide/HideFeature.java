@@ -42,7 +42,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.InventoryState;
+import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.util.IndexedWidget;
 

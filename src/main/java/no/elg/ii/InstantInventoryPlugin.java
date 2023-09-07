@@ -155,16 +155,16 @@ public class InstantInventoryPlugin extends Plugin {
   }
 
   /* (non-javadoc)
-   * When an item is different longer in the inventory, unmark it as being hidden
+   * When an item is different in the inventory, unmark it as being hidden
    */
   @Subscribe
   public void onGameTick(GameTick event) {
     Widget[] inventoryWidgets = inventoryItems(WidgetInfo.INVENTORY);
-    HashSet<Feature> copy = new HashSet<>(features);
+    Set<Feature> activeFeatures = new HashSet<>(features);
     for (int index = 0; index < inventoryWidgets.length; index++) {
-      int currentItemId = inventoryWidgets[index].getItemId();
-      for (Feature feature : copy) {
-        feature.getState().validateState(index, currentItemId);
+      int actualItemId = inventoryWidgets[index].getItemId();
+      for (Feature feature : activeFeatures) {
+        feature.getState().validateState(index, actualItemId);
       }
     }
   }

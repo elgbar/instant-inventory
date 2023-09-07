@@ -39,12 +39,16 @@ import static org.mockito.Mockito.verify;
 import java.lang.reflect.Method;
 import net.runelite.client.config.ConfigItem;
 import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.InventoryState;
+import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.feature.Feature;
 import org.junit.Test;
 
 public abstract class FeatureTestMother<T extends Feature> {
 
+  /**
+   *
+   * @return A {@link org.mockito.Spy} instance of this feature
+   */
   public abstract T createNewInstance();
 
   @Test
@@ -65,7 +69,7 @@ public abstract class FeatureTestMother<T extends Feature> {
 
   @Test
   public void reset_calls_state_resetAll() {
-    Feature feature = spy(createNewInstance());
+    Feature feature = createNewInstance();
     InventoryState mockState = mock(InventoryState.class);
     doReturn(mockState).when(feature).getState();
     doNothing().when(mockState).resetAll();

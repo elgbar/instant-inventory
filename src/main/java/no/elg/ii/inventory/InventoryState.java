@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii;
+package no.elg.ii.inventory;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
@@ -33,6 +33,8 @@ import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 
 /**
@@ -41,26 +43,26 @@ import no.elg.ii.feature.Feature;
  * <p>
  * A {@link Feature} uses this class to handle how to render the changes on the client. Typically, a
  * feature will modify the rendering of a given item in the inventory of the player when the
- * {@link #getItemId(int)} is different to {@link #INVALID_ITEM_ID}.
+ * {@link #getItemId(int)} is different to {@link InventorySlotState#INVALID_ITEM_ID}.
  */
 @EqualsAndHashCode
 @Slf4j
 public class InventoryState {
 
   /**
-   * Indicate the item has not been modified
-   */
-  public static final int NOT_MODIFIED = -1;
-  /**
    * Maximum number of ticks an item should be displayed as something else
    */
   public static final int DEFAULT_MAX_UNMODIFIED_TICKS = 1;
 
+  /**
+   * Number of items in an inventory
+   */
   public static final int INVENTORY_SIZE = 28;
-  public static final int INVALID_ITEM_ID = -1;
 
-  private final int[] items = new int[INVENTORY_SIZE];
-  private final int[] modified = new int[INVENTORY_SIZE];
+  /**
+   * The tick the item was modified
+   */
+  private final InventorySlotState[] slots = new InventorySlotState[INVENTORY_SIZE];
 
   @VisibleForTesting
   InstantInventoryConfig config;
@@ -82,25 +84,33 @@ public class InventoryState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setItemId(int index, int itemId) {
-    modified[index] = client.getTickCount();
-    items[index] = itemId;
+    log.debug("Setting index {} to {}", index, itemId);
+    slots[index] = new InventorySlotState(client.getTickCount(), itemId);
   }
 
 
   /**
    * @param index The index of the item
    * @return Which tick the item was last modified on
+   * @deprecated Use {@link #getSlot(int)} instead
    */
+  @Deprecated(since = "1.1.1", forRemoval = true)
   public int getModifiedTick(int index) {
-    return modified[index];
+    return slots[index].getChangedTick();
   }
 
   /**
    * @param index The index of the item
    * @return The last seen real item id at the given index
+   * @deprecated Use {@link #getSlot(int)} instead
    */
+  @Deprecated(since = "1.1.1", forRemoval = true)
   public int getItemId(int index) {
-    return items[index];
+    return slots[index].getItemId();
+  }
+
+  public InventorySlotState getSlot(int index) {
+    return slots[index];
   }
 
   /**
@@ -108,7 +118,7 @@ public class InventoryState {
    * @return Whether the {@code index} and the item at the given index is invalid
    */
   public boolean isInvalid(int index) {
-    return index < 0 || index >= items.length || items[index] == INVALID_ITEM_ID;
+    return index < 0 || index >= slots.length || !getSlot(index).hasValidItemId();
   }
 
   /**
@@ -123,8 +133,7 @@ public class InventoryState {
    * Reset the state to its inital state
    */
   public void resetAll() {
-    Arrays.fill(modified, NOT_MODIFIED);
-    Arrays.fill(items, INVALID_ITEM_ID);
+    Arrays.fill(slots, InventorySlotState.UNMODIFIED_SLOT);
   }
 
   /**
@@ -133,36 +142,39 @@ public class InventoryState {
    * @param index The index of the item
    */
   public void resetState(int index) {
-    modified[index] = NOT_MODIFIED;
-    items[index] = INVALID_ITEM_ID;
+    slots[index] = InventorySlotState.UNMODIFIED_SLOT;
   }
 
   /**
    * Validate and modify the state of an item for a given index.
    * <p>
-   * The state will be reset when the {@code currentItemId} indicates a different item exists in at
-   * the index's inventory slot. Additionally, if too much time have passed without a item change,
+   * The state will be reset when the {@code actualItemId} indicates a different item exists in at
+   * the index's inventory slot. Additionally, if too much time have passed without an item change,
    * the state will also be reset to not operate on stale data
    *
-   * @param index         The index of the item
-   * @param currentItemId The current itemId at the index
+   * @param index        The index of the item
+   * @param actualItemId The actual item which is in the inventory
    */
-  public void validateState(int index, int currentItemId) {
-    int itemId = getItemId(index);
+  public void validateState(int index, int actualItemId) {
+    InventorySlotState state = getSlot(index);
+    if (state.isUnmodifiedState()) {
+      // This item is not modified (or at least not by us) so we do not need to do anything
+      return;
+    }
+
+    int itemId = state.getItemId();
+    int modifiedTick = state.getChangedTick();
     // Item at index changed so we must reset the state
-    if (itemId != INVALID_ITEM_ID && itemId != currentItemId) {
-      log.debug("Item at index {} changed from item id {} to {}, resetting the item", index, itemId,
-        currentItemId);
+    if (state.hasValidItemId() && itemId != actualItemId) {
+      log.debug("Item at index {} changed from item id {} to {}, resetting the item", index, itemId, actualItemId);
       resetState(index);
       return;
     }
 
     // The item at the given index have not changes in some time, we reset to
-    int modifiedTick = getModifiedTick(index);
     int ticksSinceModified = client.getTickCount() - modifiedTick;
-    if (modifiedTick != NOT_MODIFIED && ticksSinceModified >= config.maxUnmodifiedTicks()) {
-      log.debug("Item at index {} has not changed in {} tick, resetting the item", index,
-        ticksSinceModified);
+    if (state.hasChangedTick() && ticksSinceModified >= config.maxUnmodifiedTicks()) {
+      log.debug("Item at index {} has not changed in {} tick, resetting the item", index, ticksSinceModified);
       resetState(index);
     }
   }

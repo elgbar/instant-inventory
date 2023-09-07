@@ -25,19 +25,52 @@
  *
  */
 
-package no.elg.ii.util;
+package no.elg.ii.inventory;
 
+import com.google.common.annotations.VisibleForTesting;
 import lombok.Data;
-import net.runelite.api.widgets.Widget;
 
 @Data
-public class IndexedWidget implements Comparable<IndexedWidget> {
+public class InventorySlotState {
 
-  private final int index;
-  private final Widget widget;
+  private final int changedTick;
+  private final int itemId;
 
-  @Override
-  public int compareTo(IndexedWidget o) {
-    return Integer.compare(index, o.index);
+  /**
+   *
+   * @return Whether this slot is valid, i.e. has an item id
+   */
+  public boolean hasValidItemId(){
+    return itemId != INVALID_ITEM_ID;
   }
+
+  /**
+   *
+   * @return Whether this slot has been modified
+   */
+  public boolean hasChangedTick() {
+    return changedTick != NO_CHANGED_TICK;
+  }
+
+  /**
+   *
+   * @return Whether this slot has no modifications compared to the current inventory
+   */
+  public boolean isUnmodifiedState() {
+    return this == UNMODIFIED_SLOT || (!hasValidItemId() && !hasChangedTick());
+  }
+
+  /**
+   * Indicate that the item is not a real item, but rather a placeholder
+   */
+  @VisibleForTesting
+  public static final int INVALID_ITEM_ID = -1;
+
+  /**
+   * Indicate the item has not been modified
+   */
+  @VisibleForTesting
+  public static final int NO_CHANGED_TICK = -1;
+
+  public static final InventorySlotState UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID);
 }

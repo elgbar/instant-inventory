@@ -27,11 +27,12 @@
 
 package no.elg.ii.feature.hide;
 
-import static no.elg.ii.InventoryState.INVALID_ITEM_ID;
-import static no.elg.ii.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
+import static no.elg.ii.inventory.InventorySlotState.INVALID_ITEM_ID;
+import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -47,7 +48,7 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.InventoryState;
+import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
@@ -92,9 +93,9 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
 
-    assertEquals(INVALID_ITEM_ID, dropFeature.getState().getItemId(index));
+    assertFalse(dropFeature.getState().getSlot(index).hasValidItemId());
     dropFeature.onMenuOptionClicked(event);
-    assertEquals(INVALID_ITEM_ID, dropFeature.getState().getItemId(index));
+    assertFalse(dropFeature.getState().getSlot(index).hasValidItemId());
   }
 
   @Test
@@ -113,9 +114,9 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
 
-    assertEquals(INVALID_ITEM_ID, dropFeature.getState().getItemId(index));
+    assertFalse(dropFeature.getState().getSlot(index).hasValidItemId());
     dropFeature.onMenuOptionClicked(event);
-    assertEquals(INVALID_ITEM_ID, dropFeature.getState().getItemId(index));
+    assertFalse(dropFeature.getState().getSlot(index).hasValidItemId());
   }
 
   @Test
@@ -140,18 +141,17 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
 
-    assertEquals(INVALID_ITEM_ID, feature.getState().getItemId(index));
+    assertFalse(feature.getState().getSlot(index).hasValidItemId());
     feature.onMenuOptionClicked(event);
-    assertEquals(itemId, feature.getState().getItemId(index));
+    assertEquals(itemId, feature.getState().getSlot(index).getItemId());
+    assertTrue(feature.getState().getSlot(index).hasValidItemId());
 
     feature.getState().validateState(index, itemId);
-    assertEquals("State was reset when it should not have been", itemId,
-      feature.getState().getItemId(index));
+    assertTrue("State was reset when it should not have been", feature.getState().getSlot(index).hasValidItemId());
 
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
     feature.getState().validateState(index, itemId);
-    assertEquals("State was NOT reset when it should have been", INVALID_ITEM_ID,
-      feature.getState().getItemId(index));
+    assertFalse("State was NOT reset when it should have been", feature.getState().getSlot(index).hasValidItemId());
   }
 
   @Test

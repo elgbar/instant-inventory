@@ -40,7 +40,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.InventoryState;
+import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.clean.CleanHerbOverlay;

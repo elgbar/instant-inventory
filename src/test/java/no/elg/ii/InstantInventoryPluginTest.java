@@ -54,6 +54,7 @@ import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
+import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.test.TestSetup;
 import org.junit.Before;
 import org.junit.Test;

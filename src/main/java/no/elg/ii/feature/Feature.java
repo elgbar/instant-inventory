@@ -30,7 +30,7 @@ package no.elg.ii.feature;
 import javax.annotation.Nonnull;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
-import no.elg.ii.InventoryState;
+import no.elg.ii.inventory.InventoryState;
 
 /**
  * A feature of the instant inventory plugin. Features have a {@link #getState()} and modifies how
