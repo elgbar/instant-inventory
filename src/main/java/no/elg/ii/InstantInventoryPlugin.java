@@ -32,6 +32,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameStateChanged;
@@ -50,16 +52,12 @@ import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
 
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
 @PluginDescriptor(name = "Instant Inventory")
 public class InstantInventoryPlugin extends Plugin {
 
   public static final Widget[] EMPTY_WIDGET = new Widget[0];
-
-  /**
-   * The currently loaded features
-   */
-  @VisibleForTesting
-  protected final Set<Feature> features = new HashSet<>();
 
   @Inject
   @VisibleForTesting
@@ -75,83 +73,17 @@ public class InstantInventoryPlugin extends Plugin {
 
   @Inject
   @VisibleForTesting
-  protected DropFeature dropFeature;
-
-  @Inject
-  @VisibleForTesting
-  protected CleanHerbFeature cleanHerbFeature;
-  @Inject
-  @VisibleForTesting
-  protected DepositFeature depositFeature;
+  protected FeatureManager featureManager;
 
   @Override
   protected void startUp() {
-    updateAllFeatureStatus();
+    featureManager.updateAllFeatureStatus();
   }
 
   @Override
   protected void shutDown() {
     // Disable all features when the plugin shuts down
-    HashSet<Feature> copy = new HashSet<>(features);
-    for (Feature feature : copy) {
-      disableFeature(feature);
-    }
-  }
-
-  /**
-   * Make sure all features are in its correct state
-   */
-  @VisibleForTesting
-  protected void updateAllFeatureStatus() {
-    updateFeatureStatus(dropFeature, config.instantDrop());
-    updateFeatureStatus(cleanHerbFeature, config.instantClean());
-    updateFeatureStatus(depositFeature, config.instantDeposit());
-  }
-
-  /**
-   * Make sure a feature is in its correct state, that is disabled when disabled in the config and
-   * vice versa
-   *
-   * @param feature           The feature to check
-   * @param isEnabledInConfig Whether the feature is currently enable in the config
-   */
-  @VisibleForTesting
-  void updateFeatureStatus(@Nonnull Feature feature, boolean isEnabledInConfig) {
-    boolean wasEnabled = features.contains(feature);
-
-    if (!wasEnabled && isEnabledInConfig) {
-      enableFeature(feature);
-    } else if (wasEnabled && !isEnabledInConfig) {
-      disableFeature(feature);
-    }
-  }
-
-  /**
-   * Enable a feature, meaning it is listing to events and generally acting as a mini-plugin
-   *
-   * @param feature The feature to enable
-   */
-  @VisibleForTesting
-  void enableFeature(@Nonnull Feature feature) {
-    log.debug("Enabling " + feature.getConfigKey());
-    eventBus.register(feature);
-    features.add(feature);
-    feature.onEnable();
-    feature.reset();
-  }
-
-  /**
-   * Disable a feature, it will no longer receive events
-   *
-   * @param feature The feature to disable
-   */
-  @VisibleForTesting
-  void disableFeature(@Nonnull Feature feature) {
-    log.debug("Disabling " + feature.getConfigKey());
-    eventBus.unregister(feature);
-    features.remove(feature);
-    feature.onDisable();
-    feature.reset();
+    featureManager.disableAllFeatures();
   }
 
   /* (non-javadoc)
@@ -160,7 +92,7 @@ public class InstantInventoryPlugin extends Plugin {
   @Subscribe
   public void onGameTick(GameTick event) {
     Widget[] inventoryWidgets = inventoryItems(WidgetInfo.INVENTORY);
-    Set<Feature> activeFeatures = new HashSet<>(features);
+    Set<Feature> activeFeatures = featureManager.getActiveFeatures();
     for (int index = 0; index < inventoryWidgets.length; index++) {
       int actualItemId = inventoryWidgets[index].getItemId();
       for (Feature feature : activeFeatures) {
@@ -175,8 +107,8 @@ public class InstantInventoryPlugin extends Plugin {
   @Subscribe
   public void onGameStateChanged(GameStateChanged event) {
     log.debug("Resetting features as the GameState changed to {}", event.getGameState());
-    HashSet<Feature> copy = new HashSet<>(features);
-    for (Feature feature : copy) {
+    Set<Feature> activeFeatures = featureManager.getActiveFeatures();
+    for (Feature feature : activeFeatures) {
       feature.reset();
     }
   }
@@ -184,7 +116,7 @@ public class InstantInventoryPlugin extends Plugin {
   @Subscribe
   public void onConfigChanged(ConfigChanged configChanged) {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
-      updateAllFeatureStatus();
+      featureManager.updateAllFeatureStatus();
     }
   }
 
