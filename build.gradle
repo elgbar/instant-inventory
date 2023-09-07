@@ -22,14 +22,19 @@ dependencies {
   annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
   testImplementation 'junit:junit:4.13.2'
-  testImplementation 'org.mockito:mockito-core:5.2.0'
+  testImplementation 'org.mockito:mockito-core:5.5.0'
   testImplementation group: 'net.runelite', name: 'client', version: runeLiteVersion
   testImplementation group: 'net.runelite', name: 'jshell', version: runeLiteVersion
 }
 
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+  }
+}
+
 group = 'no.elg'
 version = '1.1.1'
-sourceCompatibility = '1.8'
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
