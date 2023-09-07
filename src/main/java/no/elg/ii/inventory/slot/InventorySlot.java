@@ -25,52 +25,53 @@
  *
  */
 
-package no.elg.ii.inventory;
+package no.elg.ii.inventory.slot;
 
-import com.google.common.annotations.VisibleForTesting;
-import lombok.Data;
+public interface InventorySlot {
 
-@Data
-public class InventorySlotState {
+  /**
+   * Indicate that the item is not a real item, but rather a placeholder
+   */
+  static final int INVALID_ITEM_ID = -1;
 
-  private final int changedTick;
-  private final int itemId;
+  /**
+   * Indicate the item has not been modified
+   */
+  static final int NO_CHANGED_TICK = -2;
+
+  static final InventorySlot UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID);
+
+  /**
+   *
+   * @return When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
+   */
+  int getChangedTick();
+
+  /**
+   * @return The item id of this slot, or {@link InventorySlot#INVALID_ITEM_ID} if this slot is not a real item
+   */
+  int getItemId();
 
   /**
    *
    * @return Whether this slot is valid, i.e. has an item id
    */
-  public boolean hasValidItemId(){
-    return itemId != INVALID_ITEM_ID;
+  default boolean hasValidItemId(){
+    return getItemId() != INVALID_ITEM_ID;
   }
 
   /**
    *
    * @return Whether this slot has been modified
    */
-  public boolean hasChangedTick() {
-    return changedTick != NO_CHANGED_TICK;
+  default boolean hasChangedTick() {
+    return getChangedTick() != NO_CHANGED_TICK;
   }
 
   /**
-   *
-   * @return Whether this slot has no modifications compared to the current inventory
+   * @return If the given slot is the unmodified slot
    */
-  public boolean isUnmodifiedState() {
-    return this == UNMODIFIED_SLOT || (!hasValidItemId() && !hasChangedTick());
+  static boolean isUnmodifiedSlot(InventorySlot slot) {
+    return slot == UNMODIFIED_SLOT;
   }
-
-  /**
-   * Indicate that the item is not a real item, but rather a placeholder
-   */
-  @VisibleForTesting
-  public static final int INVALID_ITEM_ID = -1;
-
-  /**
-   * Indicate the item has not been modified
-   */
-  @VisibleForTesting
-  public static final int NO_CHANGED_TICK = -1;
-
-  public static final InventorySlotState UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID);
 }

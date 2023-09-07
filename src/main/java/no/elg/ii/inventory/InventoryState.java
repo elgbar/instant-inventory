@@ -36,6 +36,8 @@ import net.runelite.api.events.GameTick;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.inventory.slot.InventorySlotState;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -43,7 +45,7 @@ import no.elg.ii.feature.Feature;
  * <p>
  * A {@link Feature} uses this class to handle how to render the changes on the client. Typically, a
  * feature will modify the rendering of a given item in the inventory of the player when the
- * {@link #getItemId(int)} is different to {@link InventorySlotState#INVALID_ITEM_ID}.
+ * {@link #getItemId(int)} is different to {@link InventorySlot#INVALID_ITEM_ID}.
  */
 @EqualsAndHashCode
 @Slf4j
@@ -62,7 +64,7 @@ public class InventoryState {
   /**
    * The tick the item was modified
    */
-  private final InventorySlotState[] slots = new InventorySlotState[INVENTORY_SIZE];
+  private final InventorySlot[] slots = new InventorySlot[INVENTORY_SIZE];
 
   @VisibleForTesting
   InstantInventoryConfig config;
@@ -109,7 +111,7 @@ public class InventoryState {
     return slots[index].getItemId();
   }
 
-  public InventorySlotState getSlot(int index) {
+  public InventorySlot getSlot(int index) {
     return slots[index];
   }
 
@@ -133,7 +135,7 @@ public class InventoryState {
    * Reset the state to its inital state
    */
   public void resetAll() {
-    Arrays.fill(slots, InventorySlotState.UNMODIFIED_SLOT);
+    Arrays.fill(slots, InventorySlot.UNMODIFIED_SLOT);
   }
 
   /**
@@ -142,7 +144,7 @@ public class InventoryState {
    * @param index The index of the item
    */
   public void resetState(int index) {
-    slots[index] = InventorySlotState.UNMODIFIED_SLOT;
+    slots[index] = InventorySlot.UNMODIFIED_SLOT;
   }
 
   /**

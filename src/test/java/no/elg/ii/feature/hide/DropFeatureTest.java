@@ -27,7 +27,7 @@
 
 package no.elg.ii.feature.hide;
 
-import static no.elg.ii.inventory.InventorySlotState.INVALID_ITEM_ID;
+import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static org.junit.Assert.assertEquals;

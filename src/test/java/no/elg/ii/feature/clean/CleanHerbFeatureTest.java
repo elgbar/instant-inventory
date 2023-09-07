@@ -29,7 +29,7 @@ package no.elg.ii.feature.clean;
 
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.GRIMY_GUAM_LEAF;
-import static no.elg.ii.inventory.InventorySlotState.INVALID_ITEM_ID;
+import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
 import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_OPTION;
 import static org.junit.Assert.assertEquals;
@@ -44,7 +44,6 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.ui.overlay.OverlayManager;
-import no.elg.ii.inventory.InventorySlotState;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;

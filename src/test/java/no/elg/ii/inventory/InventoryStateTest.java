@@ -27,10 +27,10 @@
 
 package no.elg.ii.inventory;
 
-import static no.elg.ii.inventory.InventorySlotState.INVALID_ITEM_ID;
+import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.inventory.InventoryState.INVENTORY_SIZE;
 import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
-import static no.elg.ii.inventory.InventorySlotState.NO_CHANGED_TICK;
+import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
@@ -41,6 +41,8 @@ import static org.mockito.Mockito.spy;
 
 import net.runelite.api.Client;
 import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.inventory.slot.InventorySlotState;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,7 +69,7 @@ public class InventoryStateTest {
   @Test
   public void initially_invalid() {
     int index = 0;
-    assertSame(inventoryState.getSlot(index), InventorySlotState.UNMODIFIED_SLOT);
+    assertSame(inventoryState.getSlot(index), InventorySlot.UNMODIFIED_SLOT);
     assertTrue(inventoryState.isInvalid(index));
     assertFalse(inventoryState.isValid(index));
   }
