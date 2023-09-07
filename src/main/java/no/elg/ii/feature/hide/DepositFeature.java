@@ -71,7 +71,7 @@ public class DepositFeature extends HideFeature {
             .filter(it -> it.getWidget().getItemId() == eventItemId)
             .sorted()
             .limit(toTake)
-            .forEach(indexedWidget -> getState().setItemId(indexedWidget.getIndex(), eventItemId));
+            .forEach(indexedWidget -> hide(indexedWidget.getWidget()));
         } else {
           int quantity = widget.getItemQuantity() - toTake;
           log.debug("Updating item quantity from " + widget.getItemQuantity() + " be " + quantity);

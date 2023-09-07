@@ -58,6 +58,10 @@ public abstract class HideFeature implements Feature {
   @Inject
   private InventoryState state;
 
+  protected void hide(Widget widget) {
+    getState().setItemId(widget.getIndex(), widget.getItemId());
+  }
+
   /* (non-javadoc)
    * Make sure the item in the slot is hidden, the client sets it as non-hidden each tick (?)
    *  or so. This must be done before the client is rendered otherwise (such as if we were to use

@@ -52,7 +52,7 @@ public class DropFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
         log.debug("Dropped item at index {}", widget.getIndex());
-        getState().setItemId(widget.getIndex(), event.getItemId());
+        hide(widget);
       }
     }
   }
