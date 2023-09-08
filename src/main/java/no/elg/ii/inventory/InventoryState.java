@@ -48,7 +48,7 @@ import no.elg.ii.util.InventoryUtil;
  * <p>
  * A {@link Feature} uses this class to handle how to render the changes on the client. Typically, a
  * feature will modify the rendering of a given item in the inventory of the player when the
- * {@link #getItemId(int)} is different to {@link InventorySlot#INVALID_ITEM_ID}.
+ * {@link #getSlot(int)} is different to {@link InventorySlot#INVALID_ITEM_ID}.
  */
 @EqualsAndHashCode
 @Slf4j
@@ -94,46 +94,8 @@ public class InventoryState {
     slots[index] = slot;
   }
 
-  /**
-   * @param index The index of the item
-   * @return Which tick the item was last modified on
-   * @deprecated Use {@link #getSlot(int)} instead
-   */
-  @Deprecated(since = "1.1.2", forRemoval = true)
-  public int getModifiedTick(int index) {
-    return slots[index].getChangedTick();
-  }
-
-  /**
-   * @param index The index of the item
-   * @return The last seen real item id at the given index
-   * @deprecated Use {@link #getSlot(int)} instead
-   */
-  @Deprecated(since = "1.1.2", forRemoval = true)
-  public int getItemId(int index) {
-    return slots[index].getItemId();
-  }
-
   public InventorySlot getSlot(int index) {
     return slots[index];
-  }
-
-  /**
-   * @param index The index of the item to test
-   * @return Whether the {@code index} and the item at the given index is invalid
-   */
-  @Deprecated(since = "1.1.2", forRemoval = true)
-  public boolean isInvalid(int index) {
-    return index < 0 || index >= slots.length || !getSlot(index).hasValidItemId();
-  }
-
-  /**
-   * @param index The index of the item to test
-   * @return Whether the {@code index} and the item at the given index is a valid itemID
-   */
-  @Deprecated(since = "1.1.2", forRemoval = true)
-  public boolean isValid(int index) {
-    return !isInvalid(index);
   }
 
   /**
