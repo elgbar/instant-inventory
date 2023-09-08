@@ -127,6 +127,7 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     Widget widget = mock(Widget.class);
     doReturn(index).when(widget).getIndex();
+    doReturn(itemId).when(widget).getItemId();
 
     MenuEntry menuEntry = mock(MenuEntry.class);
     doReturn(DropFeature.DROP_OPTION).when(menuEntry).getOption();
@@ -143,8 +144,8 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
 
     assertFalse(feature.getState().getSlot(index).hasValidItemId());
     feature.onMenuOptionClicked(event);
-    assertEquals(itemId, feature.getState().getSlot(index).getItemId());
     assertTrue(feature.getState().getSlot(index).hasValidItemId());
+    assertEquals(itemId, feature.getState().getSlot(index).getItemId());
 
     feature.getState().validateState(index, itemId);
     assertTrue("State was reset when it should not have been", feature.getState().getSlot(index).hasValidItemId());
@@ -165,34 +166,4 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     HideFeature dropFeature = createNewInstance();
     assertFalse(dropFeature.getWidgets().isEmpty());
   }
-
-  @Test
-  public void testUpdateHiddenStatus() {
-    testUpdateHiddenStatus("true,true", true, true);
-    testUpdateHiddenStatus("true,false", true, false);
-    testUpdateHiddenStatus("false,true", false, true);
-    testUpdateHiddenStatus("false,false", false, false);
-  }
-
-  private void testUpdateHiddenStatus(String name, boolean shouldBeHidden, boolean isSelfHidden) {
-    System.out.println(name);
-    int index = 0;
-    DropFeature dropFeature = createNewInstance();
-
-    InstantInventoryPlugin plugin = dropFeature.plugin;
-    Widget widget = mock(Widget.class);
-    Widget[] widgets = {widget};
-    doReturn(widgets).when(plugin).inventoryItems(any());
-
-    InventoryState state = dropFeature.getState();
-    state.setItemId(index, shouldBeHidden ? 1 : INVALID_ITEM_ID);
-
-    assertEquals(name, shouldBeHidden, state.isValid(index));
-    doReturn(isSelfHidden).when(widget).isSelfHidden();
-
-    dropFeature.updateHiddenStatus();
-
-    verify(widget, times(shouldBeHidden == isSelfHidden ? 0 : 1)).setHidden(shouldBeHidden);
-  }
-
 }

@@ -28,6 +28,8 @@
 package no.elg.ii.inventory;
 
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
+import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
+import static no.elg.ii.inventory.slot.InventorySlot.RESET_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
@@ -71,24 +73,6 @@ public class InventoryStateTest {
   public void initially_invalid() {
     int index = 0;
     assertSame(inventoryState.getSlot(index), InventorySlot.UNMODIFIED_SLOT);
-    assertTrue(inventoryState.isInvalid(index));
-    assertFalse(inventoryState.isValid(index));
-  }
-
-  @Test
-  public void index_out_bound_never_valid() {
-    setAll(1);
-    assertTrue(inventoryState.isInvalid(-1));
-    assertFalse(inventoryState.isValid(-1));
-    assertTrue(inventoryState.isInvalid(INVENTORY_SIZE));
-    assertFalse(inventoryState.isValid(INVENTORY_SIZE));
-  }
-
-  @Test
-  public void state_is_valid_when_not_invalid_item_id() {
-    inventoryState.setItemId(0, 1);
-    assertFalse(inventoryState.isInvalid(0));
-    assertTrue(inventoryState.isValid(0));
   }
 
   @Test
@@ -101,7 +85,6 @@ public class InventoryStateTest {
 
       assertTrue(slot.hasValidItemId());
       assertTrue(slot.hasChangedTick());
-      assertSame(slot, UNMODIFIED_SLOT);
     }
 
     inventoryState.resetAll();
@@ -111,7 +94,7 @@ public class InventoryStateTest {
 
       assertFalse(slot.hasValidItemId());
       assertFalse(slot.hasChangedTick());
-      assertNotSame(slot, UNMODIFIED_SLOT);
+      assertSame(slot, RESET_SLOT);
     }
   }
 
@@ -126,7 +109,7 @@ public class InventoryStateTest {
 
     inventoryState.validateState(index, 2);
 
-    assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
+    assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
   }
 
@@ -142,7 +125,7 @@ public class InventoryStateTest {
 
     inventoryState.validateState(index, 1);
 
-    assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
+    assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
   }
 
@@ -179,7 +162,7 @@ public class InventoryStateTest {
 
     inventoryState.validateState(index, itemId);
 
-    assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
+    assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
   }
 

@@ -46,6 +46,7 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
 
@@ -85,8 +86,10 @@ public class CleanHerbOverlayTest {
     ItemManager itemManager = overlay.itemManager = mock(ItemManager.class);
     CleanHerbFeature clean = overlay.clean = TestSetup.createNewCleanHerbFeature();
     InventoryState state = mock(InventoryState.class);
+    InventorySlot slot = mock(InventorySlot.class);
     doReturn(state).when(clean).getState();
-    doReturn(invalidState).when(state).isInvalid(index);
+    doReturn(slot).when(state).getSlot(index);
+    doReturn(!invalidState).when(slot).hasValidItemId();
 
     Graphics2D graphics = mock(Graphics2D.class);
     WidgetItem widgetItem = mock(WidgetItem.class);
