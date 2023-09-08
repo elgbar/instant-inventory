@@ -32,17 +32,18 @@ public interface InventorySlot {
   /**
    * Indicate that the item is not a real item, but rather a placeholder
    */
-  static final int INVALID_ITEM_ID = -1;
+  int INVALID_ITEM_ID = -1;
+  int RESET_ITEM_ID = -2;
 
   /**
    * Indicate the item has not been modified
    */
-  static final int NO_CHANGED_TICK = -2;
+  int NO_CHANGED_TICK = -1;
 
-  static final InventorySlot UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID);
+  InventorySlot UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID);
+  InventorySlot RESET_SLOT = new InventorySlotState(NO_CHANGED_TICK, RESET_ITEM_ID);
 
   /**
-   *
    * @return When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
    */
   int getChangedTick();
@@ -53,25 +54,17 @@ public interface InventorySlot {
   int getItemId();
 
   /**
-   *
    * @return Whether this slot is valid, i.e. has an item id
    */
-  default boolean hasValidItemId(){
-    return getItemId() != INVALID_ITEM_ID;
+  default boolean hasValidItemId() {
+    return getItemId() != INVALID_ITEM_ID && getItemId() != RESET_ITEM_ID;
   }
 
   /**
-   *
    * @return Whether this slot has been modified
    */
   default boolean hasChangedTick() {
-    return getChangedTick() != NO_CHANGED_TICK;
+    return getChangedTick() >= 0;
   }
 
-  /**
-   * @return If the given slot is the unmodified slot
-   */
-  static boolean isUnmodifiedSlot(InventorySlot slot) {
-    return slot == UNMODIFIED_SLOT;
-  }
 }

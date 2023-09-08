@@ -28,7 +28,6 @@ package no.elg.ii;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
-import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -47,9 +46,6 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.hide.DepositFeature;
-import no.elg.ii.feature.hide.DropFeature;
 
 @Slf4j
 @AllArgsConstructor
@@ -118,11 +114,6 @@ public class InstantInventoryPlugin extends Plugin {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
       featureManager.updateAllFeatureStatus();
     }
-  }
-
-  public boolean isHidden(WidgetInfo widgetInfo) {
-    Widget widget = client.getWidget(widgetInfo);
-    return widget == null || widget.isHidden();
   }
 
   /**

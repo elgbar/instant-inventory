@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Elg
+ * Copyright (c) 2023 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,42 +24,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.hide;
 
-import javax.annotation.Nonnull;
-import javax.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.events.MenuOptionClicked;
+package no.elg.ii.util;
+
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.Subscribe;
 
-@Singleton
-@Slf4j
-public class DropFeature extends HideFeature {
-
-  public static final String DROP_OPTION = "Drop";
-  public static final String DROP_CONFIG_KEY = "instantDrop";
-
-  {
-    showOnWidgets(WidgetInfo.INVENTORY);
+public final class WidgetUtil {
+  private WidgetUtil() {
   }
 
-  @Subscribe
-  public void onMenuOptionClicked(final MenuOptionClicked event) {
-    Widget widget = event.getWidget();
-    if (widget != null) {
-      String menuOption = event.getMenuOption();
-      if (DROP_OPTION.equals(menuOption)) {
-        log.debug("Dropped item at index {} ({}: {})", widget.getIndex(), widget.getName());
-        hide(widget);
-      }
-    }
-  }
-
-  @Nonnull
-  @Override
-  public String getConfigKey() {
-    return DROP_CONFIG_KEY;
+  public static String getWidgetInfo(Widget widget) {
+    return widget.getName() + " (id: " + widget.getItemId() + ", index: " + widget.getIndex() + ")";
   }
 }

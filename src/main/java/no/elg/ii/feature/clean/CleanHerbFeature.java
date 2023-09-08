@@ -36,8 +36,8 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayManager;
-import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
 
 @Singleton
 public class CleanHerbFeature implements Feature {

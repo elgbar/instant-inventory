@@ -86,17 +86,21 @@ public class InventoryState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setItemId(int index, int itemId) {
-    log.debug("Setting index {} to {}", index, itemId);
+//    log.debug("Setting index {} to {}", index, itemId);
     slots[index] = new InventorySlotState(client.getTickCount(), itemId);
   }
 
+  public void setSlot(int index, InventorySlot slot) {
+//    log.debug("Setting index {} to {}", index, slot);
+    slots[index] = slot;
+  }
 
   /**
    * @param index The index of the item
    * @return Which tick the item was last modified on
    * @deprecated Use {@link #getSlot(int)} instead
    */
-  @Deprecated(since = "1.1.1", forRemoval = true)
+  @Deprecated(since = "1.1.2", forRemoval = true)
   public int getModifiedTick(int index) {
     return slots[index].getChangedTick();
   }
@@ -106,7 +110,7 @@ public class InventoryState {
    * @return The last seen real item id at the given index
    * @deprecated Use {@link #getSlot(int)} instead
    */
-  @Deprecated(since = "1.1.1", forRemoval = true)
+  @Deprecated(since = "1.1.2", forRemoval = true)
   public int getItemId(int index) {
     return slots[index].getItemId();
   }
@@ -119,6 +123,7 @@ public class InventoryState {
    * @param index The index of the item to test
    * @return Whether the {@code index} and the item at the given index is invalid
    */
+  @Deprecated(since = "1.1.2", forRemoval = true)
   public boolean isInvalid(int index) {
     return index < 0 || index >= slots.length || !getSlot(index).hasValidItemId();
   }
@@ -127,15 +132,16 @@ public class InventoryState {
    * @param index The index of the item to test
    * @return Whether the {@code index} and the item at the given index is a valid itemID
    */
+  @Deprecated(since = "1.1.2", forRemoval = true)
   public boolean isValid(int index) {
     return !isInvalid(index);
   }
 
   /**
-   * Reset the state to its inital state
+   * Reset the state to its initial state
    */
   public void resetAll() {
-    Arrays.fill(slots, InventorySlot.UNMODIFIED_SLOT);
+    Arrays.fill(slots, InventorySlot.RESET_SLOT);
   }
 
   /**
@@ -144,7 +150,7 @@ public class InventoryState {
    * @param index The index of the item
    */
   public void resetState(int index) {
-    slots[index] = InventorySlot.UNMODIFIED_SLOT;
+    slots[index] = InventorySlot.RESET_SLOT;
   }
 
   /**
@@ -158,16 +164,16 @@ public class InventoryState {
    * @param actualItemId The actual item which is in the inventory
    */
   public void validateState(int index, int actualItemId) {
-    InventorySlotState state = getSlot(index);
-    if (state.isUnmodifiedState()) {
+    InventorySlot slot = getSlot(index);
+    if (slot == InventorySlot.UNMODIFIED_SLOT || slot == InventorySlot.RESET_SLOT) {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }
 
-    int itemId = state.getItemId();
-    int modifiedTick = state.getChangedTick();
-    // Item at index changed so we must reset the state
-    if (state.hasValidItemId() && itemId != actualItemId) {
+    int itemId = slot.getItemId();
+    int modifiedTick = slot.getChangedTick();
+    // Item at index changed so we must reset the slot
+    if (slot.hasValidItemId() && itemId != actualItemId) {
       log.debug("Item at index {} changed from item id {} to {}, resetting the item", index, itemId, actualItemId);
       resetState(index);
       return;
@@ -175,7 +181,7 @@ public class InventoryState {
 
     // The item at the given index have not changes in some time, we reset to
     int ticksSinceModified = client.getTickCount() - modifiedTick;
-    if (state.hasChangedTick() && ticksSinceModified >= config.maxUnmodifiedTicks()) {
+    if (slot.hasChangedTick() && ticksSinceModified >= config.maxUnmodifiedTicks()) {
       log.debug("Item at index {} has not changed in {} tick, resetting the item", index, ticksSinceModified);
       resetState(index);
     }

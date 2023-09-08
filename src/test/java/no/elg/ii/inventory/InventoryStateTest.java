@@ -31,8 +31,10 @@ import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.inventory.InventoryState.INVENTORY_SIZE;
 import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
+import static no.elg.ii.inventory.slot.InventorySlot.UNMODIFIED_SLOT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
@@ -42,7 +44,7 @@ import static org.mockito.Mockito.spy;
 import net.runelite.api.Client;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.inventory.slot.InventorySlot;
-import no.elg.ii.inventory.slot.InventorySlotState;
+import no.elg.ii.inventory.slot.InventorySlot;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -96,21 +98,21 @@ public class InventoryStateTest {
     setAll(1234);
 
     for (int i = 0; i < INVENTORY_SIZE; i++) {
-      InventorySlotState slot = inventoryState.getSlot(i);
+      InventorySlot slot = inventoryState.getSlot(i);
 
       assertTrue(slot.hasValidItemId());
       assertTrue(slot.hasChangedTick());
-      assertFalse(slot.isUnmodifiedState());
+      assertSame(slot, UNMODIFIED_SLOT);
     }
 
     inventoryState.resetAll();
 
     for (int i = 0; i < INVENTORY_SIZE; i++) {
-      InventorySlotState slot = inventoryState.getSlot(i);
+      InventorySlot slot = inventoryState.getSlot(i);
 
       assertFalse(slot.hasValidItemId());
       assertFalse(slot.hasChangedTick());
-      assertTrue(slot.isUnmodifiedState());
+      assertNotSame(slot, UNMODIFIED_SLOT);
     }
   }
 

@@ -42,9 +42,11 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.util.WidgetUtil;
 
 @Slf4j
 public abstract class HideFeature implements Feature {
@@ -59,7 +61,13 @@ public abstract class HideFeature implements Feature {
   private InventoryState state;
 
   protected void hide(Widget widget) {
+    widget.setHidden(true);
     getState().setItemId(widget.getIndex(), widget.getItemId());
+  }
+
+  private void show(Widget widget) {
+    widget.setHidden(false);
+    getState().setSlot(widget.getIndex(), InventorySlot.UNMODIFIED_SLOT);
   }
 
   /* (non-javadoc)
@@ -83,15 +91,13 @@ public abstract class HideFeature implements Feature {
     for (IndexedWidget indexedWidget : inventoryItems()) {
       Widget widget = indexedWidget.getWidget();
       int index = indexedWidget.getIndex();
-      //Only hide the item when the state has been set to a valid item id
-      boolean shouldBeHidden = getState().isValid(index);
-
-      if (shouldBeHidden && !widget.isSelfHidden()) {
-        log.debug("Hiding item at index {}", index);
+      InventorySlot slot = getState().getSlot(index);
+      if (slot == InventorySlot.RESET_SLOT) {
+        log.debug("Slot is reset item, will reset | {}", WidgetUtil.getWidgetInfo(widget));
+        show(widget);
+      } else if (slot != InventorySlot.UNMODIFIED_SLOT && !widget.isHidden()) {
+        log.warn("Slot was not hidden, hiding it now | {}", WidgetUtil.getWidgetInfo(widget));
         widget.setHidden(true);
-      } else if (!shouldBeHidden && widget.isSelfHidden()) {
-        log.debug("Showing item at index {}", index);
-        widget.setHidden(false);
       }
     }
   }

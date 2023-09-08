@@ -28,7 +28,6 @@
 package no.elg.ii.inventory.slot;
 
 import lombok.Data;
-import no.elg.ii.inventory.slot.InventorySlot;
 
 @Data
 public class InventorySlotState implements InventorySlot {
@@ -37,15 +36,13 @@ public class InventorySlotState implements InventorySlot {
   private final int itemId;
 
   /**
-   *
    * @return Whether this slot is valid, i.e. has an item id
    */
-  public boolean hasValidItemId(){
+  public boolean hasValidItemId() {
     return itemId != InventorySlot.INVALID_ITEM_ID;
   }
 
   /**
-   *
    * @return Whether this slot has been modified
    */
   public boolean hasChangedTick() {
@@ -53,7 +50,6 @@ public class InventorySlotState implements InventorySlot {
   }
 
   /**
-   *
    * @return Whether this slot has no modifications compared to the current inventory
    */
   public boolean isUnmodifiedState() {
