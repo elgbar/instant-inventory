@@ -75,7 +75,11 @@ public interface InstantInventoryConfig extends Config {
     keyName = DEPOSIT_CONFIG_KEY,
     section = FEATURE_SECTION,
     name = "Deposit Items Instantly",
-    description = "Deposit items into your bank instantly",
+    description = "Deposit items into your bank (almost) instantly."
+      + "<p>"
+      + "<p>Note that how many items that can be deposited at a time is limited by how osrs works. It appears"
+      + "<p>that only four items can be deposited in a single game tick, so if you deposit more than four items at "
+      + "<p>once, you have to wait for the next game tick before the rest of the items are deposited.",
     position = 2
   )
   default boolean instantDeposit() {
