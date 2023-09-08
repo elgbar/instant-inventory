@@ -28,7 +28,7 @@
 package no.elg.ii.inventory;
 
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
-import static no.elg.ii.inventory.InventoryState.INVENTORY_SIZE;
+import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static no.elg.ii.inventory.slot.InventorySlot.UNMODIFIED_SLOT;
@@ -43,7 +43,6 @@ import static org.mockito.Mockito.spy;
 
 import net.runelite.api.Client;
 import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import org.junit.Before;
 import org.junit.Test;

@@ -29,7 +29,9 @@ package no.elg.ii.inventory;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import javax.inject.Inject;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
@@ -38,6 +40,7 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.InventorySlotState;
+import no.elg.ii.util.InventoryUtil;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -49,6 +52,8 @@ import no.elg.ii.inventory.slot.InventorySlotState;
  */
 @EqualsAndHashCode
 @Slf4j
+@AllArgsConstructor
+@NoArgsConstructor
 public class InventoryState {
 
   /**
@@ -57,26 +62,20 @@ public class InventoryState {
   public static final int DEFAULT_MAX_UNMODIFIED_TICKS = 1;
 
   /**
-   * Number of items in an inventory
-   */
-  public static final int INVENTORY_SIZE = 28;
-
-  /**
    * The tick the item was modified
    */
-  private final InventorySlot[] slots = new InventorySlot[INVENTORY_SIZE];
+  private final InventorySlot[] slots = new InventorySlot[InventoryUtil.INVENTORY_SIZE];
 
+  @Inject
   @VisibleForTesting
   InstantInventoryConfig config;
 
+  @Inject
   @VisibleForTesting
   Client client;
 
-  @Inject
-  public InventoryState(InstantInventoryConfig config, Client client) {
-    this.config = config;
-    this.client = client;
-    resetAll();
+  {
+    Arrays.fill(slots, InventorySlot.UNMODIFIED_SLOT);
   }
 
   /**
@@ -86,12 +85,12 @@ public class InventoryState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setItemId(int index, int itemId) {
-//    log.debug("Setting index {} to {}", index, itemId);
+    log.debug("Setting index {} to {}", index, itemId);
     slots[index] = new InventorySlotState(client.getTickCount(), itemId);
   }
 
   public void setSlot(int index, InventorySlot slot) {
-//    log.debug("Setting index {} to {}", index, slot);
+    log.debug("Setting index {} to {}", index, slot);
     slots[index] = slot;
   }
 

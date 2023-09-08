@@ -25,46 +25,22 @@
  *
  */
 
-package no.elg.ii.inventory.slot;
+package no.elg.ii.util;
 
-public interface InventorySlot {
-
+public final class InventoryUtil {
   /**
-   * Indicate that the item is not a real item, but rather a placeholder
+   * Number of items in an inventory
    */
-  int INVALID_ITEM_ID = -1;
-  int RESET_ITEM_ID = -2;
+  public static final int INVENTORY_SIZE = 28;
 
-  /**
-   * Indicate the item has not been modified
-   */
-  int NO_CHANGED_TICK = -1;
 
-  InventorySlot UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID);
-  InventorySlot RESET_SLOT = new InventorySlotState(NO_CHANGED_TICK, RESET_ITEM_ID);
-
-  /**
-   * @return When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
-   */
-  int getChangedTick();
-
-  /**
-   * @return The item id of this slot, or {@link InventorySlot#INVALID_ITEM_ID} if this slot is not a real item
-   */
-  int getItemId();
-
-  /**
-   * @return Whether this slot is valid, i.e. has an item id
-   */
-  default boolean hasValidItemId() {
-    return getItemId() >= 0;
+  public static boolean isValidInventoryIndex(int index){
+    return index >= 0 && index < INVENTORY_SIZE;
   }
 
-  /**
-   * @return Whether this slot has been modified
-   */
-  default boolean hasChangedTick() {
-    return getChangedTick() >= 0;
+  public static boolean isInvalidInventoryIndex(int index){
+    return index < 0 || index >= INVENTORY_SIZE;
   }
 
+  private InventoryUtil() {}
 }

@@ -96,7 +96,7 @@ public abstract class HideFeature implements Feature {
         log.debug("Slot is reset item, will reset | {}", WidgetUtil.getWidgetInfo(widget));
         show(widget);
       } else if (slot != InventorySlot.UNMODIFIED_SLOT && !widget.isHidden()) {
-        log.warn("Slot was not hidden, hiding it now | {}", WidgetUtil.getWidgetInfo(widget));
+        log.debug("Slot was not hidden, hiding it now | {}", WidgetUtil.getWidgetInfo(widget));
         widget.setHidden(true);
       }
     }

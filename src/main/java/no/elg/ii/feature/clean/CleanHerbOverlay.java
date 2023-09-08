@@ -35,6 +35,11 @@ import javax.inject.Singleton;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
+
+import static no.elg.ii.util.InventoryUtil.isInvalidInventoryIndex;
+import static no.elg.ii.util.InventoryUtil.isValidInventoryIndex;
 
 @Singleton
 public class CleanHerbOverlay extends WidgetItemOverlay {
@@ -61,7 +66,11 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
   @Override
   public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
     int index = widgetItem.getWidget().getIndex();
-    if (clean.getState().isInvalid(index)) {
+    if(isInvalidInventoryIndex(index)){
+      return;
+    }
+    InventorySlot slot = clean.getState().getSlot(index);
+    if (!slot.hasValidItemId()) {
       return;
     }
 

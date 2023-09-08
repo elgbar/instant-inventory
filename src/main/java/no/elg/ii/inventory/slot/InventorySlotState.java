@@ -34,26 +34,4 @@ public class InventorySlotState implements InventorySlot {
 
   private final int changedTick;
   private final int itemId;
-
-  /**
-   * @return Whether this slot is valid, i.e. has an item id
-   */
-  public boolean hasValidItemId() {
-    return itemId != InventorySlot.INVALID_ITEM_ID;
-  }
-
-  /**
-   * @return Whether this slot has been modified
-   */
-  public boolean hasChangedTick() {
-    return changedTick != InventorySlot.NO_CHANGED_TICK;
-  }
-
-  /**
-   * @return Whether this slot has no modifications compared to the current inventory
-   */
-  public boolean isUnmodifiedState() {
-    return this == InventorySlot.UNMODIFIED_SLOT || (!hasValidItemId() && !hasChangedTick());
-  }
-
 }
