@@ -15,9 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fix #8 showing items other plugins have hidden
-
 ### Removed
+
+---
+
+## 1.1.2 - 2023-09-08
+
+### Fixed
+
+* Fix #8 showing items other plugins have hidden
 
 ---
 
