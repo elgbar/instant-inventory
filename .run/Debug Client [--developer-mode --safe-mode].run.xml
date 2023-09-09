@@ -2,7 +2,7 @@
   <configuration default="false" name="Debug Client [--developer-mode --safe-mode]" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="no.elg.ii.LivePluginTest" />
     <module name="instant-inventory.test" />
-    <option name="PROGRAM_PARAMETERS" value="--developer-mode --safe-mode " />
+    <option name="PROGRAM_PARAMETERS" value="--developer-mode --safe-mode --debug" />
     <option name="VM_PARAMETERS" value="-ea" />
     <extension name="coverage">
       <pattern>
