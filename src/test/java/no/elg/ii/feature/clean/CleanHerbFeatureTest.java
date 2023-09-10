@@ -78,16 +78,6 @@ public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
   }
 
   @Test
-  public void invalidateCacheOnReset() {
-    CleanHerbFeature feature = createNewInstance();
-    CleanHerbOverlay overlay = feature.overlay;
-
-    feature.reset();
-
-    verify(overlay).invalidateCache();
-  }
-
-  @Test
   public void configKey_is_CLEAN_CONFIG_KEY() {
     CleanHerbFeature feature = createNewInstance();
     assertEquals(CLEAN_CONFIG_KEY, feature.getConfigKey());

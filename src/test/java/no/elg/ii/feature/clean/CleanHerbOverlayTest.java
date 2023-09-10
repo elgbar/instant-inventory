@@ -52,18 +52,6 @@ import org.junit.Test;
 
 public class CleanHerbOverlayTest {
 
-  @SuppressWarnings("unchecked")
-  @Test
-  public void invalidateCache_invalidates_fillCache() {
-    CleanHerbOverlay overlay = spy(new CleanHerbOverlay());
-    Cache<Long, Image> cache = mock(Cache.class);
-    overlay.fillCache = cache;
-
-    overlay.invalidateCache();
-
-    verify(cache).invalidateAll();
-  }
-
   @Test
   public void renderItemOverlay_happy_path() {
     renderItemOverlay_test(ItemID.GRIMY_GUAM_LEAF, false, true);

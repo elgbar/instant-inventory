@@ -51,16 +51,9 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
   @VisibleForTesting
   CleanHerbFeature clean;
 
-  @VisibleForTesting
-  Cache<Long, Image> fillCache;
-
   {
     showOnBank();
     showOnInventory();
-    fillCache = CacheBuilder.newBuilder()
-      .concurrencyLevel(1)
-      .maximumSize(32)
-      .build();
   }
 
   @Override
@@ -83,9 +76,5 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
     Image item = itemManager.getImage(cleanItemId.getCleanItemId(), widgetItem.getQuantity(),
       false);
     graphics.drawImage(item, (int) bounds.getX(), (int) bounds.getY(), null);
-  }
-
-  public void invalidateCache() {
-    fillCache.invalidateAll();
   }
 }
