@@ -59,7 +59,7 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
       return;
     }
     InventorySlot slot = clean.getState().getSlot(index);
-    if (!slot.hasValidItemId()) {
+    if (!slot.hasValidItemId() || slot.getItemId() != itemId) {
       return;
     }
 
