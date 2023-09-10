@@ -25,38 +25,24 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.util;
 
-import com.google.common.annotations.VisibleForTesting;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.equip.EquipFeature;
-import no.elg.ii.feature.hide.DepositFeature;
-import no.elg.ii.feature.hide.DropFeature;
+import net.runelite.api.Item;
 
-@Singleton
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class Features {
+public class IndexedItem {
+  private final int index;
+  @Nonnull
+  private final Item item;
 
-  @Inject
-  @VisibleForTesting
-  private DropFeature dropFeature;
-
-  @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
-
-  @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
-
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
+  @Nullable
+  public static IndexedItem of(int index, @Nullable Item item) {
+    if (item == null) {
+      return null;
+    }
+    return new IndexedItem(index, item);
+  }
 }

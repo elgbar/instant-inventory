@@ -25,38 +25,13 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.inventory.slot;
 
-import com.google.common.annotations.VisibleForTesting;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.equip.EquipFeature;
-import no.elg.ii.feature.hide.DepositFeature;
-import no.elg.ii.feature.hide.DropFeature;
 
-@Singleton
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class Features {
+public class IndexedInventorySlot {
 
-  @Inject
-  @VisibleForTesting
-  private DropFeature dropFeature;
-
-  @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
-
-  @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
-
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
+  private final int index;
+  private final InventorySlot slot;
 }

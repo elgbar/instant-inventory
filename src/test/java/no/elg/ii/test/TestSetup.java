@@ -40,6 +40,7 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
+import no.elg.ii.feature.equip.EquipFeature;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.clean.CleanHerbFeature;
@@ -70,6 +71,12 @@ public class TestSetup {
   public static DepositFeature createNewDepositFeature() {
     DepositFeature feature = spy(new DepositFeature());
     setupHideFeature(feature);
+    return feature;
+  }
+
+  public static EquipFeature createNewEquipFeature() {
+    EquipFeature feature = spy(new EquipFeature());
+//    setupHideFeature(feature);
     return feature;
   }
 

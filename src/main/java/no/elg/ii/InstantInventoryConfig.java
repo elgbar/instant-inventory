@@ -28,6 +28,7 @@ package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryConfig.GROUP;
 import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.feature.equip.EquipFeature.EQUIP_CONFIG_KEY;
 import static no.elg.ii.feature.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
 import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 
@@ -83,6 +84,17 @@ public interface InstantInventoryConfig extends Config {
     position = 2
   )
   default boolean instantDeposit() {
+    return true;
+  }
+
+  @ConfigItem(
+    keyName = EQUIP_CONFIG_KEY,
+    section = FEATURE_SECTION,
+    name = "Equip Items Instantly",
+    description = "Equip wearable/wieldable items instantly",
+    position = 3
+  )
+  default boolean instantEquip() {
     return true;
   }
 

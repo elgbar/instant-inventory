@@ -66,7 +66,6 @@ public class FeatureManager {
   @Inject
   protected Features featureInstances;
 
-
   /**
    * Make sure all features are in its correct state
    */
@@ -75,6 +74,7 @@ public class FeatureManager {
     updateFeatureStatus(featureInstances.getDropFeature(), config.instantDrop());
     updateFeatureStatus(featureInstances.getCleanHerbFeature(), config.instantClean());
     updateFeatureStatus(featureInstances.getDepositFeature(), config.instantDeposit());
+    updateFeatureStatus(featureInstances.getEquipFeature(), config.instantEquip());
   }
 
   public void disableAllFeatures() {

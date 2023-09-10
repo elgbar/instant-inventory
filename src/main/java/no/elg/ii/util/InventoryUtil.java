@@ -34,13 +34,14 @@ public final class InventoryUtil {
   public static final int INVENTORY_SIZE = 28;
 
 
-  public static boolean isValidInventoryIndex(int index){
+  public static boolean isValidInventoryIndex(int index) {
     return index >= 0 && index < INVENTORY_SIZE;
   }
 
-  public static boolean isInvalidInventoryIndex(int index){
+  public static boolean isInvalidInventoryIndex(int index) {
     return index < 0 || index >= INVENTORY_SIZE;
   }
 
-  private InventoryUtil() {}
+  private InventoryUtil() {
+  }
 }

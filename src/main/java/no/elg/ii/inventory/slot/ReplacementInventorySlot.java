@@ -25,38 +25,28 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.inventory.slot;
 
-import com.google.common.annotations.VisibleForTesting;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
+import javax.annotation.Nullable;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.equip.EquipFeature;
-import no.elg.ii.feature.hide.DepositFeature;
-import no.elg.ii.feature.hide.DropFeature;
+import no.elg.ii.util.IndexedItem;
 
-@Singleton
+
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class Features {
+public class ReplacementInventorySlot implements InventorySlot {
 
-  @Inject
-  @VisibleForTesting
-  private DropFeature dropFeature;
+  private final int changedTick;
+  private final int itemId;
 
-  @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
+  /**
+   * The index of this replaced item must be the same as the index of this slot
+   */
+  @Nullable
+  private final IndexedItem replacedItem;
 
-  @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
-
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
+  /**
+   * The index of this offhand replaced item must be the first empty slot in the inventory
+   */
+  @Nullable
+  private final IndexedItem offhandReplacedItem;
 }

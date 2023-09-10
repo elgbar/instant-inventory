@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Elg
+ * Copyright (c) 2023 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,53 +24,63 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.clean;
 
-import static no.elg.ii.util.InventoryUtil.isInvalidInventoryIndex;
+package no.elg.ii.feature.equip;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.awt.*;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import net.runelite.api.Item;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.inventory.slot.ReplacementInventorySlot;
+import no.elg.ii.util.IndexedItem;
 
 @Singleton
-public class CleanHerbOverlay extends WidgetItemOverlay {
+public class EquipOverlay extends WidgetItemOverlay {
 
   @Inject
   @VisibleForTesting
   ItemManager itemManager;
   @Inject
   @VisibleForTesting
-  CleanHerbFeature clean;
+  EquipFeature feature;
 
   {
-    showOnBank();
     showOnInventory();
   }
 
   @Override
   public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
     int index = widgetItem.getWidget().getIndex();
-    if (isInvalidInventoryIndex(index)) {
-      return;
-    }
-    InventorySlot slot = clean.getState().getSlot(index);
-    if (!slot.hasValidItemId()) {
-      return;
-    }
+    // If the item is after this index, then it cannot be placed here
+    var activeSlots = feature.getState().getActiveSlots().filter(iis -> iis.getIndex() >= index).collect(Collectors.toSet());
+    for (IndexedInventorySlot indexedInventorySlot : activeSlots) {
+      InventorySlot slot = indexedInventorySlot.getSlot();
+      if (slot instanceof ReplacementInventorySlot) {
+        ReplacementInventorySlot replacementInventorySlot = (ReplacementInventorySlot) slot;
+        Rectangle bounds = widgetItem.getCanvasBounds();
 
-    Rectangle bounds = widgetItem.getCanvasBounds();
-    HerbInfo cleanItemId = HerbInfo.HERBS.getOrDefault(itemId, null);
-    if (cleanItemId == null) {
-      return;
-    }
+        IndexedItem primaryHand = replacementInventorySlot.getReplacedItem();
+        if (primaryHand != null && primaryHand.getIndex() == widgetItem.getWidget().getIndex()) {
+          renderItem(graphics, bounds, primaryHand.getItem());
+        }
 
-    Image item = itemManager.getImage(cleanItemId.getCleanItemId(), widgetItem.getQuantity(),
-      false);
-    graphics.drawImage(item, (int) bounds.getX(), (int) bounds.getY(), null);
+        IndexedItem offhand = replacementInventorySlot.getOffhandReplacedItem();
+        if (offhand != null && offhand.getIndex() == widgetItem.getWidget().getIndex()) {
+          renderItem(graphics, bounds, offhand.getItem());
+        }
+      }
+    }
+  }
+
+  private void renderItem(Graphics2D graphics, Rectangle bounds, Item item) {
+    Image image = itemManager.getImage(item.getId(), item.getQuantity(), false);
+    graphics.drawImage(image, (int) bounds.getX(), (int) bounds.getY(), null);
   }
 }

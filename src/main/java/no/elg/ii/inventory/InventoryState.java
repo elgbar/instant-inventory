@@ -26,8 +26,12 @@
  */
 package no.elg.ii.inventory;
 
+import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -38,9 +42,9 @@ import net.runelite.api.events.GameTick;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.InventorySlotState;
-import no.elg.ii.util.InventoryUtil;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -64,7 +68,7 @@ public class InventoryState {
   /**
    * The tick the item was modified
    */
-  private final InventorySlot[] slots = new InventorySlot[InventoryUtil.INVENTORY_SIZE];
+  private final InventorySlot[] slots = new InventorySlot[INVENTORY_SIZE];
 
   @Inject
   @VisibleForTesting
@@ -96,6 +100,13 @@ public class InventoryState {
 
   public InventorySlot getSlot(int index) {
     return slots[index];
+  }
+
+  /**
+   * @return The slots and its index we're currently modifying
+   */
+  public Stream<IndexedInventorySlot> getActiveSlots() {
+    return IntStream.range(0, INVENTORY_SIZE).mapToObj(i -> new IndexedInventorySlot(i, slots[i])).filter((iis) -> iis.getSlot().hasValidItemId());
   }
 
   /**
