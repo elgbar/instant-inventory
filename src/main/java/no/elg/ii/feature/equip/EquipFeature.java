@@ -27,21 +27,10 @@
 
 package no.elg.ii.feature.equip;
 
-import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
-
 import com.google.common.annotations.VisibleForTesting;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.InventoryID;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
-import net.runelite.api.NullItemID;
+import net.runelite.api.*;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -56,6 +45,12 @@ import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
 import no.elg.ii.util.WidgetUtil;
 import org.apache.commons.lang3.tuple.Pair;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 
 @Singleton
 @Slf4j
@@ -130,7 +125,11 @@ public class EquipFeature implements Feature {
           return;
         }
         for (int index = 0; index < inventoryWidgets.length; index++) {
-          if (inventoryWidgets[index].getName().isBlank()) {
+          Widget offhandWidget = inventoryWidgets[index];
+          if (offhandWidget.getName().isBlank()) {
+            offhandWidget.setHidden(false);
+            offhandWidget.setItemId(offhandItem.getId());
+            offhandWidget.setItemQuantity(offhandItem.getQuantity());
             offhandIndexedItem = IndexedItem.of(index, offhandItem);
             break;
           }

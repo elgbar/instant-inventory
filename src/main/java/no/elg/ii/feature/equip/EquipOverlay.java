@@ -28,20 +28,18 @@
 package no.elg.ii.feature.equip;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.awt.*;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
-import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.awt.*;
 
 @Singleton
 public class EquipOverlay extends WidgetItemOverlay {
@@ -62,24 +60,23 @@ public class EquipOverlay extends WidgetItemOverlay {
     Widget widget = widgetItem.getWidget();
     if (widget.isHidden() || widget.getName().isBlank()) {
       int index = widget.getIndex();
-      var activeSlots = feature.getState().getActiveSlots().filter(iis -> iis.getIndex() == index).collect(Collectors.toSet());
-      for (IndexedInventorySlot indexedInventorySlot : activeSlots) {
-        InventorySlot slot = indexedInventorySlot.getSlot();
+      feature.getState().getActiveSlots().forEach(indexedSlot -> {
+        InventorySlot slot = indexedSlot.getSlot();
         if (slot instanceof ReplacementInventorySlot) {
           ReplacementInventorySlot replacementInventorySlot = (ReplacementInventorySlot) slot;
           Rectangle bounds = widgetItem.getCanvasBounds();
 
           IndexedItem primaryHand = replacementInventorySlot.getReplacedItem();
-          if (primaryHand != null) {
+          if (primaryHand != null && index == primaryHand.getIndex()) {
             renderItem(graphics, bounds, primaryHand.getItem());
           }
 
           IndexedItem offhand = replacementInventorySlot.getOffhandReplacedItem();
-          if (offhand != null) {
+          if (offhand != null && index == offhand.getIndex()) {
             renderItem(graphics, bounds, offhand.getItem());
           }
         }
-      }
+      });
     }
   }
 
