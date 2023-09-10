@@ -27,19 +27,34 @@
 
 package no.elg.ii.util;
 
+import javax.annotation.Nullable;
+import net.runelite.api.Client;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+
 public final class InventoryUtil {
   /**
    * Number of items in an inventory
    */
   public static final int INVENTORY_SIZE = 28;
 
-
-  public static boolean isValidInventoryIndex(int index) {
-    return index >= 0 && index < INVENTORY_SIZE;
-  }
-
   public static boolean isInvalidInventoryIndex(int index) {
     return index < 0 || index >= INVENTORY_SIZE;
+  }
+
+  @Nullable
+  public static Widget firstEmptyWidget(Client client) {
+    Widget invWidget = client.getWidget(WidgetInfo.INVENTORY);
+    if (invWidget == null) {
+      return null;
+    }
+    Widget[] inventoryWidgets = invWidget.getDynamicChildren();
+    for (Widget emptyWidget : inventoryWidgets) {
+      if (emptyWidget.getName().isBlank()) {
+        return emptyWidget;
+      }
+    }
+    return null;
   }
 
   private InventoryUtil() {

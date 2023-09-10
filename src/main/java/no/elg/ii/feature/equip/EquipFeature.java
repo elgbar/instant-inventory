@@ -27,13 +27,23 @@
 
 package no.elg.ii.feature.equip;
 
+import static no.elg.ii.util.InventoryUtil.firstEmptyWidget;
+
 import com.google.common.annotations.VisibleForTesting;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.NullItemID;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -45,12 +55,6 @@ import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
 import no.elg.ii.util.WidgetUtil;
 import org.apache.commons.lang3.tuple.Pair;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 
 @Singleton
 @Slf4j
@@ -115,30 +119,17 @@ public class EquipFeature implements Feature {
 
       Item offhandItem = itemIds.getRight();
       if (offhandItem != null) {
-        Widget invWidget = client.getWidget(WidgetInfo.INVENTORY);
-        if (invWidget == null) {
-          return;
-        }
-        Widget[] inventoryWidgets = invWidget.getDynamicChildren();
-        if (inventoryWidgets.length != INVENTORY_SIZE) {
-          log.warn("Inventory widget has {} children, expected {}", inventoryWidgets.length, INVENTORY_SIZE);
-          return;
-        }
-        for (int index = 0; index < inventoryWidgets.length; index++) {
-          Widget offhandWidget = inventoryWidgets[index];
-          if (offhandWidget.getName().isBlank()) {
-            offhandWidget.setHidden(false);
-            offhandWidget.setItemId(offhandItem.getId());
-            offhandWidget.setItemQuantity(offhandItem.getQuantity());
-            offhandIndexedItem = IndexedItem.of(index, offhandItem);
-            break;
-          }
+        var offhandWidget = firstEmptyWidget(client);
+        if (offhandWidget != null) {
+          offhandWidget.setHidden(false);
+          offhandWidget.setItemId(offhandItem.getId());
+          offhandWidget.setItemQuantity(offhandItem.getQuantity());
+          offhandIndexedItem = IndexedItem.of(offhandWidget.getIndex(), offhandItem);
         }
       }
     } else {
       widget.setItemId(NullItemID.NULL_6512);
     }
-
     getState().setSlot(widget.getIndex(), new ReplacementInventorySlot(client.getTickCount(), widget.getItemId(), mainIndexedItem, offhandIndexedItem));
   }
 
