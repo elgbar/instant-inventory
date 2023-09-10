@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Item;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
@@ -57,23 +59,25 @@ public class EquipOverlay extends WidgetItemOverlay {
 
   @Override
   public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
-    int index = widgetItem.getWidget().getIndex();
-    // If the item is after this index, then it cannot be placed here
-    var activeSlots = feature.getState().getActiveSlots().filter(iis -> iis.getIndex() >= index).collect(Collectors.toSet());
-    for (IndexedInventorySlot indexedInventorySlot : activeSlots) {
-      InventorySlot slot = indexedInventorySlot.getSlot();
-      if (slot instanceof ReplacementInventorySlot) {
-        ReplacementInventorySlot replacementInventorySlot = (ReplacementInventorySlot) slot;
-        Rectangle bounds = widgetItem.getCanvasBounds();
+    Widget widget = widgetItem.getWidget();
+    if (widget.isHidden() || widget.getName().isBlank()) {
+      int index = widget.getIndex();
+      var activeSlots = feature.getState().getActiveSlots().filter(iis -> iis.getIndex() == index).collect(Collectors.toSet());
+      for (IndexedInventorySlot indexedInventorySlot : activeSlots) {
+        InventorySlot slot = indexedInventorySlot.getSlot();
+        if (slot instanceof ReplacementInventorySlot) {
+          ReplacementInventorySlot replacementInventorySlot = (ReplacementInventorySlot) slot;
+          Rectangle bounds = widgetItem.getCanvasBounds();
 
-        IndexedItem primaryHand = replacementInventorySlot.getReplacedItem();
-        if (primaryHand != null && primaryHand.getIndex() == widgetItem.getWidget().getIndex()) {
-          renderItem(graphics, bounds, primaryHand.getItem());
-        }
+          IndexedItem primaryHand = replacementInventorySlot.getReplacedItem();
+          if (primaryHand != null) {
+            renderItem(graphics, bounds, primaryHand.getItem());
+          }
 
-        IndexedItem offhand = replacementInventorySlot.getOffhandReplacedItem();
-        if (offhand != null && offhand.getIndex() == widgetItem.getWidget().getIndex()) {
-          renderItem(graphics, bounds, offhand.getItem());
+          IndexedItem offhand = replacementInventorySlot.getOffhandReplacedItem();
+          if (offhand != null) {
+            renderItem(graphics, bounds, offhand.getItem());
+          }
         }
       }
     }
