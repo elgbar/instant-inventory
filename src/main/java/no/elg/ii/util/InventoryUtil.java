@@ -27,12 +27,11 @@
 
 package no.elg.ii.util;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public final class InventoryUtil {
   /**

@@ -33,20 +33,18 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Method;
 import net.runelite.client.config.ConfigItem;
 import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
 import org.junit.Test;
 
 public abstract class FeatureTestMother<T extends Feature> {
 
   /**
-   *
    * @return A {@link org.mockito.Spy} instance of this feature
    */
   public abstract T createNewInstance();

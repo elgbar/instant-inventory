@@ -26,6 +26,10 @@
  */
 package no.elg.ii.feature.hide;
 
+import static net.runelite.api.widgets.WidgetInfo.GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER;
+
+import java.util.Set;
+import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
@@ -33,11 +37,6 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.Util;
-
-import javax.annotation.Nonnull;
-import java.util.Set;
-
-import static net.runelite.api.widgets.WidgetInfo.GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER;
 
 @Slf4j
 public class DepositFeature extends HideFeature {

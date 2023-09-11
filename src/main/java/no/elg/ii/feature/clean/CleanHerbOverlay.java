@@ -29,7 +29,9 @@ package no.elg.ii.feature.clean;
 import static no.elg.ii.util.InventoryUtil.isInvalidInventoryIndex;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.widgets.WidgetItem;

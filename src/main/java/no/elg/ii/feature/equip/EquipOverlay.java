@@ -28,6 +28,10 @@
 package no.elg.ii.feature.equip;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
+import javax.inject.Inject;
 import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
@@ -36,9 +40,6 @@ import net.runelite.client.ui.overlay.WidgetItemOverlay;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
-
-import javax.inject.Inject;
-import java.awt.*;
 
 public class EquipOverlay extends WidgetItemOverlay {
 

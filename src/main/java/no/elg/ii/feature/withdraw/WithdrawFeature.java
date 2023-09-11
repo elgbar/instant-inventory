@@ -27,7 +27,12 @@
 
 package no.elg.ii.feature.withdraw;
 
+import static no.elg.ii.util.InventoryUtil.IS_EMPTY_FILTER;
+import static no.elg.ii.util.InventoryUtil.findFirst;
+
 import com.google.common.annotations.VisibleForTesting;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -47,12 +52,6 @@ import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtil;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-
-import static no.elg.ii.util.InventoryUtil.IS_EMPTY_FILTER;
-import static no.elg.ii.util.InventoryUtil.findFirst;
 
 @Slf4j
 public class WithdrawFeature implements Feature {

@@ -26,18 +26,18 @@
  */
 package no.elg.ii;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
-import no.elg.ii.inventory.InventoryState;
-
 import static no.elg.ii.InstantInventoryConfig.GROUP;
 import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
 import static no.elg.ii.feature.equip.EquipFeature.EQUIP_CONFIG_KEY;
 import static no.elg.ii.feature.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
 import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
 import static no.elg.ii.feature.withdraw.WithdrawFeature.WITHDRAW_CONFIG_KEY;
+
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
+import no.elg.ii.inventory.InventoryState;
 
 @ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {

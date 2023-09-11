@@ -27,16 +27,14 @@
 
 package no.elg.ii.inventory;
 
+import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
+import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
-import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
-import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
-import static no.elg.ii.inventory.slot.InventorySlot.UNMODIFIED_SLOT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;

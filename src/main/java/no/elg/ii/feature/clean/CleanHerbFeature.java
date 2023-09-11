@@ -29,7 +29,6 @@ package no.elg.ii.feature.clean;
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.events.MenuOptionClicked;
@@ -39,7 +38,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
 
-@Singleton
 public class CleanHerbFeature implements Feature {
 
   public static final String CLEAN_OPTION = "Clean";
