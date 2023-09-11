@@ -71,8 +71,7 @@ public class CleanHerbOverlay extends WidgetItemOverlay {
       return;
     }
 
-    Image item = itemManager.getImage(cleanItemId.getCleanItemId(), widgetItem.getQuantity(),
-      false);
+    Image item = itemManager.getImage(cleanItemId.getCleanItemId(), widgetItem.getQuantity(), false);
     graphics.drawImage(item, (int) bounds.getX(), (int) bounds.getY(), null);
   }
 }

@@ -27,6 +27,7 @@
 
 package no.elg.ii.feature.clean;
 
+import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,22 +53,26 @@ public class CleanHerbOverlayTest {
 
   @Test
   public void renderItemOverlay_happy_path() {
-    renderItemOverlay_test(ItemID.GRIMY_GUAM_LEAF, false, true);
+    renderItemOverlay_test(ItemID.GRIMY_GUAM_LEAF, false, true, 1);
+  }
+
+  @Test
+  public void renderItemOverlay_invalid_index() {
+    renderItemOverlay_test(ItemID.GRIMY_RANARR_WEED, false, false, INVENTORY_SIZE);
+    renderItemOverlay_test(ItemID.GRIMY_RANARR_WEED, false, false, -1);
   }
 
   @Test
   public void renderItemOverlay_not_grimy_herb() {
-    renderItemOverlay_test(ItemID.INFERNAL_CAPE, false, false);
+    renderItemOverlay_test(ItemID.INFERNAL_CAPE, false, false, 1);
   }
 
   @Test
   public void renderItemOverlay_invalid_state_does_not_draw() {
-    renderItemOverlay_test(ItemID.GRIMY_GUAM_LEAF, true, false);
+    renderItemOverlay_test(ItemID.GRIMY_GUAM_LEAF, true, false, 1);
   }
 
-  public void renderItemOverlay_test(int itemId, boolean invalidState, boolean shouldDraw) {
-    int index = 1;
-
+  public void renderItemOverlay_test(int itemId, boolean invalidState, boolean shouldDraw, int index) {
     CleanHerbOverlay overlay = spy(new CleanHerbOverlay());
     ItemManager itemManager = overlay.itemManager = mock(ItemManager.class);
     CleanHerbFeature clean = overlay.clean = TestSetup.createNewCleanHerbFeature();
@@ -76,6 +81,7 @@ public class CleanHerbOverlayTest {
     doReturn(state).when(clean).getState();
     doReturn(slot).when(state).getSlot(index);
     doReturn(!invalidState).when(slot).hasValidItemId();
+    doReturn(itemId).when(slot).getItemId();
 
     Graphics2D graphics = mock(Graphics2D.class);
     WidgetItem widgetItem = mock(WidgetItem.class);
