@@ -26,8 +26,6 @@
  */
 package no.elg.ii.feature.hide;
 
-import static net.runelite.api.widgets.WidgetInfo.GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER;
-
 import java.util.Set;
 import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +44,11 @@ public class DepositFeature extends HideFeature {
   public static final String DEPOSIT_CONFIG_KEY = "instantDeposit";
 
   {
-    showOnWidgets(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER, GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER);
+    showOnWidgets(
+      WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER,
+      WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER,
+      WidgetInfo.GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER
+    );
   }
 
   @Subscribe

@@ -27,6 +27,8 @@
 
 package no.elg.ii.util;
 
+import static net.runelite.api.NullItemID.NULL_6512;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.runelite.api.Client;
@@ -62,7 +64,7 @@ public final class InventoryUtil {
     return null;
   }
 
-  public static final Filter<Widget> IS_EMPTY_FILTER = w -> w.getName().isBlank();
+  public static final Filter<Widget> IS_EMPTY_FILTER = w -> w.getName().isBlank() || w.getItemId() == NULL_6512;
 
   @Nullable
   public static Widget firstEmptyWidget(@Nonnull Client client) {
