@@ -36,7 +36,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
-import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
@@ -44,8 +43,8 @@ import no.elg.ii.util.IndexedItem;
 @AllArgsConstructor
 public class ReplacedItemOverlay extends WidgetItemOverlay {
 
-  private ItemManager itemManager;
-  private Feature feature;
+  private final ItemManager itemManager;
+  private final ReplacedItemFeature feature;
 
   {
     showOnInventory();

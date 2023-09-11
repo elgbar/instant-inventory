@@ -49,6 +49,7 @@ import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.hide.HideFeature;
 import no.elg.ii.feature.replace.EquipFeature;
 import no.elg.ii.feature.replace.ReplacedItemFeature;
+import no.elg.ii.feature.replace.ReplacedItemOverlay;
 import no.elg.ii.feature.replace.WithdrawFeature;
 import no.elg.ii.inventory.InventoryState;
 import org.mockito.stubbing.Answer;
@@ -106,6 +107,7 @@ public class TestSetup {
     setupCommonFeature(feature, mock(Client.class));
     feature.overlayManager = mock(OverlayManager.class);
     feature.itemManager = mock(ItemManager.class);
+    feature.overlay = mock(ReplacedItemOverlay.class);
   }
 
   public static ClientThread mockedClientThread() {

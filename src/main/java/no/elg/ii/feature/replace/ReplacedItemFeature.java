@@ -46,13 +46,14 @@ public abstract class ReplacedItemFeature implements Feature {
   @Inject
   @VisibleForTesting
   public ItemManager itemManager;
-
-  @Inject
   @VisibleForTesting
-  protected ReplacedItemOverlay overlay = new ReplacedItemOverlay(itemManager, this);
+  public ReplacedItemOverlay overlay;
 
   @Override
   public void onEnable() {
+    if (overlay == null) {
+      overlay = new ReplacedItemOverlay(itemManager, this);
+    }
     overlayManager.add(overlay);
   }
 
