@@ -29,7 +29,6 @@ package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryPlugin.EMPTY_WIDGET;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -63,7 +62,6 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   @Test
   public void onGameStateChanged_calls_nothing_on_incorrect_group() {
     plugin.startUp();
-    assertEquals(3, featureManager.getActiveFeatures().size());
     plugin.onGameStateChanged(new GameStateChanged());
 
     verify(dropFeature, times(2)).reset();

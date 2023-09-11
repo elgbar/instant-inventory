@@ -37,6 +37,7 @@ import static org.mockito.Mockito.spy;
 import java.util.function.BooleanSupplier;
 import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
@@ -47,6 +48,7 @@ import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.hide.HideFeature;
 import no.elg.ii.feature.replace.EquipFeature;
+import no.elg.ii.feature.replace.ReplacedItemFeature;
 import no.elg.ii.feature.replace.WithdrawFeature;
 import no.elg.ii.inventory.InventoryState;
 import org.mockito.stubbing.Answer;
@@ -77,13 +79,13 @@ public class TestSetup {
 
   public static EquipFeature createNewEquipFeature() {
     EquipFeature feature = spy(new EquipFeature());
-//    setupHideFeature(feature);
+    setupReplacedItemFeature(feature);
     return feature;
   }
 
   public static WithdrawFeature createNewWithdrawFeature() {
     WithdrawFeature feature = spy(new WithdrawFeature());
-//    setupHideFeature(feature);
+    setupReplacedItemFeature(feature);
     return feature;
   }
 
@@ -98,6 +100,12 @@ public class TestSetup {
     feature.clientThread = TestSetup.mockedClientThread();
     InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
     doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
+  }
+
+  private static void setupReplacedItemFeature(ReplacedItemFeature feature) {
+    setupCommonFeature(feature, mock(Client.class));
+    feature.overlayManager = mock(OverlayManager.class);
+    feature.itemManager = mock(ItemManager.class);
   }
 
   public static ClientThread mockedClientThread() {

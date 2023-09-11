@@ -42,6 +42,8 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
+import no.elg.ii.feature.replace.EquipFeature;
+import no.elg.ii.feature.replace.WithdrawFeature;
 import no.elg.ii.inventory.InventoryState;
 import org.junit.Before;
 
@@ -51,6 +53,8 @@ public class IntegrationTestHelper {
   protected DropFeature dropFeature;
   protected CleanHerbFeature cleanHerbFeature;
   protected DepositFeature depositFeature;
+  protected EquipFeature equipFeature;
+  protected WithdrawFeature withdrawFeature;
   protected InstantInventoryConfig instantInventoryConfig;
   protected EventBus eventBus;
   protected Client client;
@@ -66,6 +70,8 @@ public class IntegrationTestHelper {
     doReturn(true).when(instantInventoryConfig).instantDrop();
     doReturn(true).when(instantInventoryConfig).instantClean();
     doReturn(true).when(instantInventoryConfig).instantDeposit();
+    doReturn(true).when(instantInventoryConfig).instantEquip();
+    doReturn(true).when(instantInventoryConfig).instantWithdraw();
 
     features = new Features(
       TestSetup.createNewDropFeature(),
@@ -77,6 +83,8 @@ public class IntegrationTestHelper {
     dropFeature = features.getDropFeature();
     cleanHerbFeature = features.getCleanHerbFeature();
     depositFeature = features.getDepositFeature();
+    equipFeature = features.getEquipFeature();
+    withdrawFeature = features.getWithdrawFeature();
 
     featureManager = spy(new FeatureManager(eventBus, instantInventoryConfig, features));
 

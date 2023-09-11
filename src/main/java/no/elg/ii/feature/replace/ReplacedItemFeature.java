@@ -41,9 +41,11 @@ public abstract class ReplacedItemFeature implements Feature {
   @Getter
   private InventoryState state;
   @Inject
-  private OverlayManager overlayManager;
+  @VisibleForTesting
+  public OverlayManager overlayManager;
   @Inject
-  protected ItemManager itemManager;
+  @VisibleForTesting
+  public ItemManager itemManager;
 
   @Inject
   @VisibleForTesting
