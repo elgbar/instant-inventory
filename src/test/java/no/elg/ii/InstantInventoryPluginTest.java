@@ -30,34 +30,20 @@ package no.elg.ii;
 import static no.elg.ii.InstantInventoryPlugin.EMPTY_WIDGET;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import net.runelite.api.Client;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.events.ConfigChanged;
-import no.elg.ii.feature.Feature;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.hide.DepositFeature;
-import no.elg.ii.feature.hide.DropFeature;
-import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.test.IntegrationTestHelper;
-import no.elg.ii.test.TestSetup;
-import org.junit.Before;
 import org.junit.Test;
 
 public class InstantInventoryPluginTest extends IntegrationTestHelper {

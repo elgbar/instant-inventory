@@ -27,10 +27,12 @@
 
 package no.elg.ii.util;
 
-import javax.annotation.Nullable;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public final class InventoryUtil {
   /**
@@ -42,19 +44,30 @@ public final class InventoryUtil {
     return index < 0 || index >= INVENTORY_SIZE;
   }
 
+  public interface Filter<T> {
+    boolean filter(T t);
+  }
+
   @Nullable
-  public static Widget firstEmptyWidget(Client client) {
-    Widget invWidget = client.getWidget(WidgetInfo.INVENTORY);
+  public static Widget findFirst(@Nonnull Client client, WidgetInfo widgetInfo, @Nonnull Filter<Widget> filter) {
+    Widget invWidget = client.getWidget(widgetInfo);
     if (invWidget == null) {
       return null;
     }
     Widget[] inventoryWidgets = invWidget.getDynamicChildren();
-    for (Widget emptyWidget : inventoryWidgets) {
-      if (emptyWidget.getName().isBlank()) {
-        return emptyWidget;
+    for (Widget widget : inventoryWidgets) {
+      if (filter.filter(widget)) {
+        return widget;
       }
     }
     return null;
+  }
+
+  public static final Filter<Widget> IS_EMPTY_FILTER = w -> w.getName().isBlank();
+
+  @Nullable
+  public static Widget firstEmptyWidget(@Nonnull Client client) {
+    return findFirst(client, WidgetInfo.INVENTORY, IS_EMPTY_FILTER);
   }
 
   private InventoryUtil() {

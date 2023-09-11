@@ -71,7 +71,8 @@ public class IntegrationTestHelper {
       TestSetup.createNewDropFeature(),
       TestSetup.createNewCleanHerbFeature(),
       TestSetup.createNewDepositFeature(),
-      TestSetup.createNewEquipFeature()
+      TestSetup.createNewEquipFeature(),
+      TestSetup.createNewWithdrawFeature()
     );
     dropFeature = features.getDropFeature();
     cleanHerbFeature = features.getCleanHerbFeature();

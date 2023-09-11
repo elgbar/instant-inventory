@@ -75,6 +75,7 @@ public class FeatureManager {
     updateFeatureStatus(featureInstances.getCleanHerbFeature(), config.instantClean());
     updateFeatureStatus(featureInstances.getDepositFeature(), config.instantDeposit());
     updateFeatureStatus(featureInstances.getEquipFeature(), config.instantEquip());
+    updateFeatureStatus(featureInstances.getWithdrawFeature(), config.instantWithdraw());
   }
 
   public void disableAllFeatures() {

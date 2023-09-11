@@ -28,8 +28,6 @@
 package no.elg.ii;
 
 import com.google.common.annotations.VisibleForTesting;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,6 +35,10 @@ import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.equip.EquipFeature;
 import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
+import no.elg.ii.feature.withdraw.WithdrawFeature;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 @Data
@@ -59,4 +61,8 @@ public final class Features {
   @Inject
   @VisibleForTesting
   private EquipFeature equipFeature;
+
+  @Inject
+  @VisibleForTesting
+  private WithdrawFeature withdrawFeature;
 }

@@ -26,17 +26,18 @@
  */
 package no.elg.ii;
 
-import static no.elg.ii.InstantInventoryConfig.GROUP;
-import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
-import static no.elg.ii.feature.equip.EquipFeature.EQUIP_CONFIG_KEY;
-import static no.elg.ii.feature.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
-import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
-
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import no.elg.ii.inventory.InventoryState;
+
+import static no.elg.ii.InstantInventoryConfig.GROUP;
+import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.feature.equip.EquipFeature.EQUIP_CONFIG_KEY;
+import static no.elg.ii.feature.hide.DepositFeature.DEPOSIT_CONFIG_KEY;
+import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.feature.withdraw.WithdrawFeature.WITHDRAW_CONFIG_KEY;
 
 @ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {
@@ -95,6 +96,17 @@ public interface InstantInventoryConfig extends Config {
     position = 3
   )
   default boolean instantEquip() {
+    return true;
+  }
+
+  @ConfigItem(
+    keyName = WITHDRAW_CONFIG_KEY,
+    section = FEATURE_SECTION,
+    name = "Withdraw Items Instantly",
+    description = "Withdraw items from your bank instantly",
+    position = 4
+  )
+  default boolean instantWithdraw() {
     return true;
   }
 
