@@ -25,30 +25,27 @@
  *
  */
 
-package no.elg.ii.feature.equip;
+package no.elg.ii.feature.replace;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-import javax.inject.Inject;
+import lombok.AllArgsConstructor;
 import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
 
-public class EquipOverlay extends WidgetItemOverlay {
+@AllArgsConstructor
+public class ReplacedItemOverlay extends WidgetItemOverlay {
 
-  @Inject
-  @VisibleForTesting
-  ItemManager itemManager;
-  @Inject
-  @VisibleForTesting
-  EquipFeature feature;
+  private ItemManager itemManager;
+  private Feature feature;
 
   {
     showOnInventory();

@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.feature.withdraw;
+package no.elg.ii.feature.replace;
 
 import static no.elg.ii.util.InventoryUtil.IS_EMPTY_FILTER;
 import static no.elg.ii.util.InventoryUtil.findFirst;
@@ -33,7 +33,6 @@ import static no.elg.ii.util.InventoryUtil.findFirst;
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
@@ -42,11 +41,6 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.ui.overlay.OverlayManager;
-import no.elg.ii.feature.Feature;
-import no.elg.ii.feature.equip.EquipOverlay;
-import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlotState;
 import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
@@ -54,24 +48,10 @@ import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtil;
 
 @Slf4j
-public class WithdrawFeature implements Feature {
+public class WithdrawFeature extends ReplacedItemFeature {
 
   public static final String WITHDRAW_PREFIX_OPTION = "Withdraw-";
   public static final String WITHDRAW_CONFIG_KEY = "instantWithdraw";
-
-  @Inject
-  @VisibleForTesting
-  public EquipOverlay overlay;
-  @Inject
-  @VisibleForTesting
-  public OverlayManager overlayManager;
-
-  @Inject
-  @Getter
-  private InventoryState state;
-
-  @Inject
-  private ItemManager itemManager;
 
   @Inject
   @VisibleForTesting
@@ -118,16 +98,6 @@ public class WithdrawFeature implements Feature {
   @Override
   public String getConfigKey() {
     return WITHDRAW_CONFIG_KEY;
-  }
-
-  @Override
-  public void onEnable() {
-    overlayManager.add(overlay);
-  }
-
-  @Override
-  public void onDisable() {
-    overlayManager.remove(overlay);
   }
 
 }

@@ -43,11 +43,11 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.clean.CleanHerbFeature;
 import no.elg.ii.feature.clean.CleanHerbOverlay;
-import no.elg.ii.feature.equip.EquipFeature;
 import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.hide.HideFeature;
-import no.elg.ii.feature.withdraw.WithdrawFeature;
+import no.elg.ii.feature.replace.EquipFeature;
+import no.elg.ii.feature.replace.WithdrawFeature;
 import no.elg.ii.inventory.InventoryState;
 import org.mockito.stubbing.Answer;
 

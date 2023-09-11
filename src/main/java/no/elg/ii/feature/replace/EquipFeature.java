@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.feature.equip;
+package no.elg.ii.feature.replace;
 
 import static no.elg.ii.util.InventoryUtil.firstEmptyWidget;
 
@@ -34,7 +34,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
@@ -46,11 +45,8 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.http.api.item.ItemEquipmentStats;
 import net.runelite.http.api.item.ItemStats;
-import no.elg.ii.feature.Feature;
-import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
 import no.elg.ii.util.WidgetUtil;
@@ -58,22 +54,11 @@ import org.apache.commons.lang3.tuple.Pair;
 
 @Singleton
 @Slf4j
-public class EquipFeature implements Feature {
+public class EquipFeature extends ReplacedItemFeature {
 
   public static final String WEAR_OPTION = "Wear";
   public static final String WIELD_OPTION = "Wield";
   public static final String EQUIP_CONFIG_KEY = "instantEquip";
-
-  @Inject
-  @VisibleForTesting
-  public EquipOverlay overlay;
-  @Inject
-  @VisibleForTesting
-  public OverlayManager overlayManager;
-
-  @Inject
-  @Getter
-  private InventoryState state;
 
   @Inject
   @VisibleForTesting
@@ -82,16 +67,6 @@ public class EquipFeature implements Feature {
   @Inject
   @VisibleForTesting
   Client client;
-
-  @Override
-  public void onEnable() {
-    overlayManager.add(overlay);
-  }
-
-  @Override
-  public void onDisable() {
-    overlayManager.remove(overlay);
-  }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {

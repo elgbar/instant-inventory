@@ -25,43 +25,37 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.feature.replace;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.hide.DepositFeature;
-import no.elg.ii.feature.hide.DropFeature;
-import no.elg.ii.feature.replace.EquipFeature;
-import no.elg.ii.feature.replace.WithdrawFeature;
+import lombok.Getter;
+import net.runelite.client.game.ItemManager;
+import net.runelite.client.ui.overlay.OverlayManager;
+import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
 
-@Singleton
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class Features {
+public abstract class ReplacedItemFeature implements Feature {
+
+  @Inject
+  @Getter
+  private InventoryState state;
+  @Inject
+  private OverlayManager overlayManager;
+  @Inject
+  protected ItemManager itemManager;
 
   @Inject
   @VisibleForTesting
-  private DropFeature dropFeature;
+  protected ReplacedItemOverlay overlay = new ReplacedItemOverlay(itemManager, this);
 
-  @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
+  @Override
+  public void onEnable() {
+    overlayManager.add(overlay);
+  }
 
-  @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
-
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
-
-  @Inject
-  @VisibleForTesting
-  private WithdrawFeature withdrawFeature;
+  @Override
+  public void onDisable() {
+    overlayManager.remove(overlay);
+  }
 }
