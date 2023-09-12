@@ -91,7 +91,7 @@ public class EquipFeature extends ReplacedItemFeature {
     @Nullable IndexedItem mainIndexedItem = IndexedItem.of(widget.getIndex(), itemIds.getLeft());
     @Nullable IndexedItem offhandIndexedItem = null;
     if (mainIndexedItem != null) {
-      WidgetUtil.setFakeWidgetItem(widget, mainIndexedItem.getItem());
+      setFakeWidgetItem(widget, mainIndexedItem.getItem());
 
       Item offhandItem = itemIds.getRight();
       if (offhandItem != null) {
@@ -123,28 +123,46 @@ public class EquipFeature extends ReplacedItemFeature {
     if (itemStats == null || !itemStats.isEquipable()) {
       return Pair.of(null, null);
     }
-    Item mainhand = null;
-    // Used if switching into a 2 handed weapon to store off-hand stats
+    Item toReplace = null;
     Item offHand = null;
-    final ItemEquipmentStats currentEquipment = itemStats.getEquipment();
+
+    final ItemEquipmentStats clickedEquipment = itemStats.getEquipment();
 
     ItemContainer equipmentContainer = client.getItemContainer(InventoryID.EQUIPMENT);
-    if (currentEquipment != null && equipmentContainer != null) {
-      final int slot = currentEquipment.getSlot();
-      mainhand = equipmentContainer.getItem(slot);
-      if (mainhand == null && slot == EquipmentInventorySlot.SHIELD.getSlotIdx()) {
+    if (clickedEquipment != null && equipmentContainer != null) {
+      final int slotOfClickedItem = clickedEquipment.getSlot();
+      toReplace = equipmentContainer.getItem(slotOfClickedItem);
+
+      if (isWeaponSlot(slotOfClickedItem)) {
+        if (clickedEquipment.isTwoHanded()) {
+          offHand = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx());
+        }
+      } else if (isShieldSlot(slotOfClickedItem)) {
         var weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
         if (weaponItem != null) {
           ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId(), false);
           if (weaponStat != null && weaponStat.isEquipable()) {
-            mainhand = weaponItem;
+            ItemEquipmentStats weaponStatEquipment = weaponStat.getEquipment();
+            if (weaponStatEquipment != null && weaponStatEquipment.isTwoHanded()) {
+              //If we click a shield while have a two-handed weapon equipped, the weapon get unequipped
+              offHand = weaponItem;
+            }
           }
         }
-      } else if (slot == EquipmentInventorySlot.WEAPON.getSlotIdx() && currentEquipment.isTwoHanded()) {
-        offHand = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx());
       }
     }
-    return Pair.of(mainhand, offHand);
+    if (offHand != null && toReplace == null) {
+      return Pair.of(offHand, null);
+    }
+    return Pair.of(toReplace, offHand);
+  }
+
+  private boolean isShieldSlot(int index) {
+    return index == EquipmentInventorySlot.SHIELD.getSlotIdx();
+  }
+
+  private boolean isWeaponSlot(int index) {
+    return index == EquipmentInventorySlot.WEAPON.getSlotIdx();
   }
 
   @Nonnull
