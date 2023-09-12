@@ -27,13 +27,58 @@
 
 package no.elg.ii.util;
 
+import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
 
 public final class WidgetUtil {
   private WidgetUtil() {
   }
 
+  public static final int FULLY_TRANSPARENT = 255;
+  public static final int HALF_TRANSPARENT = FULLY_TRANSPARENT / 2;
+  public static final int FULLY_OPAQUE = 0;
+
   public static String getWidgetInfo(Widget widget) {
     return widget.getName() + " (id: " + widget.getItemId() + ", index: " + widget.getIndex() + ")";
+  }
+
+//  public static void updateContainerSlot(@Nullable Widget containerWidget, int index, int itemId, int amount) {
+//    if (containerWidget != null && containerWidget.getDynamicChildren().length > index) {
+//      var childWidget = containerWidget.getChild(index);
+//      setFakeWidgetItem(childWidget, itemId, amount);
+//    }
+//  }
+
+  public static void setFakeWidgetItem(Widget widget, int itemId, int amount) {
+    widget.setHidden(false);
+    widget.setOpacity(HALF_TRANSPARENT);
+
+    widget.setItemId(itemId);
+    widget.setItemQuantity(amount);
+  }
+
+  public static void setFakeWidgetItem(Widget widget, Item fromWidget) {
+    setFakeWidgetItem(widget, fromWidget.getId(), fromWidget.getQuantity());
+  }
+
+  public static void setFakeWidgetItem(Widget widget, Widget fromWidget) {
+    setFakeWidgetItem(widget, fromWidget.getItemId(), fromWidget.getItemQuantity());
+
+    widget.setItemQuantityMode(widget.getItemQuantityMode());
+    widget.setName(widget.getName());
+  }
+
+  public static void updateQuantity(Widget widget, int delta) {
+    widget.setItemQuantity(widget.getItemQuantity() - delta);
+    if (widget.getItemQuantity() == 0) {
+      widget.setOpacity(HALF_TRANSPARENT);
+    }
+  }
+
+  public static void setQuantity(Widget widget, int quantity) {
+    widget.setItemQuantity(quantity);
+    if (widget.getItemQuantity() == 0) {
+      widget.setOpacity(HALF_TRANSPARENT);
+    }
   }
 }

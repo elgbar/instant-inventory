@@ -32,6 +32,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -39,6 +40,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
@@ -88,12 +90,25 @@ public class InventoryState {
    * @param index  The index of the item
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
-  public void setItemId(int index, int itemId) {
-    log.debug("Setting index {} to {}", index, itemId);
-    slots[index] = new InventorySlotState(client.getTickCount(), itemId);
+  public void setSlot(Widget widget) {
+    int index = widget.getIndex();
+    int itemId = widget.getItemId();
+    log.debug("Setting index {} to id: {} q: {}", index, itemId, widget.getItemQuantity());
+    slots[index] = new InventorySlotState(client.getTickCount(), itemId, widget.getIndex());
   }
 
-  public void setSlot(int index, InventorySlot slot) {
+  /**
+   * Update the {@code itemId} at {@code index} will also update which tick the item was modified
+   *
+   * @param index  The index of the item
+   * @param itemId The new itemId, intended to be the current item in the players inventory
+   */
+  public void setSlot(int index, int itemId, int quantity) {
+    log.debug("Setting index {} to {}", index, itemId);
+    slots[index] = new InventorySlotState(client.getTickCount(), itemId, quantity);
+  }
+
+  public void setSlot(int index, @Nonnull InventorySlot slot) {
     log.debug("Setting index {} to {}", index, slot);
     slots[index] = slot;
   }
@@ -135,7 +150,7 @@ public class InventoryState {
    * @param index        The index of the item
    * @param actualItemId The actual item which is in the inventory
    */
-  public void validateState(int index, int actualItemId) {
+  public void validateState(int index, int actualItemId, int actualQuantity) {
     InventorySlot slot = getSlot(index);
     if (slot == InventorySlot.UNMODIFIED_SLOT || slot == InventorySlot.RESET_SLOT) {
       // This item is not modified (or at least not by us) so we do not need to do anything
@@ -143,10 +158,11 @@ public class InventoryState {
     }
 
     int itemId = slot.getItemId();
+    int quantity = slot.getQuantity();
     int modifiedTick = slot.getChangedTick();
     // Item at index changed so we must reset the slot
-    if (slot.hasValidItemId() && itemId != actualItemId) {
-      log.debug("Item at index {} changed from item id {} to {}, resetting the item", index, itemId, actualItemId);
+    if (slot.hasValidItemId() && (itemId != actualItemId || quantity != actualQuantity)) {
+      log.debug("Item at index {} changed from item id {} to {} or from quantity {} to {} , resetting the item", index, itemId, actualItemId, quantity, actualItemId);
       resetState(index);
       return;
     }

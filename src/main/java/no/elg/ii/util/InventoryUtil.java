@@ -27,7 +27,7 @@
 
 package no.elg.ii.util;
 
-import static net.runelite.api.NullItemID.NULL_6512;
+import static no.elg.ii.util.WidgetUtil.FULLY_TRANSPARENT;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,7 +50,7 @@ public final class InventoryUtil {
   }
 
   @Nullable
-  public static Widget findFirst(@Nonnull Client client, WidgetInfo widgetInfo, @Nonnull Filter<Widget> filter) {
+  public static Widget findFirst(@Nonnull Client client, @Nonnull WidgetInfo widgetInfo, @Nonnull Filter<Widget> filter) {
     Widget invWidget = client.getWidget(widgetInfo);
     if (invWidget == null) {
       return null;
@@ -64,11 +64,14 @@ public final class InventoryUtil {
     return null;
   }
 
-  public static final Filter<Widget> IS_EMPTY_FILTER = w -> w.getName().isBlank() || w.getItemId() == NULL_6512;
+  /**
+   * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
+   */
+  public static final Filter<Widget> IS_EMPTY_FILTER = w -> w.isHidden() || w.getName().isBlank() || w.getOpacity() == FULLY_TRANSPARENT;
 
   @Nullable
-  public static Widget firstEmptyWidget(@Nonnull Client client) {
-    return findFirst(client, WidgetInfo.INVENTORY, IS_EMPTY_FILTER);
+  public static Widget findFirstEmptySlot(@Nonnull Client client, @Nonnull WidgetInfo widgetInfo) {
+    return findFirst(client, widgetInfo, IS_EMPTY_FILTER);
   }
 
   private InventoryUtil() {

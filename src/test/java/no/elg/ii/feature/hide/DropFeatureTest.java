@@ -143,11 +143,11 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     assertTrue(feature.getState().getSlot(index).hasValidItemId());
     assertEquals(itemId, feature.getState().getSlot(index).getItemId());
 
-    feature.getState().validateState(index, itemId);
+    feature.getState().validateState(index, itemId, 0);
     assertTrue("State was reset when it should not have been", feature.getState().getSlot(index).hasValidItemId());
 
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
-    feature.getState().validateState(index, itemId);
+    feature.getState().validateState(index, itemId, 0);
     assertFalse("State was NOT reset when it should have been", feature.getState().getSlot(index).hasValidItemId());
   }
 

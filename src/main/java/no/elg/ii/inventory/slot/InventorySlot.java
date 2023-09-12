@@ -40,8 +40,8 @@ public interface InventorySlot {
    */
   int NO_CHANGED_TICK = -1;
 
-  InventorySlot UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID);
-  InventorySlot RESET_SLOT = new InventorySlotState(NO_CHANGED_TICK, RESET_ITEM_ID);
+  InventorySlot UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID, 0);
+  InventorySlot RESET_SLOT = new InventorySlotState(NO_CHANGED_TICK, RESET_ITEM_ID, 0);
 
   /**
    * @return When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
@@ -52,6 +52,8 @@ public interface InventorySlot {
    * @return The item id of this slot, or {@link InventorySlot#INVALID_ITEM_ID} if this slot is not a real item
    */
   int getItemId();
+
+  int getQuantity(); //TODO implement
 
   /**
    * @return Whether this slot is valid, i.e. has an item id

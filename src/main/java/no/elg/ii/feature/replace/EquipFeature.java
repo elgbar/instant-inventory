@@ -27,7 +27,8 @@
 
 package no.elg.ii.feature.replace;
 
-import static no.elg.ii.util.InventoryUtil.firstEmptyWidget;
+import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
+import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
@@ -40,9 +41,9 @@ import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.api.NullItemID;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.http.api.item.ItemEquipmentStats;
@@ -75,12 +76,12 @@ public class EquipFeature extends ReplacedItemFeature {
       String menuOption = event.getMenuOption();
       if (WIELD_OPTION.equals(menuOption) || WEAR_OPTION.equals(menuOption)) {
         log.debug("Equipped item {}", WidgetUtil.getWidgetInfo(widget));
-        hide(widget);
+        equip(widget);
       }
     }
   }
 
-  protected void hide(Widget widget) {
+  protected void equip(Widget widget) {
     Pair<Item, Item> itemIds = getEquipmentToReplace(widget);
     ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
     if (inventoryContainer == null) {
@@ -90,28 +91,26 @@ public class EquipFeature extends ReplacedItemFeature {
     @Nullable IndexedItem mainIndexedItem = IndexedItem.of(widget.getIndex(), itemIds.getLeft());
     @Nullable IndexedItem offhandIndexedItem = null;
     if (mainIndexedItem != null) {
-      widget.setItemId(mainIndexedItem.getItem().getId());
+      WidgetUtil.setFakeWidgetItem(widget, mainIndexedItem.getItem());
 
       Item offhandItem = itemIds.getRight();
       if (offhandItem != null) {
-        var offhandWidget = firstEmptyWidget(client);
+        var offhandWidget = findFirstEmptySlot(client, WidgetInfo.INVENTORY);
         if (offhandWidget != null) {
-          offhandWidget.setHidden(false);
-          offhandWidget.setItemId(offhandItem.getId());
-          offhandWidget.setItemQuantity(offhandItem.getQuantity());
+          setFakeWidgetItem(offhandWidget, offhandItem);
           offhandIndexedItem = IndexedItem.of(offhandWidget.getIndex(), offhandItem);
         }
       }
     } else {
-      widget.setItemId(NullItemID.NULL_6512);
+      widget.setHidden(true);
     }
     getState().setSlot(widget.getIndex(), new ReplacementInventorySlot(client.getTickCount(), widget.getItemId(), mainIndexedItem, offhandIndexedItem));
   }
 
 
   @Nullable
-  private Item getItemFromContainer(ItemContainer container, int slotID) {
-    return container.getItem(slotID);
+  private Item getItemFromContainer(ItemContainer equipmentContainer, int slot) {
+    return equipmentContainer.getItem(slot);
   }
 
   /**
@@ -124,7 +123,7 @@ public class EquipFeature extends ReplacedItemFeature {
     if (itemStats == null || !itemStats.isEquipable()) {
       return Pair.of(null, null);
     }
-    Item replaced = null;
+    Item mainhand = null;
     // Used if switching into a 2 handed weapon to store off-hand stats
     Item offHand = null;
     final ItemEquipmentStats currentEquipment = itemStats.getEquipment();
@@ -132,20 +131,20 @@ public class EquipFeature extends ReplacedItemFeature {
     ItemContainer equipmentContainer = client.getItemContainer(InventoryID.EQUIPMENT);
     if (currentEquipment != null && equipmentContainer != null) {
       final int slot = currentEquipment.getSlot();
-      replaced = getItemFromContainer(equipmentContainer, slot);
-      if (replaced == null && slot == EquipmentInventorySlot.SHIELD.getSlotIdx()) {
-        var weaponItem = getItemFromContainer(equipmentContainer, EquipmentInventorySlot.WEAPON.getSlotIdx());
+      mainhand = equipmentContainer.getItem(slot);
+      if (mainhand == null && slot == EquipmentInventorySlot.SHIELD.getSlotIdx()) {
+        var weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
         if (weaponItem != null) {
           ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId(), false);
           if (weaponStat != null && weaponStat.isEquipable()) {
-            replaced = weaponItem;
+            mainhand = weaponItem;
           }
         }
       } else if (slot == EquipmentInventorySlot.WEAPON.getSlotIdx() && currentEquipment.isTwoHanded()) {
-        offHand = getItemFromContainer(equipmentContainer, EquipmentInventorySlot.SHIELD.getSlotIdx());
+        offHand = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx());
       }
     }
-    return Pair.of(replaced, offHand);
+    return Pair.of(mainhand, offHand);
   }
 
   @Nonnull

@@ -90,9 +90,9 @@ public class InstantInventoryPlugin extends Plugin {
     Widget[] inventoryWidgets = inventoryItems(WidgetInfo.INVENTORY);
     Set<Feature> activeFeatures = featureManager.getActiveFeatures();
     for (int index = 0; index < inventoryWidgets.length; index++) {
-      int actualItemId = inventoryWidgets[index].getItemId();
+      Widget widget = inventoryWidgets[index];
       for (Feature feature : activeFeatures) {
-        feature.getState().validateState(index, actualItemId);
+        feature.getState().validateState(index, widget.getItemId(), widget.getItemQuantity());
       }
     }
   }

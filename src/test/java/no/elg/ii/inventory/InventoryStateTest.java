@@ -63,7 +63,7 @@ public class InventoryStateTest {
 
   private void setAll(int itemId) {
     for (int index = 0; index < INVENTORY_SIZE; index++) {
-      inventoryState.setItemId(index, itemId);
+      inventoryState.setSlot(index, itemId, 0);
     }
   }
 
@@ -100,12 +100,12 @@ public class InventoryStateTest {
   public void validateState_differentItemIdFromCurrent_resets() {
     doReturn(2).when(client).getTickCount();
     int index = 0;
-    inventoryState.setItemId(index, 1);
+    inventoryState.setSlot(index, 1, 0);
 
     assertEquals(1, inventoryState.getSlot(index).getItemId());
     assertEquals(2, inventoryState.getSlot(index).getChangedTick());
 
-    inventoryState.validateState(index, 2);
+    inventoryState.validateState(index, 2, 0);
 
     assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
@@ -114,14 +114,14 @@ public class InventoryStateTest {
   @Test
   public void validateState_timeout_resets_default_is_2() {
     int index = 0;
-    inventoryState.setItemId(index, 1);
+    inventoryState.setSlot(index, 1, 0);
 
     assertEquals(1, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
 
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
 
-    inventoryState.validateState(index, 1);
+    inventoryState.validateState(index, 1, 0);
 
     assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
@@ -132,14 +132,14 @@ public class InventoryStateTest {
     int index = 0;
     int itemId = 1;
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS + 1).when(config).maxUnmodifiedTicks();
-    inventoryState.setItemId(index, itemId);
+    inventoryState.setSlot(index, itemId, 0);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
 
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
 
-    inventoryState.validateState(index, itemId);
+    inventoryState.validateState(index, itemId, 0);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
@@ -151,14 +151,14 @@ public class InventoryStateTest {
     int itemId = 1;
     int maxUnmodifiedTicks = DEFAULT_MAX_UNMODIFIED_TICKS + 1;
     doReturn(maxUnmodifiedTicks).when(config).maxUnmodifiedTicks();
-    inventoryState.setItemId(index, itemId);
+    inventoryState.setSlot(index, itemId, 0);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
 
     doReturn(maxUnmodifiedTicks).when(client).getTickCount();
 
-    inventoryState.validateState(index, itemId);
+    inventoryState.validateState(index, itemId, 0);
 
     assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
@@ -171,7 +171,7 @@ public class InventoryStateTest {
     assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
 
-    inventoryState.validateState(index, 2);
+    inventoryState.validateState(index, 2, 0);
 
     assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
@@ -180,12 +180,12 @@ public class InventoryStateTest {
   @Test
   public void validateState_not_timeout_and_same_item_does_not_reset() {
     int index = 0;
-    inventoryState.setItemId(0, 1);
+    inventoryState.setSlot(0, 1, 0);
 
     assertEquals(1, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
 
-    inventoryState.validateState(0, 1);
+    inventoryState.validateState(0, 1, 0);
 
     assertEquals(1, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());

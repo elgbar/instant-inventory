@@ -34,4 +34,5 @@ public class InventorySlotState implements InventorySlot {
 
   private final int changedTick;
   private final int itemId;
+  private final int quantity;
 }

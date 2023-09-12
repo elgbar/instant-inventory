@@ -29,21 +29,19 @@ package no.elg.ii.feature.replace;
 
 import static no.elg.ii.util.InventoryUtil.IS_EMPTY_FILTER;
 import static no.elg.ii.util.InventoryUtil.findFirst;
+import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
+import static no.elg.ii.util.WidgetUtil.setQuantity;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.inventory.slot.ReplacementInventorySlot;
-import no.elg.ii.util.IndexedItem;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtil;
 
@@ -73,47 +71,54 @@ public class WithdrawFeature extends ReplacedItemFeature {
     }
   }
 
-  private void setSlot(int index, int itemId, int amount) {
-    updateSlot(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER), index, itemId, amount);
-    updateSlot(client.getWidget(WidgetInfo.INVENTORY), index, itemId, amount);
-  }
-
-  private void updateSlot(@Nullable Widget parentWidget, int index, int itemId, int amount) {
-    if (parentWidget != null) {
-      var widget = parentWidget.getChild(index);
-      changeWidgetItem(widget, itemId, amount);
-    }
-  }
-
-  private void changeWidgetItem(Widget widget, int itemId, int amount) {
-    widget.setHidden(false);
-    widget.setOpacity(0);
-    widget.setItemId(itemId);
-    widget.setItemQuantity(amount);
-  }
+//  private void setSlot(int index, int itemId, int amount) {
+//    updateSlot(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER), index, itemId, amount);
+////    updateSlot(client.getWidget(WidgetInfo.INVENTORY), index, itemId, amount);
+//  }
 
   private void withdraw(Widget widget, int amount) {
     int itemId = widget.getItemId();
-    ItemComposition itemComposition = itemManager.getItemComposition(itemId);
+    ItemComposition itemComposition = itemManager.getItemComposition(itemManager.canonicalize(itemId));
 
-    Widget matchingWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> w.getItemId() == itemId);
-    if (itemComposition.isStackable() && matchingWidget != null) {
-      widget.setItemQuantity(widget.getItemQuantity() - amount);
-      matchingWidget.setItemQuantity(matchingWidget.getItemQuantity() + amount);
-      IndexedItem indexedItem = IndexedItem.of(matchingWidget.getIndex(), new Item(itemId, matchingWidget.getItemQuantity()));
-      getState().setSlot(matchingWidget.getIndex(), new ReplacementInventorySlot(client.getTickCount(), itemId, indexedItem, null));
+    //Only withdraw the amount that is available
+    int quantityToWithdraw = Math.min(widget.getItemQuantity(), amount);
+
+    if (itemComposition.isStackable()) {
+      Widget matchingWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> w.getItemId() == itemId);
+      if (matchingWidget != null) {
+        //There is a matching widget, so we can just update the quantity
+        int updatedQuantity = matchingWidget.getItemQuantity() + quantityToWithdraw;
+        setQuantity(widget, updatedQuantity);
+        setQuantity(matchingWidget, updatedQuantity);
+        getState().setSlot(matchingWidget.getIndex(), itemId, updatedQuantity);
+      } else {
+        fillFirstEmpty(widget, quantityToWithdraw);
+      }
     } else {
-      var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> IS_EMPTY_FILTER.filter(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
-      if (emptyWidget != null) {
-        //FIXME if not  stackable then find N empty slots, not just set the quantity :p
-        int index = emptyWidget.getIndex();
-        setSlot(index, itemId, amount);
-        changeWidgetItem(emptyWidget, itemId, amount);
-
-        IndexedItem indexedItem = IndexedItem.of(index, new Item(itemId, amount));
-        getState().setSlot(index, new ReplacementInventorySlot(client.getTickCount(), itemId, indexedItem, null));
+      //Item is not stackable, so we have to fill the inventory with the item until we run out of space or items
+      for (int i = 0; i < quantityToWithdraw; i++) {
+        boolean outOfSpace = fillFirstEmpty(widget, 1);
+        if (outOfSpace) {
+          break;
+        }
       }
     }
+  }
+
+  /**
+   * @param widget
+   * @param quantityToWithdraw
+   * @return If there is no more space in the inventory
+   */
+  private boolean fillFirstEmpty(Widget widget, int quantityToWithdraw) {
+    var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> IS_EMPTY_FILTER.filter(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
+    if (emptyWidget != null) {
+      setFakeWidgetItem(emptyWidget, widget);
+      setQuantity(emptyWidget, quantityToWithdraw);
+      getState().setSlot(emptyWidget.getIndex(), widget.getItemId(), quantityToWithdraw);
+      return false;
+    }
+    return true;
   }
 
   @Nonnull

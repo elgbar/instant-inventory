@@ -79,6 +79,8 @@ public class DepositFeature extends HideFeature {
     }
   }
 
+  //TODO handle WidgetID.BANK_DEPOSIT_INVENTORY click (hide all items in inventory)
+
   @Nonnull
   @Override
   public String getConfigKey() {

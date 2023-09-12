@@ -62,7 +62,7 @@ public abstract class HideFeature implements Feature {
 
   protected void hide(Widget widget) {
     widget.setHidden(true);
-    getState().setItemId(widget.getIndex(), widget.getItemId());
+    getState().setSlot(widget);
   }
 
   private void show(Widget widget) {

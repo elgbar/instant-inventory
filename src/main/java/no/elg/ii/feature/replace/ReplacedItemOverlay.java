@@ -32,13 +32,9 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import lombok.AllArgsConstructor;
 import net.runelite.api.Item;
-import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
-import no.elg.ii.inventory.slot.InventorySlot;
-import no.elg.ii.inventory.slot.ReplacementInventorySlot;
-import no.elg.ii.util.IndexedItem;
 
 @AllArgsConstructor
 public class ReplacedItemOverlay extends WidgetItemOverlay {
@@ -52,27 +48,27 @@ public class ReplacedItemOverlay extends WidgetItemOverlay {
 
   @Override
   public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem widgetItem) {
-    Widget widget = widgetItem.getWidget();
-    if (widget.isHidden() || widget.getName().isBlank()) {
-      int index = widget.getIndex();
-      feature.getState().getActiveSlots().forEach(indexedSlot -> {
-        InventorySlot slot = indexedSlot.getSlot();
-        if (slot instanceof ReplacementInventorySlot) {
-          ReplacementInventorySlot replacementInventorySlot = (ReplacementInventorySlot) slot;
-          Rectangle bounds = widgetItem.getCanvasBounds();
-
-          IndexedItem primaryHand = replacementInventorySlot.getReplacedItem();
-          if (primaryHand != null && index == primaryHand.getIndex()) {
-            renderItem(graphics, bounds, primaryHand.getItem());
-          }
-
-          IndexedItem offhand = replacementInventorySlot.getOffhandReplacedItem();
-          if (offhand != null && index == offhand.getIndex()) {
-            renderItem(graphics, bounds, offhand.getItem());
-          }
-        }
-      });
-    }
+//    Widget widget = widgetItem.getWidget();
+//    if (widget.isHidden() || widget.getName().isBlank()) {
+//      int index = widget.getIndex();
+//      feature.getState().getActiveSlots().forEach(indexedSlot -> {
+//        InventorySlot slot = indexedSlot.getSlot();
+//        if (slot instanceof ReplacementInventorySlot) {
+//          ReplacementInventorySlot replacementInventorySlot = (ReplacementInventorySlot) slot;
+//          Rectangle bounds = widgetItem.getCanvasBounds();
+//
+//          IndexedItem primaryHand = replacementInventorySlot.getReplacedItem();
+//          if (primaryHand != null && index == primaryHand.getIndex()) {
+//            renderItem(graphics, bounds, primaryHand.getItem());
+//          }
+//
+//          IndexedItem offhand = replacementInventorySlot.getOffhandReplacedItem();
+//          if (offhand != null && index == offhand.getIndex()) {
+//            renderItem(graphics, bounds, offhand.getItem());
+//          }
+//        }
+//      });
+//    }
   }
 
   private void renderItem(Graphics2D graphics, Rectangle bounds, Item item) {
