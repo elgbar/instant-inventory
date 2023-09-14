@@ -28,6 +28,7 @@
 package no.elg.ii.util;
 
 import static no.elg.ii.util.WidgetUtil.FULLY_TRANSPARENT;
+import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,6 +50,30 @@ public final class InventoryUtil {
     boolean filter(T t);
   }
 
+  /**
+   * Copy a widget from one container to another
+   *
+   * @param client      The client
+   * @param source      The source container
+   * @param destination The destination container
+   * @param index       The index in the destination container to copy to
+   */
+  public static void copyWidgetFromContainer(@Nonnull Client client, @Nonnull WidgetInfo source, @Nonnull WidgetInfo destination, int index) {
+    Widget srcWidgetContainer = client.getWidget(source);
+    Widget dstWidgetContainer = client.getWidget(destination);
+    if (srcWidgetContainer == null || dstWidgetContainer == null) {
+      return;
+    }
+    int length = dstWidgetContainer.getDynamicChildren().length;
+    if (srcWidgetContainer.getDynamicChildren().length != length || index < 0 || index >= length) {
+      return;
+    }
+    Widget srcWidget = srcWidgetContainer.getChild(index);
+    Widget dstWidget = dstWidgetContainer.getChild(index);
+
+    setFakeWidgetItem(srcWidget, dstWidget);
+  }
+
   @Nullable
   public static Widget findFirst(@Nonnull Client client, @Nonnull WidgetInfo widgetInfo, @Nonnull Filter<Widget> filter) {
     Widget invWidget = client.getWidget(widgetInfo);
@@ -64,14 +89,17 @@ public final class InventoryUtil {
     return null;
   }
 
+
   /**
    * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
    */
-  public static final Filter<Widget> IS_EMPTY_FILTER = w -> w.isHidden() || w.getName().isBlank() || w.getOpacity() == FULLY_TRANSPARENT;
+  public static boolean isEmpty(@Nonnull Widget widget) {
+    return widget.isHidden() || widget.getName().isBlank() || widget.getOpacity() == FULLY_TRANSPARENT;
+  }
 
   @Nullable
   public static Widget findFirstEmptySlot(@Nonnull Client client, @Nonnull WidgetInfo widgetInfo) {
-    return findFirst(client, widgetInfo, IS_EMPTY_FILTER);
+    return findFirst(client, widgetInfo, InventoryUtil::isEmpty);
   }
 
   private InventoryUtil() {

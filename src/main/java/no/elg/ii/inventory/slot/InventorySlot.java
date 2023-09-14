@@ -27,6 +27,9 @@
 
 package no.elg.ii.inventory.slot;
 
+import javax.annotation.Nonnull;
+import net.runelite.api.widgets.Widget;
+
 public interface InventorySlot {
 
   /**
@@ -54,6 +57,14 @@ public interface InventorySlot {
   int getItemId();
 
   int getQuantity(); //TODO implement
+
+  /**
+   * @param widget
+   * @return If the item id or quantity is different from this slot
+   */
+  default boolean isDifferent(@Nonnull Widget widget) {
+    return getItemId() != widget.getItemId() || getQuantity() != widget.getItemQuantity();
+  }
 
   /**
    * @return Whether this slot is valid, i.e. has an item id

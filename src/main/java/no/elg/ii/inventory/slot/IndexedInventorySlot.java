@@ -27,11 +27,12 @@
 
 package no.elg.ii.inventory.slot;
 
+import javax.annotation.Nonnull;
 import lombok.Data;
 
 @Data
 public class IndexedInventorySlot {
 
   private final int index;
-  private final InventorySlot slot;
+  private final @Nonnull InventorySlot slot;
 }
