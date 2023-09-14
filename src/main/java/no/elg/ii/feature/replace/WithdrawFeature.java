@@ -40,9 +40,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -65,7 +65,7 @@ public class WithdrawFeature implements Feature {
   @Inject
   @VisibleForTesting
   public ItemManager itemManager;
-  
+
   @Inject
   @Getter
   private InventoryState state;
@@ -86,33 +86,40 @@ public class WithdrawFeature implements Feature {
     }
   }
 
-//  private void setSlot(int index, int itemId, int amount) {
-//    updateSlot(client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER), index, itemId, amount);
-////    updateSlot(client.getWidget(WidgetInfo.INVENTORY), index, itemId, amount);
-//  }
+  private void withdraw(Widget bankWidget, int amount) {
+    int bankWidgetItemId;
+    ItemComposition bankWidgetComposition;
 
-  private void withdraw(Widget widget, int amount) {
-    int itemId = widget.getItemId();
-    ItemComposition itemComposition = itemManager.getItemComposition(itemManager.canonicalize(itemId));
+    //If we're withdrawing as a note, we need to get the item id of the note as the banked item is never the noted item
+    boolean isWithdrawingAsNote = isWithdrawingAsNote();
+    int originalItemId = bankWidget.getItemId();
+    ItemComposition originalComposition = itemManager.getItemComposition(originalItemId);
+    if (isWithdrawingAsNote) {
+      bankWidgetItemId = originalComposition.getLinkedNoteId();
+      bankWidgetComposition = itemManager.getItemComposition(bankWidgetItemId);
+    } else {
+      bankWidgetItemId = originalItemId;
+      bankWidgetComposition = originalComposition;
+    }
 
     //Only withdraw the amount that is available
-    int quantityToWithdraw = Math.min(widget.getItemQuantity(), amount);
+    int quantityToWithdraw = Math.min(bankWidget.getItemQuantity(), amount);
 
-    if (itemComposition.isStackable()) {
-      Widget matchingWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> w.getItemId() == itemId);
-      if (matchingWidget != null) {
+    if (bankWidgetComposition.isStackable()) {
+      Widget inventoryWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> w.getItemId() == bankWidgetItemId);
+      if (inventoryWidget != null) {
         //There is a matching widget, so we can just update the quantity
-        int updatedQuantity = matchingWidget.getItemQuantity() + quantityToWithdraw;
-        setQuantity(widget, updatedQuantity);
-        setQuantity(matchingWidget, updatedQuantity);
-        getState().setSlot(matchingWidget.getIndex(), itemId, updatedQuantity);
+        updateQuantity(bankWidget, -quantityToWithdraw);
+        updateQuantity(inventoryWidget, quantityToWithdraw);
+        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity());
+        InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, inventoryWidget.getIndex());
       } else {
-        fillFirstEmpty(widget, quantityToWithdraw);
+        fillFirstEmpty(bankWidget, quantityToWithdraw);
       }
     } else {
       //Item is not stackable, so we have to fill the inventory with the item until we run out of space or items
       for (int i = 0; i < quantityToWithdraw; i++) {
-        boolean outOfSpace = fillFirstEmpty(widget, 1);
+        boolean outOfSpace = fillFirstEmpty(bankWidget, 1);
         if (outOfSpace) {
           break;
         }
@@ -121,20 +128,32 @@ public class WithdrawFeature implements Feature {
   }
 
   /**
-   * @param widget
-   * @param quantityToWithdraw
-   * @return If there is no more space in the inventory
+   * @return {@code false} if there is no more space in the inventory, {@code true} otherwise
    */
   private boolean fillFirstEmpty(Widget widget, int quantityToWithdraw) {
-    var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> IS_EMPTY_FILTER.filter(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
+    var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> isEmpty(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
     if (emptyWidget != null) {
-      setFakeWidgetItem(emptyWidget, widget);
+      setFakeWidgetItem(widget, emptyWidget);
       setQuantity(emptyWidget, quantityToWithdraw);
       getState().setSlot(emptyWidget.getIndex(), widget.getItemId(), quantityToWithdraw);
+      InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, emptyWidget.getIndex());
       return false;
     }
     return true;
   }
+
+  /**
+   * This is based on observation, so it might not be correct.
+   *
+   * @return Whether the bank is set to withdraw as a note
+   */
+  private boolean isWithdrawingAsNote() {
+    Widget widget = client.getWidget(WidgetID.BANK_GROUP_ID, BANK_WITHDRAW_AS_ITEM);
+    return widget != null && widget.getOnOpListener() != null;
+  }
+
+  static final int BANK_WITHDRAW_AS_ITEM = 22;
+  static final int BANK_WITHDRAW_AS_NOTE = 24;
 
   @Nonnull
   @Override
