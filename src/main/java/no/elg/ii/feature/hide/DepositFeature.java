@@ -40,7 +40,7 @@ import no.elg.ii.util.Util;
 public class DepositFeature extends HideFeature {
 
   public static final String DEPOSIT_PREFIX_OPTION = "Deposit-";
-  public static final String ADD_PREFIX_OPTION = "Add-";
+  public static final String DEPOSIT_ALL_OPTION = "Deposit inventory";
   public static final String DEPOSIT_CONFIG_KEY = "instantDeposit";
 
   {
@@ -56,6 +56,11 @@ public class DepositFeature extends HideFeature {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
+      if (DEPOSIT_ALL_OPTION.equals(menuOption)) {
+        log.debug("Hiding all items");
+        inventoryItems().forEach(indexedWidget -> hide(indexedWidget.getWidget()));
+        return;
+      }
       int eventItemId = event.getItemId();
       if (menuOption != null && (menuOption.startsWith(DEPOSIT_PREFIX_OPTION) || menuOption.startsWith(ADD_PREFIX_OPTION))) {
         int toTake = Util.getNumber(menuOption);
