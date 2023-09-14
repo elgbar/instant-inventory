@@ -35,6 +35,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
@@ -102,10 +103,12 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameStateChanged(GameStateChanged event) {
-    log.debug("Resetting features as the GameState changed to {}", event.getGameState());
-    Set<Feature> activeFeatures = featureManager.getActiveFeatures();
-    for (Feature feature : activeFeatures) {
-      feature.reset();
+    if (event.getGameState() != GameState.LOGGED_IN) {
+      log.debug("Resetting features as the GameState changed to {}", event.getGameState());
+      Set<Feature> activeFeatures = featureManager.getActiveFeatures();
+      for (Feature feature : activeFeatures) {
+        feature.reset();
+      }
     }
   }
 
