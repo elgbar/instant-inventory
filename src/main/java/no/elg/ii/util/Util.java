@@ -30,7 +30,7 @@ package no.elg.ii.util;
 public class Util {
   public static final int NO_NUMBER = -1;
 
-  public static int getNumber(String text) {
+  public static int getNumberFromMenuOption(String text) {
     try {
       String substring = text.substring(text.lastIndexOf('-') + 1);
       return Integer.parseInt(substring);

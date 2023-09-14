@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
@@ -48,6 +49,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.http.api.item.ItemEquipmentStats;
 import net.runelite.http.api.item.ItemStats;
+import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.ReplacementInventorySlot;
 import no.elg.ii.util.IndexedItem;
 import no.elg.ii.util.WidgetUtil;
@@ -55,7 +58,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 @Singleton
 @Slf4j
-public class EquipFeature extends ReplacedItemFeature {
+public class EquipFeature implements Feature {
 
   public static final String WEAR_OPTION = "Wear";
   public static final String WIELD_OPTION = "Wield";
@@ -68,6 +71,10 @@ public class EquipFeature extends ReplacedItemFeature {
   @Inject
   @VisibleForTesting
   Client client;
+
+  @Inject
+  @Getter
+  private InventoryState state;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -91,13 +98,13 @@ public class EquipFeature extends ReplacedItemFeature {
     @Nullable IndexedItem mainIndexedItem = IndexedItem.of(widget.getIndex(), itemIds.getLeft());
     @Nullable IndexedItem offhandIndexedItem = null;
     if (mainIndexedItem != null) {
-      setFakeWidgetItem(widget, mainIndexedItem.getItem());
+      setFakeWidgetItem(mainIndexedItem.getItem(), widget);
 
       Item offhandItem = itemIds.getRight();
       if (offhandItem != null) {
         var offhandWidget = findFirstEmptySlot(client, WidgetInfo.INVENTORY);
         if (offhandWidget != null) {
-          setFakeWidgetItem(offhandWidget, offhandItem);
+          setFakeWidgetItem(offhandItem, offhandWidget);
           offhandIndexedItem = IndexedItem.of(offhandWidget.getIndex(), offhandItem);
         }
       }
@@ -107,24 +114,19 @@ public class EquipFeature extends ReplacedItemFeature {
     getState().setSlot(widget.getIndex(), new ReplacementInventorySlot(client.getTickCount(), widget.getItemId(), mainIndexedItem, offhandIndexedItem));
   }
 
-
-  @Nullable
-  private Item getItemFromContainer(ItemContainer equipmentContainer, int slot) {
-    return equipmentContainer.getItem(slot);
-  }
-
   /**
    * @param widget the widget to equip
    * @return The item that was equipped (left) and potentially the off-hand item that was equipped (right) if it will be unequipped
    */
+  @VisibleForTesting
   @Nonnull
-  private Pair<Item, Item> getEquipmentToReplace(Widget widget) {
+  public Pair<Item, Item> getEquipmentToReplace(Widget widget) {
     final ItemStats itemStats = itemManager.getItemStats(widget.getItemId(), false);
     if (itemStats == null || !itemStats.isEquipable()) {
       return Pair.of(null, null);
     }
     Item toReplace = null;
-    Item offHand = null;
+    Item extra = null;
 
     final ItemEquipmentStats clickedEquipment = itemStats.getEquipment();
 
@@ -135,7 +137,7 @@ public class EquipFeature extends ReplacedItemFeature {
 
       if (isWeaponSlot(slotOfClickedItem)) {
         if (clickedEquipment.isTwoHanded()) {
-          offHand = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx());
+          extra = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx());
         }
       } else if (isShieldSlot(slotOfClickedItem)) {
         var weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
@@ -145,16 +147,17 @@ public class EquipFeature extends ReplacedItemFeature {
             ItemEquipmentStats weaponStatEquipment = weaponStat.getEquipment();
             if (weaponStatEquipment != null && weaponStatEquipment.isTwoHanded()) {
               //If we click a shield while have a two-handed weapon equipped, the weapon get unequipped
-              offHand = weaponItem;
+              extra = weaponItem;
             }
           }
         }
       }
     }
-    if (offHand != null && toReplace == null) {
-      return Pair.of(offHand, null);
+    if (extra != null && toReplace == null) {
+      //
+      return Pair.of(extra, null);
     }
-    return Pair.of(toReplace, offHand);
+    return Pair.of(toReplace, extra);
   }
 
   private boolean isShieldSlot(int index) {

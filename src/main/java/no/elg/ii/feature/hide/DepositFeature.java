@@ -63,7 +63,7 @@ public class DepositFeature extends HideFeature {
       }
       int eventItemId = event.getItemId();
       if (menuOption != null && (menuOption.startsWith(DEPOSIT_PREFIX_OPTION) || menuOption.startsWith(ADD_PREFIX_OPTION))) {
-        int toTake = Util.getNumber(menuOption);
+        int toTake = Util.getNumberFromMenuOption(menuOption);
         if (toTake == Util.NO_NUMBER) {
           return;
         }

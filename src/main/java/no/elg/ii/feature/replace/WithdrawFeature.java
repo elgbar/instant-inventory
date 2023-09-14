@@ -27,26 +27,33 @@
 
 package no.elg.ii.feature.replace;
 
-import static no.elg.ii.util.InventoryUtil.IS_EMPTY_FILTER;
 import static no.elg.ii.util.InventoryUtil.findFirst;
+import static no.elg.ii.util.InventoryUtil.isEmpty;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 import static no.elg.ii.util.WidgetUtil.setQuantity;
+import static no.elg.ii.util.WidgetUtil.updateQuantity;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
+import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.util.InventoryUtil;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtil;
 
 @Slf4j
-public class WithdrawFeature extends ReplacedItemFeature {
+public class WithdrawFeature implements Feature {
 
   public static final String WITHDRAW_PREFIX_OPTION = "Withdraw-";
   public static final String WITHDRAW_CONFIG_KEY = "instantWithdraw";
@@ -55,18 +62,26 @@ public class WithdrawFeature extends ReplacedItemFeature {
   @VisibleForTesting
   Client client;
 
+  @Inject
+  @VisibleForTesting
+  public ItemManager itemManager;
+  
+  @Inject
+  @Getter
+  private InventoryState state;
+
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
-    Widget widget = event.getWidget();
-    if (widget != null) {
+    Widget bankWidget = event.getWidget();
+    if (bankWidget != null) {
       String menuOption = event.getMenuOption();
       if (menuOption != null && menuOption.startsWith(WITHDRAW_PREFIX_OPTION)) {
-        int amount = Util.getNumber(menuOption);
+        int amount = Util.getNumberFromMenuOption(menuOption);
         if (amount == Util.NO_NUMBER) {
           return;
         }
-        log.debug("Withdrawing item {}", WidgetUtil.getWidgetInfo(widget));
-        withdraw(widget, amount);
+        log.debug("Withdrawing item {}", WidgetUtil.getWidgetInfo(bankWidget));
+        withdraw(bankWidget, amount);
       }
     }
   }
@@ -126,5 +141,4 @@ public class WithdrawFeature extends ReplacedItemFeature {
   public String getConfigKey() {
     return WITHDRAW_CONFIG_KEY;
   }
-
 }
