@@ -29,8 +29,10 @@ package no.elg.ii.feature.replace;
 
 import static no.elg.ii.util.InventoryUtil.findFirst;
 import static no.elg.ii.util.InventoryUtil.isEmpty;
+import static no.elg.ii.util.WidgetUtil.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 import static no.elg.ii.util.WidgetUtil.setQuantity;
+import static no.elg.ii.util.WidgetUtil.unhide;
 import static no.elg.ii.util.WidgetUtil.updateQuantity;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -40,14 +42,17 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.util.InventoryUtil;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtil;
@@ -69,6 +74,9 @@ public class WithdrawFeature implements Feature {
   @Inject
   @Getter
   private InventoryState state;
+  @Inject
+  @Getter
+  private ClientThread clientThread;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -82,6 +90,44 @@ public class WithdrawFeature implements Feature {
         }
         log.debug("Withdrawing item {}", WidgetUtil.getWidgetInfo(bankWidget));
         withdraw(bankWidget, amount);
+      }
+    }
+  }
+
+  boolean b = true;
+  boolean c = true;
+
+
+  @Subscribe
+  public void onItemContainerChanged(final ItemContainerChanged event) {
+    Widget bankInvContainer = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
+    if (bankInvContainer == null || bankInvContainer.isHidden()) {
+      return;
+    }
+//    clientThread.invokeAtTickEnd(() -> {
+    getState().getActiveSlots().forEach(iis -> {
+      var slot = iis.getSlot();
+      Widget inventoryWidget = bankInvContainer.getChild(iis.getIndex());
+//      if (inventoryWidget == null || !slot.isDifferent(inventoryWidget) || isEmpty(inventoryWidget)) {
+//        return;
+//      }
+//      if (slot.isDifferent(inventoryWidget)) {
+      //The item in the inventory is not the same as the one in the bank, so we need to update it
+
+//        if (c)
+      setFakeWidgetItem(bankInvContainer, slot.getItemId(), slot.getQuantity());
+//        if (b)
+      getState().resetState(iis.getIndex());
+//      }
+    });
+//    });
+
+
+    for (Widget child : bankInvContainer.getDynamicChildren()) {
+      unhide(child);
+      InventorySlot slot = getState().getSlot(child.getIndex());
+      if (slot == null || !slot.hasValidItemId()) {
+        child.setOpacity(FULLY_OPAQUE);
       }
     }
   }
