@@ -130,12 +130,13 @@ public class WithdrawFeature implements Feature {
   /**
    * @return {@code false} if there is no more space in the inventory, {@code true} otherwise
    */
-  private boolean fillFirstEmpty(Widget widget, int quantityToWithdraw) {
+  private boolean fillFirstEmpty(Widget bankWidget, int quantityToWithdraw) {
     var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> isEmpty(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
     if (emptyWidget != null) {
-      setFakeWidgetItem(widget, emptyWidget);
+      setFakeWidgetItem(bankWidget, emptyWidget);
       setQuantity(emptyWidget, quantityToWithdraw);
-      getState().setSlot(emptyWidget.getIndex(), widget.getItemId(), quantityToWithdraw);
+      updateQuantity(bankWidget, -quantityToWithdraw);
+      getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw);
       InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, emptyWidget.getIndex());
       return false;
     }
