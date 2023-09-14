@@ -11,7 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* Add Equip feature
+* Add Withdraw feature
+* Deposit all items in inventory into the bank instantly when clicking `Deposit inventory`
+
 ### Changed
+
+* Only reset all features when the game stage changes to `LOGGED_IN`
+* Simplify the clean feature by editing inventory widgets directly, instead of using an overlay
 
 ### Fixed
 

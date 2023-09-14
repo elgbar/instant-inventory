@@ -37,13 +37,11 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
@@ -53,28 +51,6 @@ public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
   @Override
   public CleanHerbFeature createNewInstance() {
     return TestSetup.createNewCleanHerbFeature();
-  }
-
-  @Test
-  public void addsOverlayOnEnable() {
-    CleanHerbFeature feature = createNewInstance();
-    OverlayManager overlayManager = feature.overlayManager;
-    CleanHerbOverlay overlay = feature.overlay;
-
-    feature.onEnable();
-
-    verify(overlayManager).add(overlay);
-  }
-
-  @Test
-  public void removesOverOnDisable() {
-    CleanHerbFeature feature = createNewInstance();
-    OverlayManager overlayManager = feature.overlayManager;
-    CleanHerbOverlay overlay = feature.overlay;
-
-    feature.onDisable();
-
-    verify(overlayManager).remove(overlay);
   }
 
   @Test

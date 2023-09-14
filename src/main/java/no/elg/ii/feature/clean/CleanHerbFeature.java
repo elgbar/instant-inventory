@@ -26,6 +26,8 @@
  */
 package no.elg.ii.feature.clean;
 
+import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
+
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -34,7 +36,6 @@ import net.runelite.api.Skill;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.ui.overlay.OverlayManager;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
 
@@ -45,27 +46,10 @@ public class CleanHerbFeature implements Feature {
 
   @Inject
   @VisibleForTesting
-  public CleanHerbOverlay overlay;
-  @Inject
-  @VisibleForTesting
-  public OverlayManager overlayManager;
-
-  @Inject
-  @VisibleForTesting
   public Client client;
 
   @Inject
   private InventoryState state;
-
-  @Override
-  public void onEnable() {
-    overlayManager.add(overlay);
-  }
-
-  @Override
-  public void onDisable() {
-    overlayManager.remove(overlay);
-  }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -78,10 +62,10 @@ public class CleanHerbFeature implements Feature {
         if (herbInfo == null) {
           return;
         }
-
         int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
         if (herbloreLevel >= herbInfo.getMinLevel()) {
           getState().setSlot(widget);
+          setFakeWidgetItem(widget, herbInfo.getCleanItemId(), 1);
         }
       }
     }

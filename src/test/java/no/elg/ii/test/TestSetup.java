@@ -43,7 +43,6 @@ import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.clean.CleanHerbFeature;
-import no.elg.ii.feature.clean.CleanHerbOverlay;
 import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.hide.HideFeature;
@@ -58,9 +57,7 @@ public class TestSetup {
 
   public static CleanHerbFeature createNewCleanHerbFeature() {
     CleanHerbFeature feature = spy(new CleanHerbFeature());
-    feature.overlayManager = mock(OverlayManager.class);
     feature.client = mock(Client.class);
-    feature.overlay = mock(CleanHerbOverlay.class);
 
     setupCommonFeature(feature, feature.client);
     return feature;
