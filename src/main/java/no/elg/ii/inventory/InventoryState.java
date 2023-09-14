@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -86,15 +87,10 @@ public class InventoryState {
 
   /**
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
-   *
-   * @param index  The index of the item
-   * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setSlot(Widget widget) {
     int index = widget.getIndex();
-    int itemId = widget.getItemId();
-    log.debug("Setting index {} to id: {} q: {}", index, itemId, widget.getItemQuantity());
-    slots[index] = new InventorySlotState(client.getTickCount(), itemId, widget.getIndex());
+    setSlot(index, new InventorySlotState(client.getTickCount(), widget.getItemId(), index));
   }
 
   /**
@@ -104,24 +100,40 @@ public class InventoryState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setSlot(int index, int itemId, int quantity) {
-    log.debug("Setting index {} to {}", index, itemId);
-    slots[index] = new InventorySlotState(client.getTickCount(), itemId, quantity);
+    setSlot(index, new InventorySlotState(client.getTickCount(), itemId, quantity));
   }
 
   public void setSlot(int index, @Nonnull InventorySlot slot) {
-    log.debug("Setting index {} to {}", index, slot);
-    slots[index] = slot;
+    if (isValidIndex(index)) {
+      log.trace("Setting index {} to {}", index, slot);
+      slots[index] = slot;
+    } else {
+      log.debug("Tried to set invalid index {} to {}", index, slot);
+    }
   }
 
+  @Nullable
   public InventorySlot getSlot(int index) {
+    if (isInvalidIndex(index)) {
+      log.debug("Tried to get invalid index {}", index);
+      return null;
+    }
     return slots[index];
+  }
+
+  public static boolean isValidIndex(int index) {
+    return index >= 0 && index < INVENTORY_SIZE;
+  }
+
+  public static boolean isInvalidIndex(int index) {
+    return index < 0 || index >= INVENTORY_SIZE;
   }
 
   /**
    * @return The slots and its index we're currently modifying
    */
   public Stream<IndexedInventorySlot> getActiveSlots() {
-    return IntStream.range(0, INVENTORY_SIZE).mapToObj(i -> new IndexedInventorySlot(i, slots[i])).filter((iis) -> iis.getSlot().hasValidItemId());
+    return IntStream.range(0, INVENTORY_SIZE).mapToObj(i -> new IndexedInventorySlot(i, getSlot(i))).filter((iis) -> iis.getSlot().hasValidItemId());
   }
 
   /**
@@ -137,7 +149,12 @@ public class InventoryState {
    * @param index The index of the item
    */
   public void resetState(int index) {
-    slots[index] = InventorySlot.RESET_SLOT;
+    if (isValidIndex(index)) {
+      log.trace("Resetting index {}", index);
+      slots[index] = InventorySlot.RESET_SLOT;
+    } else {
+      log.debug("Tried to reset invalid index {}", index);
+    }
   }
 
   /**
@@ -152,7 +169,7 @@ public class InventoryState {
    */
   public void validateState(int index, int actualItemId, int actualQuantity) {
     InventorySlot slot = getSlot(index);
-    if (slot == InventorySlot.UNMODIFIED_SLOT || slot == InventorySlot.RESET_SLOT) {
+    if (slot == null || slot == InventorySlot.UNMODIFIED_SLOT || slot == InventorySlot.RESET_SLOT) {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }
