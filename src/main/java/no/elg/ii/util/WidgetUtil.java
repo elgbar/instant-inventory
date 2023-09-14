@@ -27,6 +27,7 @@
 
 package no.elg.ii.util;
 
+import javax.annotation.Nonnull;
 import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
 
@@ -34,48 +35,54 @@ public final class WidgetUtil {
   private WidgetUtil() {
   }
 
+  /**
+   * Item is fully transparent, not visible
+   */
   public static final int FULLY_TRANSPARENT = 255;
   public static final int HALF_TRANSPARENT = FULLY_TRANSPARENT / 2;
+  /**
+   * Item is fully opaque, visible
+   */
   public static final int FULLY_OPAQUE = 0;
 
-  public static String getWidgetInfo(Widget widget) {
+  @Nonnull
+  public static String getWidgetInfo(@Nonnull Widget widget) {
     return widget.getName() + " (id: " + widget.getItemId() + ", index: " + widget.getIndex() + ")";
   }
 
-//  public static void updateContainerSlot(@Nullable Widget containerWidget, int index, int itemId, int amount) {
-//    if (containerWidget != null && containerWidget.getDynamicChildren().length > index) {
-//      var childWidget = containerWidget.getChild(index);
-//      setFakeWidgetItem(childWidget, itemId, amount);
-//    }
-//  }
-
-  public static void setFakeWidgetItem(Widget widget, int itemId, int amount) {
+  public static void unhide(@Nonnull Widget widget) {
     widget.setHidden(false);
     widget.setOpacity(HALF_TRANSPARENT);
-
-    widget.setItemId(itemId);
-    widget.setItemQuantity(amount);
   }
 
-  public static void setFakeWidgetItem(Widget widget, Item fromWidget) {
-    setFakeWidgetItem(widget, fromWidget.getId(), fromWidget.getQuantity());
+  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
+    unhide(dstWidget);
+    dstWidget.setItemId(itemId);
+    dstWidget.setItemQuantity(amount);
   }
 
-  public static void setFakeWidgetItem(Widget widget, Widget fromWidget) {
-    setFakeWidgetItem(widget, fromWidget.getItemId(), fromWidget.getItemQuantity());
-
-    widget.setItemQuantityMode(widget.getItemQuantityMode());
-    widget.setName(widget.getName());
+  public static void setFakeWidgetItem(@Nonnull Item srcItem, @Nonnull Widget dstWidget) {
+    setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity());
   }
 
-  public static void updateQuantity(Widget widget, int delta) {
-    widget.setItemQuantity(widget.getItemQuantity() - delta);
-    if (widget.getItemQuantity() == 0) {
-      widget.setOpacity(HALF_TRANSPARENT);
-    }
+  public static void setFakeWidgetItem(@Nonnull Widget srcWidget, @Nonnull Widget dstWidget) {
+    setFakeWidgetItem(dstWidget, srcWidget.getItemId(), srcWidget.getItemQuantity());
+
+    dstWidget.setItemQuantityMode(dstWidget.getItemQuantityMode());
+    dstWidget.setName(dstWidget.getName());
   }
 
-  public static void setQuantity(Widget widget, int quantity) {
+  /**
+   * Add {@code delta} from the quantity of {@code widget}
+   *
+   * @param widget the widget to update
+   * @param delta  the amount to add
+   */
+  public static void updateQuantity(@Nonnull Widget widget, int delta) {
+    setQuantity(widget, widget.getItemQuantity() + delta);
+  }
+
+  public static void setQuantity(@Nonnull Widget widget, int quantity) {
     widget.setItemQuantity(quantity);
     if (widget.getItemQuantity() == 0) {
       widget.setOpacity(HALF_TRANSPARENT);
