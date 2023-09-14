@@ -33,6 +33,7 @@ import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.runelite.api.Client;
+import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 
@@ -94,7 +95,7 @@ public final class InventoryUtil {
    * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
    */
   public static boolean isEmpty(@Nonnull Widget widget) {
-    return widget.isHidden() || widget.getName().isBlank() || widget.getOpacity() == FULLY_TRANSPARENT;
+    return widget.isHidden() || widget.getName().isBlank() || widget.getOpacity() == FULLY_TRANSPARENT || widget.getItemId() == NullItemID.NULL_6512;
   }
 
   @Nullable
