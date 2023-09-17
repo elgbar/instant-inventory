@@ -27,7 +27,6 @@
 
 package no.elg.ii.feature.replace;
 
-import static no.elg.ii.util.InventoryUtil.BANK_WITHDRAW_AS_ITEM;
 import static no.elg.ii.util.InventoryUtil.findFirst;
 import static no.elg.ii.util.WidgetUtil.isEmpty;
 
@@ -142,14 +141,14 @@ public class WithdrawFeature implements Feature {
   }
 
   /**
-   * This is based on observation, so it might not be correct.
-   *
    * @return Whether the bank is set to withdraw as a note
    */
   private boolean isWithdrawingAsNote() {
-    Widget widget = client.getWidget(BANK_WITHDRAW_AS_ITEM.getGroupId(), BANK_WITHDRAW_AS_ITEM.getChildId());
-    return widget != null && widget.getOnOpListener() != null;
+    return client.getVarbitValue(VARBIT_WITHDRAW_AS_NOTE) == VARBIT_WITHDRAW_AS_NOTE_VALUE_TRUE;
   }
+
+  public static final int VARBIT_WITHDRAW_AS_NOTE = 3958;
+  public static final int VARBIT_WITHDRAW_AS_NOTE_VALUE_TRUE = 1;
 
   @Nonnull
   @Override
