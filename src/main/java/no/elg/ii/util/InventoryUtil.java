@@ -30,11 +30,14 @@ package no.elg.ii.util;
 import static no.elg.ii.util.WidgetUtil.FULLY_TRANSPARENT;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
 import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
 
 public final class InventoryUtil {
@@ -101,6 +104,47 @@ public final class InventoryUtil {
   @Nullable
   public static Widget findFirstEmptySlot(@Nonnull Client client, @Nonnull WidgetInfo widgetInfo) {
     return findFirst(client, widgetInfo, InventoryUtil::isEmpty);
+  }
+
+  public static final AdditionalWidgetInfo GROUP_ITEM_CONTAINER = new AdditionalWidgetInfo(WidgetID.GROUP_STORAGE_INVENTORY_GROUP_ID, 0);
+
+  public static final List<AdditionalWidgetInfo> INVENTORY_ITEMS_CONTAINERS = List.of(
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.EQUIPMENT_INVENTORY_ITEMS_CONTAINER),
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER),
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.GRAND_EXCHANGE_INVENTORY_ITEMS_CONTAINER),
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER),
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.SHOP_INVENTORY_ITEMS_CONTAINER),
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.SMITHING_INVENTORY_ITEMS_CONTAINER),
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER),
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.SEED_VAULT_INVENTORY_ITEMS_CONTAINER),
+    GROUP_ITEM_CONTAINER
+  );
+
+  @Nullable
+  public static Widget getOpenWidgetItemContainer(Client client) {
+    for (AdditionalWidgetInfo widgetInfo : INVENTORY_ITEMS_CONTAINERS) {
+      Widget widget = client.getWidget(widgetInfo.getGroupId(), widgetInfo.getChildId());
+      if (widget != null && !widget.isHidden()) {
+        return widget;
+      }
+    }
+    return client.getWidget(WidgetInfo.INVENTORY);
+  }
+
+  /**
+   * @param inventoryId {@link net.runelite.api.InventoryID}
+   * @return The widget info for the given inventory id or {@code null} if there is no such widget
+   * @see net.runelite.api.InventoryID
+   */
+  @Nullable
+  public static WidgetInfo inventoryIdToWidget(int inventoryId) {
+    if (inventoryId == InventoryID.INVENTORY.getId()) {
+      return WidgetInfo.INVENTORY;
+    } else if (inventoryId == InventoryID.BANK.getId()) {
+      return WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER;
+    } else {
+      return null;
+    }
   }
 
   private InventoryUtil() {

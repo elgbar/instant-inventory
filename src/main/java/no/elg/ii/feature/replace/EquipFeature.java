@@ -31,17 +31,20 @@ import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -85,6 +88,16 @@ public class EquipFeature implements Feature {
         log.debug("Equipped item {}", WidgetUtil.getWidgetInfo(widget));
         equip(widget);
       }
+    }
+  }
+
+  @Subscribe
+  public void onChatMessage(ChatMessage event) {
+    if (event.getType() == ChatMessageType.GAMEMESSAGE && Objects.equals(event.getMessage(), "You are not a high enough level to use this item.")) {
+      log.debug("Failed to equip item?");
+      getState().getActiveSlots().filter(is -> is.getSlot().getChangedTick() == client.getTickCount()).forEach(is -> {
+        getState().resetState(is.getIndex());
+      });
     }
   }
 
@@ -166,11 +179,11 @@ public class EquipFeature implements Feature {
     return Pair.of(toReplace, extra);
   }
 
-  private boolean isShieldSlot(int index) {
+  private static boolean isShieldSlot(int index) {
     return index == EquipmentInventorySlot.SHIELD.getSlotIdx();
   }
 
-  private boolean isWeaponSlot(int index) {
+  private static boolean isWeaponSlot(int index) {
     return index == EquipmentInventorySlot.WEAPON.getSlotIdx();
   }
 

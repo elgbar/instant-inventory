@@ -27,6 +27,8 @@
 package no.elg.ii.inventory;
 
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+import static no.elg.ii.util.InventoryUtil.getOpenWidgetItemContainer;
+import static no.elg.ii.util.WidgetUtil.updateVisibleWidget;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
@@ -40,6 +42,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
@@ -152,8 +157,25 @@ public class InventoryState {
     if (isValidIndex(index)) {
       log.trace("Resetting index {}", index);
       slots[index] = InventorySlot.RESET_SLOT;
+      resetItemInSlot(index);
     } else {
       log.debug("Tried to reset invalid index {}", index);
+    }
+  }
+
+  private void resetItemInSlot(int index) {
+    ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+    if (inventoryContainer == null) {
+      return;
+    }
+    Widget inventoryWidget = getOpenWidgetItemContainer(client);
+    if (inventoryWidget == null) {
+      return;
+    }
+    Item item = inventoryContainer.getItem(index);
+    Widget[] children = inventoryWidget.getDynamicChildren();
+    if (item != null && children.length == INVENTORY_SIZE && children[index] != null) {
+      updateVisibleWidget(children[index], item);
     }
   }
 
