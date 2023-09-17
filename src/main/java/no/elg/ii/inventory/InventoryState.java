@@ -199,15 +199,17 @@ public class InventoryState {
    * the index's inventory slot. Additionally, if too much time have passed without an item change,
    * the state will also be reset to not operate on stale data
    *
-   * @param index        The index of the item
-   * @param actualItemId The actual item which is in the inventory
+   * @param index The index of the item
+   * @param item  The actual item which is in the inventory
    */
-  public void validateState(int index, int actualItemId, int actualQuantity) {
+  public void validateState(int index, @Nullable Item item) {
     InventorySlot slot = getSlot(index);
     if (slot == null || slot == InventorySlot.UNMODIFIED_SLOT || slot == InventorySlot.RESET_SLOT) {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }
+    int actualItemId = item == null ? -1 : item.getId();
+    int actualQuantity = item == null ? -1 : item.getQuantity();
 
     int itemId = slot.getItemId();
     int quantity = slot.getQuantity();

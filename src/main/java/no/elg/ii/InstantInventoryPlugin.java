@@ -95,10 +95,14 @@ public class InstantInventoryPlugin extends Plugin {
   @Subscribe
   public void onGameTick(GameTick event) {
     Set<Feature> activeFeatures = featureManager.getActiveFeatures();
-    for (int index = 0; index < inventoryWidgets.length; index++) {
-      Widget widget = inventoryWidgets[index];
+    ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+    if (itemContainer == null) {
+      return;
+    }
+    for (int index = 0; index < INVENTORY_SIZE; index++) {
+      Item item = itemContainer.getItem(index);
       for (Feature feature : activeFeatures) {
-        feature.getState().validateState(index, widget.getItemId(), widget.getItemQuantity());
+        feature.getState().validateState(index, item);
       }
     }
   }

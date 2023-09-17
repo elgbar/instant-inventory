@@ -27,7 +27,6 @@
 
 package no.elg.ii.test;
 
-import static no.elg.ii.InstantInventoryPlugin.EMPTY_WIDGET;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -91,7 +90,7 @@ public class TestSetup {
     setupCommonFeature(feature, mock(Client.class));
     feature.clientThread = TestSetup.mockedClientThread();
     InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
-    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
+//    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
   }
 
   public static ClientThread mockedClientThread() {

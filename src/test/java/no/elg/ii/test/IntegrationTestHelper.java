@@ -27,8 +27,6 @@
 
 package no.elg.ii.test;
 
-import static no.elg.ii.InstantInventoryPlugin.EMPTY_WIDGET;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -89,7 +87,7 @@ public class IntegrationTestHelper {
     featureManager = spy(new FeatureManager(eventBus, instantInventoryConfig, features));
 
     plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager));
-    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
+//    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
 
     Client client = mock(Client.class);
     InventoryState inventoryState = new InventoryState(instantInventoryConfig, client);
