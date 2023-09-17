@@ -56,7 +56,7 @@ public interface InventorySlot {
    */
   int getItemId();
 
-  int getQuantity(); //TODO implement
+  int getQuantity();
 
   /**
    * @param widget

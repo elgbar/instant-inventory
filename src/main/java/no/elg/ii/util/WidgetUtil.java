@@ -52,7 +52,7 @@ public final class WidgetUtil {
 
   @Nonnull
   public static String getWidgetInfo(@Nonnull Widget widget) {
-    return widget.getName() + " (id: " + widget.getItemId() + ", index: " + widget.getIndex() + ")";
+    return widget.getName() + " id: " + widget.getItemId() + ", index: " + widget.getIndex() + ", quantity: " + widget.getItemQuantity() + " opacity: " + widget.getOpacity();
   }
 
   public static void unhide(@Nonnull Widget widget) {

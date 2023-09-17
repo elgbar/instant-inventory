@@ -130,7 +130,7 @@ public class EquipFeature implements Feature {
     } else {
       widget.setHidden(true);
     }
-    getState().setSlot(widget.getIndex(), new ReplacementInventorySlot(client.getTickCount(), widget.getItemId(), mainIndexedItem, offhandIndexedItem));
+    getState().setSlot(widget.getIndex(), new ReplacementInventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), mainIndexedItem, offhandIndexedItem));
   }
 
   /**

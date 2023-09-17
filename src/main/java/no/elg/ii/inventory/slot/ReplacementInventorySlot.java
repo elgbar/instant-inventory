@@ -37,7 +37,7 @@ public class ReplacementInventorySlot implements InventorySlot {
 
   private final int changedTick;
   private final int itemId;
-  private final int quantity = 0;
+  private final int quantity;
 
   /**
    * The index of this replaced item must be the same as the index of this slot

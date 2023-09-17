@@ -95,7 +95,7 @@ public class InventoryState {
    */
   public void setSlot(Widget widget) {
     int index = widget.getIndex();
-    setSlot(index, new InventorySlotState(client.getTickCount(), widget.getItemId(), index));
+    setSlot(index, new InventorySlotState(client.getTickCount(), widget.getItemId(), widget.getItemQuantity()));
   }
 
   /**
@@ -201,7 +201,7 @@ public class InventoryState {
     int modifiedTick = slot.getChangedTick();
     // Item at index changed so we must reset the slot
     if (slot.hasValidItemId() && (itemId != actualItemId || quantity != actualQuantity)) {
-      log.debug("Item at index {} changed from item id {} to {} or from quantity {} to {} , resetting the item", index, itemId, actualItemId, quantity, actualItemId);
+      log.debug("Item at index {} changed from item id {} to {} or from quantity {} to {}, resetting the item", index, itemId, actualItemId, quantity, actualQuantity);
       resetState(index);
       return;
     }
