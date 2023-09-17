@@ -103,7 +103,7 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameStateChanged(GameStateChanged event) {
-    if (event.getGameState() != GameState.LOGGED_IN) {
+    if (event.getGameState() == GameState.LOGGED_IN) {
       log.debug("Resetting features as the GameState changed to {}", event.getGameState());
       Set<Feature> activeFeatures = featureManager.getActiveFeatures();
       for (Feature feature : activeFeatures) {
