@@ -29,82 +29,60 @@ package no.elg.ii.feature.hide;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.util.InventoryUtil;
 import no.elg.ii.util.WidgetUtil;
 
 @Slf4j
 public abstract class HideFeature implements Feature {
 
-  private final Set<WidgetInfo> widgets = new HashSet<>();
   @Inject
   public InstantInventoryPlugin plugin;
-
   @Inject
   @VisibleForTesting
   protected InstantInventoryConfig config;
-
   @Inject
   public ClientThread clientThread;
   @Inject
+  @Getter
   private InventoryState state;
 
+  @Inject
+  public Client client;
+
   protected void hide(Widget widget) {
-    widget.setOpacity(config.hideOpacity());
-    getState().setSlot(widget);
+    clientThread.invokeAtTickEnd(() -> {
+      log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
+      widget.setOpacity(config.hideOpacity());
+      getState().setSlot(widget);
+    });
+  }
+
+  @Nonnull
+  @SuppressWarnings("UnstableApiUsage")
+  protected Set<IndexedWidget> inventoryItems() {
+    Widget openWidgetItemContainer = InventoryUtil.getOpenWidgetItemContainer(client);
+    if (openWidgetItemContainer == null) {
+      return Set.of();
+    }
+    Widget[] children = openWidgetItemContainer.getDynamicChildren();
+    return Streams.mapWithIndex(Arrays.stream(children), (from, index) -> new IndexedWidget((int) index, from)).collect(Collectors.toSet());
   }
 
   protected boolean isHidden(Widget widget) {
     return widget.getOpacity() == config.hideOpacity() || WidgetUtil.isEmpty(widget);
-  }
-
-  @SuppressWarnings("UnstableApiUsage")
-  protected Set<IndexedWidget> inventoryItems() {
-    if (widgets.isEmpty()) {
-      log.error("No widget added to hide feature " + this.getClass().getName());
-      return Collections.emptySet();
-    }
-    return widgets.stream()
-      .map(it -> plugin.inventoryItems(it))
-      .flatMap(ws ->
-        Streams.mapWithIndex(
-          Arrays.stream(ws),
-          (from, index) -> new IndexedWidget((int) index, from)
-        )
-      )
-      .collect(Collectors.toSet());
-  }
-
-  @Nonnull
-  @Override
-  public InventoryState getState() {
-    return state;
-  }
-
-  public void showOnWidgets(WidgetInfo widget) {
-    this.widgets.add(widget);
-  }
-
-  public void showOnWidgets(WidgetInfo... widgets) {
-    this.widgets.addAll(Arrays.asList(widgets));
-  }
-
-  @VisibleForTesting
-  public Set<WidgetInfo> getWidgets() {
-    return widgets;
   }
 }

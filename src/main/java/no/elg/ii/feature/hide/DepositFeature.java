@@ -31,7 +31,6 @@ import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.Util;
@@ -42,14 +41,6 @@ public class DepositFeature extends HideFeature {
   public static final String DEPOSIT_PREFIX_OPTION = "Deposit-";
   public static final String DEPOSIT_ALL_OPTION = "Deposit inventory";
   public static final String DEPOSIT_CONFIG_KEY = "instantDeposit";
-
-  {
-    showOnWidgets(
-      WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER,
-      WidgetInfo.DEPOSIT_BOX_INVENTORY_ITEMS_CONTAINER,
-      WidgetInfo.GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER
-    );
-  }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {

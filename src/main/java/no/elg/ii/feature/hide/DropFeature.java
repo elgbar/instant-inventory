@@ -30,7 +30,6 @@ import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 
 @Slf4j
@@ -38,10 +37,6 @@ public class DropFeature extends HideFeature {
 
   public static final String DROP_OPTION = "Drop";
   public static final String DROP_CONFIG_KEY = "instantDrop";
-
-  {
-    showOnWidgets(WidgetInfo.INVENTORY);
-  }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
