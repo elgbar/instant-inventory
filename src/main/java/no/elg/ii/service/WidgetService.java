@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.inventory.slot.InventorySlot;
 
 @Singleton
 public class WidgetService {
@@ -85,6 +86,10 @@ public class WidgetService {
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
     setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity());
+  }
+
+  public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull InventorySlot srcItem) {
+    setFakeWidgetItem(dstWidget, srcItem.getItemId(), srcItem.getQuantity());
   }
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Widget srcWidget) {

@@ -44,7 +44,9 @@ import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
@@ -53,6 +55,7 @@ import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.InventorySlotState;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.util.WidgetUtil;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -179,9 +182,9 @@ public class InventoryState {
     }
     Item item = inventoryContainer.getItem(slot);
     Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllInventoryWidgets().filter(it -> it.getIndex() == slot);
-    if (item == null) {
+    if (item == null || item.getId() < 0) {
       //Make sure items that are not in the inventory are hidden
-      indexedWidgetStream.forEach(it -> it.getWidget().setHidden(true));
+      indexedWidgetStream.forEach(it -> it.getWidget().setOpacity(WidgetUtil.FULLY_OPAQUE));
     } else {
       //Update the item to the actual item
       indexedWidgetStream.forEach(it -> {
@@ -191,6 +194,15 @@ public class InventoryState {
     }
   }
 
+  @Subscribe
+  public void onItemContainerChanged(final ItemContainerChanged event) {
+    getActiveSlots().forEach(iis -> {
+      var slot = iis.getSlot();
+      inventoryService.getAllInventoryWidgets()
+        .filter(widget -> widget.getIndex() == iis.getIndex())
+        .forEach(it -> widgetService.setFakeWidgetItem(it.getWidget(), slot));
+    });
+  }
 
   /**
    * Validate and modify the state of an item for a given index.

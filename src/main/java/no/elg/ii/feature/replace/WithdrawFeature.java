@@ -38,7 +38,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
-import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -86,19 +85,6 @@ public class WithdrawFeature implements Feature {
     }
   }
 
-  @Subscribe
-  public void onItemContainerChanged(final ItemContainerChanged event) {
-    Widget bankInvContainer = client.getWidget(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER);
-    if (bankInvContainer == null || bankInvContainer.isHidden()) {
-      return;
-    }
-    getState().getActiveSlots().forEach(iis -> {
-      var slot = iis.getSlot();
-      widgetService.setFakeWidgetItem(bankInvContainer, slot.getItemId(), slot.getQuantity());
-      getState().resetState(iis.getIndex());
-    });
-  }
-
   private void withdraw(Widget bankWidget, int amount) {
     int bankWidgetItemId;
     ItemComposition bankWidgetComposition;
@@ -125,7 +111,6 @@ public class WithdrawFeature implements Feature {
         widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
         widgetService.updateQuantity(inventoryWidget, quantityToWithdraw);
         getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity());
-//        InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, inventoryWidget.getIndex());
       } else {
         fillFirstEmpty(bankWidget, quantityToWithdraw);
       }
@@ -151,7 +136,6 @@ public class WithdrawFeature implements Feature {
 
       widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
       getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw);
-//      InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, emptyWidget.getIndex());
       return false;
     }
     return true;
