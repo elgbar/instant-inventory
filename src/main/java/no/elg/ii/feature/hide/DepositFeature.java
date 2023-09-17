@@ -26,7 +26,10 @@
  */
 package no.elg.ii.feature.hide;
 
+import static net.runelite.api.widgets.WidgetInfo.BANK_ITEM_CONTAINER;
+
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
@@ -50,33 +53,45 @@ public class DepositFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DEPOSIT_ALL_OPTION.equals(menuOption) || ADD_ALL_OPTION.equals(menuOption)) {
         log.debug("Hiding all items");
-        inventoryItems().forEach(indexedWidget -> hide(indexedWidget.getWidget()));
+        getState().inventoryItems().forEach(indexedWidget -> hide(indexedWidget.getWidget()));
         return;
       }
       int eventItemId = event.getItemId();
-      if (menuOption != null && (menuOption.startsWith(DEPOSIT_PREFIX_OPTION) || menuOption.startsWith(ADD_PREFIX_OPTION))) {
+      int clickedIndex = widget.getIndex();
+      if (menuOption != null && (menuOption.startsWith(DEPOSIT_PREFIX_OPTION))) {
         int toTake = Util.getNumberFromMenuOption(menuOption);
-        if (toTake == Util.NO_NUMBER) {
+        if (toTake == Util.NO_MENU_OPTION_NUMBER) {
           return;
         }
+        int actualTaken;
         if (toTake >= widget.getItemQuantity()) {
           log.debug("Hiding " + toTake + " items");
-          Set<IndexedWidget> indexedWidgets = inventoryItems();
-          indexedWidgets.stream()
-            .filter(it -> it.getWidget().getItemId() == eventItemId)
+
+          Set<IndexedWidget> itemToTake = getState().inventoryItemsStream()
+            .filter(it -> it.getIndex() == clickedIndex || (it.getWidget().getItemId() == eventItemId && !isHidden(it.getWidget())))
             .sorted()
             .limit(toTake)
-            .forEach(indexedWidget -> hide(indexedWidget.getWidget()));
+            .collect(Collectors.toUnmodifiableSet());
+          itemToTake.forEach(indexedWidget -> hide(indexedWidget.getWidget()));
+          actualTaken = itemToTake.stream().mapToInt(indexedWidget1 -> indexedWidget1.getWidget().getItemQuantity()).sum();
         } else {
-          int quantity = widget.getItemQuantity() - toTake;
-          log.debug("Updating item quantity from " + widget.getItemQuantity() + " be " + quantity);
-          widget.setItemQuantity(quantity);
+          int ui = widget.getItemQuantity() - toTake;
+          log.debug("Updating item quantity from " + widget.getItemQuantity() + " be " + ui);
+          widget.setItemQuantity(ui);
+          actualTaken = toTake;
+        }
+
+        Widget bankInventoryContainer = client.getWidget(BANK_ITEM_CONTAINER);
+        if (bankInventoryContainer != null) {
+          for (Widget bankWidget : bankInventoryContainer.getDynamicChildren()) {
+            if (bankWidget.getItemId() == eventItemId) {
+              bankWidget.setItemQuantity(bankWidget.getItemQuantity() + actualTaken);
+            }
+          }
         }
       }
     }
   }
-
-  //TODO handle WidgetID.BANK_DEPOSIT_INVENTORY click (hide all items in inventory)
 
   @Nonnull
   @Override

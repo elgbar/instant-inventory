@@ -26,6 +26,8 @@
  */
 package no.elg.ii;
 
+import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
 import java.util.Set;
@@ -36,6 +38,9 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.InventoryID;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
@@ -47,6 +52,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.util.AdditionalWidgetInfo;
 
 @Slf4j
 @AllArgsConstructor
@@ -88,7 +94,6 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameTick(GameTick event) {
-    Widget[] inventoryWidgets = inventoryItems(WidgetInfo.INVENTORY);
     Set<Feature> activeFeatures = featureManager.getActiveFeatures();
     for (int index = 0; index < inventoryWidgets.length; index++) {
       Widget widget = inventoryWidgets[index];
@@ -124,8 +129,16 @@ public class InstantInventoryPlugin extends Plugin {
    * inventory widget
    */
   @Nonnull
-  public Widget[] inventoryItems(WidgetInfo widgetInfo) {
-    Widget widget = client.getWidget(widgetInfo);
+  public Widget[] inventoryItems(@Nonnull WidgetInfo widgetInfo) {
+    return inventoryItems(widgetInfo.getGroupId(), widgetInfo.getChildId());
+  }
+
+  public Widget[] inventoryItems(@Nonnull AdditionalWidgetInfo widgetInfo) {
+    return inventoryItems(widgetInfo.getGroupId(), widgetInfo.getChildId());
+  }
+
+  public Widget[] inventoryItems(int groupId, int childId) {
+    Widget widget = client.getWidget(groupId, childId);
     if (widget != null) {
       return widget.getDynamicChildren();
     }

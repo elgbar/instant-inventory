@@ -27,11 +27,6 @@
 package no.elg.ii.feature.hide;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Streams;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +37,6 @@ import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.util.IndexedWidget;
-import no.elg.ii.util.InventoryUtil;
 import no.elg.ii.util.WidgetUtil;
 
 @Slf4j
@@ -69,17 +62,6 @@ public abstract class HideFeature implements Feature {
       widget.setOpacity(config.hideOpacity());
       getState().setSlot(widget);
     });
-  }
-
-  @Nonnull
-  @SuppressWarnings("UnstableApiUsage")
-  protected Set<IndexedWidget> inventoryItems() {
-    Widget openWidgetItemContainer = InventoryUtil.getOpenWidgetItemContainer(client);
-    if (openWidgetItemContainer == null) {
-      return Set.of();
-    }
-    Widget[] children = openWidgetItemContainer.getDynamicChildren();
-    return Streams.mapWithIndex(Arrays.stream(children), (from, index) -> new IndexedWidget((int) index, from)).collect(Collectors.toSet());
   }
 
   protected boolean isHidden(Widget widget) {

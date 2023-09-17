@@ -26,12 +26,15 @@
  */
 package no.elg.ii.inventory;
 
+import static no.elg.ii.util.IndexedWidget.indexWidget;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
-import static no.elg.ii.util.InventoryUtil.getOpenWidgetItemContainer;
 import static no.elg.ii.util.WidgetUtil.updateVisibleWidget;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Streams;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -53,6 +56,8 @@ import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.InventorySlotState;
+import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.util.InventoryUtil;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -168,15 +173,23 @@ public class InventoryState {
     if (inventoryContainer == null) {
       return;
     }
-    Widget inventoryWidget = getOpenWidgetItemContainer(client);
-    if (inventoryWidget == null) {
+    Item item = inventoryContainer.getItem(index);
+    if (item == null) {
       return;
     }
-    Item item = inventoryContainer.getItem(index);
-    Widget[] children = inventoryWidget.getDynamicChildren();
-    if (item != null && children.length == INVENTORY_SIZE && children[index] != null) {
-      updateVisibleWidget(children[index], item);
-    }
+    inventoryItemsStream().filter(it -> it.getIndex() == index).forEach(it -> updateVisibleWidget(it.getWidget(), item));
+  }
+
+  @Nonnull
+  @SuppressWarnings("UnstableApiUsage")
+  public final Stream<IndexedWidget> inventoryItemsStream() {
+    return InventoryUtil.getOpenWidgetItemContainer(client)
+      .flatMap(container -> Streams.mapWithIndex(Arrays.stream(container.getDynamicChildren()), indexWidget));
+  }
+
+  @Nonnull
+  public final Set<IndexedWidget> inventoryItems() {
+    return inventoryItemsStream().collect(Collectors.toSet());
   }
 
   /**

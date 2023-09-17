@@ -27,6 +27,7 @@
 
 package no.elg.ii.util;
 
+import com.google.common.collect.Streams;
 import lombok.Data;
 import net.runelite.api.widgets.Widget;
 
@@ -40,4 +41,7 @@ public class IndexedWidget implements Comparable<IndexedWidget> {
   public int compareTo(IndexedWidget o) {
     return Integer.compare(index, o.index);
   }
+
+  @SuppressWarnings("UnstableApiUsage")
+  public static final Streams.FunctionWithIndex<Widget, IndexedWidget> indexWidget = (from, index) -> new IndexedWidget((int) index, from);
 }

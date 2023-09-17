@@ -30,6 +30,7 @@ package no.elg.ii.util;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
 import java.util.List;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.runelite.api.Client;
@@ -97,8 +98,10 @@ public final class InventoryUtil {
   }
 
   public static final AdditionalWidgetInfo GROUP_ITEM_CONTAINER = new AdditionalWidgetInfo(WidgetID.GROUP_STORAGE_INVENTORY_GROUP_ID, 0);
+  public static final AdditionalWidgetInfo DEPOSIT_BOX_ITEM_CONTAINER = new AdditionalWidgetInfo(268, 0);
 
   public static final List<AdditionalWidgetInfo> INVENTORY_ITEMS_CONTAINERS = List.of(
+    AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.INVENTORY),
     AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.EQUIPMENT_INVENTORY_ITEMS_CONTAINER),
     AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER),
     AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.GRAND_EXCHANGE_INVENTORY_ITEMS_CONTAINER),
@@ -107,18 +110,15 @@ public final class InventoryUtil {
     AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.SMITHING_INVENTORY_ITEMS_CONTAINER),
     AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.GUIDE_PRICES_INVENTORY_ITEMS_CONTAINER),
     AdditionalWidgetInfo.fromWidgetInfo(WidgetInfo.SEED_VAULT_INVENTORY_ITEMS_CONTAINER),
-    GROUP_ITEM_CONTAINER
+    GROUP_ITEM_CONTAINER,
+    DEPOSIT_BOX_ITEM_CONTAINER
   );
 
-  @Nullable
-  public static Widget getOpenWidgetItemContainer(Client client) {
-    for (AdditionalWidgetInfo widgetInfo : INVENTORY_ITEMS_CONTAINERS) {
-      Widget widget = client.getWidget(widgetInfo.getGroupId(), widgetInfo.getChildId());
-      if (widget != null && !widget.isHidden()) {
-        return widget;
-      }
-    }
-    return client.getWidget(WidgetInfo.INVENTORY);
+  @Nonnull
+  public static Stream<Widget> getOpenWidgetItemContainer(Client client) {
+    return INVENTORY_ITEMS_CONTAINERS.stream()
+      .map(widgetInfo -> client.getWidget(widgetInfo.getGroupId(), widgetInfo.getChildId()))
+      .filter(widget -> widget != null && !widget.isHidden());
   }
 
   /**

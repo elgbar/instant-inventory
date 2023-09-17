@@ -28,14 +28,14 @@
 package no.elg.ii.util;
 
 public class Util {
-  public static final int NO_NUMBER = -1;
+  public static final int NO_MENU_OPTION_NUMBER = -1;
 
   public static int getNumberFromMenuOption(String text) {
     try {
       String substring = text.substring(text.lastIndexOf('-') + 1);
       return Integer.parseInt(substring);
     } catch (NumberFormatException | IndexOutOfBoundsException e) {
-      return NO_NUMBER;
+      return NO_MENU_OPTION_NUMBER;
     }
   }
 
