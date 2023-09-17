@@ -42,7 +42,9 @@ import no.elg.ii.feature.hide.DepositFeature;
 import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.replace.EquipFeature;
 import no.elg.ii.feature.replace.WithdrawFeature;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.WidgetService;
 import org.junit.Before;
 
 public class IntegrationTestHelper {
@@ -90,7 +92,9 @@ public class IntegrationTestHelper {
 //    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
 
     Client client = mock(Client.class);
-    InventoryState inventoryState = new InventoryState(instantInventoryConfig, client);
+    var inventoryService = mock(InventoryService.class);
+    var widgetService = mock(WidgetService.class);
+    InventoryState inventoryState = new InventoryState(instantInventoryConfig, client, inventoryService, widgetService);
     doReturn(inventoryState).when(dropFeature).getState();
     doReturn(inventoryState).when(cleanHerbFeature).getState();
     doReturn(inventoryState).when(depositFeature).getState();

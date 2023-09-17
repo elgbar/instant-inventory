@@ -41,7 +41,9 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
@@ -110,7 +112,9 @@ public class DropFeatureTest extends FeatureTestMother<DropFeature> {
     InstantInventoryConfig config = spy(new InstantInventoryConfig() {
     });
     Client client = mock(Client.class);
-    InventoryState inventoryState = new InventoryState(config, client);
+    var inventoryService = mock(InventoryService.class);
+    var widgetService = mock(WidgetService.class);
+    InventoryState inventoryState = new InventoryState(config, client, inventoryService, widgetService);
     doReturn(inventoryState).when(feature).getState();
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);

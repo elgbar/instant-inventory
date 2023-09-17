@@ -45,7 +45,9 @@ import no.elg.ii.feature.hide.DropFeature;
 import no.elg.ii.feature.hide.HideFeature;
 import no.elg.ii.feature.replace.EquipFeature;
 import no.elg.ii.feature.replace.WithdrawFeature;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.WidgetService;
 import org.mockito.stubbing.Answer;
 
 public class TestSetup {
@@ -81,8 +83,11 @@ public class TestSetup {
   }
 
   private static void setupCommonFeature(Feature feature, Client client) {
+    var inventoryService = mock(InventoryService.class);
+    var widgetService = mock(WidgetService.class);
+
     InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {
-    }), client);
+    }), client, inventoryService, widgetService);
     doReturn(inventoryState).when(feature).getState();
   }
 

@@ -45,6 +45,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Item;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.service.WidgetService;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,7 +64,10 @@ public class InventoryStateTest {
   public void setUp() {
     config = spy(InstantInventoryConfig.class);
     client = mock(Client.class);
-    inventoryState = new InventoryState(config, client);
+    var inventoryService = mock(InventoryService.class);
+    var widgetService = mock(WidgetService.class);
+
+    inventoryState = new InventoryState(config, client, inventoryService, widgetService);
   }
 
   private void setAll(int itemId) {
