@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add Withdraw feature
 * Deposit all items in inventory into the bank instantly when clicking `Deposit inventory`
 * Hide and changed item opacity is configurable
+* Add instant deposit when clinking `Add all` in the guide prices interface
 
 ### Changed
 

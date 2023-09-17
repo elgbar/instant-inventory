@@ -40,6 +40,7 @@ public class DepositFeature extends HideFeature {
 
   public static final String DEPOSIT_PREFIX_OPTION = "Deposit-";
   public static final String DEPOSIT_ALL_OPTION = "Deposit inventory";
+  public static final String ADD_ALL_OPTION = "Add all";
   public static final String DEPOSIT_CONFIG_KEY = "instantDeposit";
 
   @Subscribe
@@ -47,7 +48,7 @@ public class DepositFeature extends HideFeature {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
-      if (DEPOSIT_ALL_OPTION.equals(menuOption)) {
+      if (DEPOSIT_ALL_OPTION.equals(menuOption) || ADD_ALL_OPTION.equals(menuOption)) {
         log.debug("Hiding all items");
         inventoryItems().forEach(indexedWidget -> hide(indexedWidget.getWidget()));
         return;
