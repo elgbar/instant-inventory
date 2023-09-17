@@ -28,7 +28,7 @@
 package no.elg.ii.feature.replace;
 
 import static no.elg.ii.util.InventoryUtil.findFirst;
-import static no.elg.ii.util.InventoryUtil.isEmpty;
+import static no.elg.ii.util.WidgetUtil.isEmpty;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 import static no.elg.ii.util.WidgetUtil.setQuantity;
 import static no.elg.ii.util.WidgetUtil.updateQuantity;

@@ -29,6 +29,7 @@ package no.elg.ii.util;
 
 import javax.annotation.Nonnull;
 import net.runelite.api.Item;
+import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 
 public final class WidgetUtil {
@@ -96,5 +97,12 @@ public final class WidgetUtil {
     if (widget.getItemQuantity() == 0) {
       widget.setOpacity(HALF_TRANSPARENT);
     }
+  }
+
+  /**
+   * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
+   */
+  public static boolean isEmpty(@Nonnull Widget widget) {
+    return widget.isHidden() || widget.getName().isEmpty() || widget.getOpacity() == FULLY_TRANSPARENT || widget.getItemId() == NullItemID.NULL_6512;
   }
 }

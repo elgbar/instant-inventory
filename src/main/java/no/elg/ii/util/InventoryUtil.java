@@ -27,7 +27,6 @@
 
 package no.elg.ii.util;
 
-import static no.elg.ii.util.WidgetUtil.FULLY_TRANSPARENT;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
 import java.util.List;
@@ -35,7 +34,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
-import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
@@ -93,17 +91,9 @@ public final class InventoryUtil {
     return null;
   }
 
-
-  /**
-   * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
-   */
-  public static boolean isEmpty(@Nonnull Widget widget) {
-    return widget.isHidden() || widget.getName().isBlank() || widget.getOpacity() == FULLY_TRANSPARENT || widget.getItemId() == NullItemID.NULL_6512;
-  }
-
   @Nullable
   public static Widget findFirstEmptySlot(@Nonnull Client client, @Nonnull WidgetInfo widgetInfo) {
-    return findFirst(client, widgetInfo, InventoryUtil::isEmpty);
+    return findFirst(client, widgetInfo, WidgetUtil::isEmpty);
   }
 
   public static final AdditionalWidgetInfo GROUP_ITEM_CONTAINER = new AdditionalWidgetInfo(WidgetID.GROUP_STORAGE_INVENTORY_GROUP_ID, 0);
