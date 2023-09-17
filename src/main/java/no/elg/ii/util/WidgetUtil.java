@@ -50,14 +50,21 @@ public final class WidgetUtil {
    */
   public static final int FULLY_OPAQUE = 0;
 
+  public static final int THE_EMPTY_ITEM_ID = NullItemID.NULL_6512;
+
   @Nonnull
   public static String getWidgetInfo(@Nonnull Widget widget) {
     return widget.getName() + " id: " + widget.getItemId() + ", index: " + widget.getIndex() + ", quantity: " + widget.getItemQuantity() + " opacity: " + widget.getOpacity();
   }
 
-  public static void unhide(@Nonnull Widget widget) {
+  public static void halfUnhide(@Nonnull Widget widget) {
     widget.setHidden(false);
     widget.setOpacity(HALF_TRANSPARENT);
+  }
+
+  public static void fullyUnhide(@Nonnull Widget widget) {
+    widget.setHidden(false);
+    widget.setOpacity(FULLY_OPAQUE);
   }
 
   public static void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
@@ -71,7 +78,7 @@ public final class WidgetUtil {
   }
 
   public static void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
-    unhide(dstWidget);
+    halfUnhide(dstWidget);
     updateVisibleWidget(dstWidget, itemId, amount);
   }
 
@@ -107,6 +114,6 @@ public final class WidgetUtil {
    * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
    */
   public static boolean isEmpty(@Nonnull Widget widget) {
-    return widget.isHidden() || widget.getName().isEmpty() || widget.getOpacity() == FULLY_TRANSPARENT || widget.getItemId() == NullItemID.NULL_6512;
+    return widget.isHidden() || widget.getName().isEmpty() || widget.getOpacity() == FULLY_TRANSPARENT || widget.getItemId() == THE_EMPTY_ITEM_ID;
   }
 }

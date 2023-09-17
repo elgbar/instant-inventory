@@ -142,14 +142,17 @@ public class InventoryState {
    * @return The slots and its index we're currently modifying
    */
   public Stream<IndexedInventorySlot> getActiveSlots() {
-    return IntStream.range(0, INVENTORY_SIZE).mapToObj(i -> new IndexedInventorySlot(i, getSlot(i))).filter((iis) -> iis.getSlot().hasValidItemId());
+    //noinspection DataFlowIssue Safe as we are always within the size of the inventory
+    return IntStream.range(0, slots.length).mapToObj(i -> new IndexedInventorySlot(i, getSlot(i))).filter((iis) -> iis.getSlot().hasValidItemId());
   }
 
   /**
    * Reset the state to its initial state
    */
   public void resetAll() {
-    Arrays.fill(slots, InventorySlot.RESET_SLOT);
+    for (int i = 0; i < INVENTORY_SIZE; i++) {
+      resetState(i);
+    }
   }
 
   /**
@@ -173,12 +176,17 @@ public class InventoryState {
       return;
     }
     Item item = inventoryContainer.getItem(index);
+    Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllInventoryWidgets().filter(it -> it.getIndex() == index);
     if (item == null) {
-      return;
+      //Make sure items that are not in the inventory are hidden
+      indexedWidgetStream.forEach(it -> it.getWidget().setHidden(true));
+    } else {
+      //Update the item to the actual item
+      indexedWidgetStream.forEach(it -> {
+        fullyUnhide(it.getWidget());
+        updateVisibleWidget(it.getWidget(), item);
+      });
     }
-    inventoryItemsStream().filter(it -> it.getIndex() == index).forEach(it -> updateVisibleWidget(it.getWidget(), item));
-  }
-
   }
 
 
