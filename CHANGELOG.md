@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add Equip feature
 * Add Withdraw feature
 * Deposit all items in inventory into the bank instantly when clicking `Deposit inventory`
+* Hide and changed item opacity is configurable
 
 ### Changed
 

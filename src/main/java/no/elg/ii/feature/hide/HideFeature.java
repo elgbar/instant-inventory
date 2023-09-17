@@ -36,11 +36,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.eventbus.Subscribe;
+import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
@@ -56,50 +55,21 @@ public abstract class HideFeature implements Feature {
   public InstantInventoryPlugin plugin;
 
   @Inject
+  @VisibleForTesting
+  protected InstantInventoryConfig config;
+
+  @Inject
   public ClientThread clientThread;
   @Inject
   private InventoryState state;
 
   protected void hide(Widget widget) {
-    widget.setHidden(true);
+    widget.setOpacity(config.hideOpacity());
     getState().setSlot(widget);
   }
 
-  private void show(Widget widget) {
-    widget.setHidden(false);
-    getState().setSlot(widget.getIndex(), InventorySlot.UNMODIFIED_SLOT);
-  }
-
-  /* (non-javadoc)
-   * Make sure the item in the slot is hidden, the client sets it as non-hidden each tick (?)
-   *  or so. This must be done before the client is rendered otherwise (such as if we were to use
-   *  the ClientTick event) the item would be visible for a single frame.
-   */
-  @Subscribe
-  public void onBeforeRender(BeforeRender beforeRender) {
-    updateHiddenStatus();
-  }
-
-  @Override
-  public void reset() {
-    Feature.super.reset();
-    clientThread.invoke(this::updateHiddenStatus);
-  }
-
-  @VisibleForTesting
-  public void updateHiddenStatus() {
-    for (IndexedWidget indexedWidget : inventoryItems()) {
-      Widget widget = indexedWidget.getWidget();
-      int index = indexedWidget.getIndex();
-      InventorySlot slot = getState().getSlot(index);
-      if (slot == InventorySlot.RESET_SLOT) {
-        log.debug("Slot is reset item, will reset | {}", WidgetUtil.getWidgetInfo(widget));
-        show(widget);
-      } else if (slot != InventorySlot.UNMODIFIED_SLOT && !widget.isHidden()) {
-        log.debug("Slot was not hidden, hiding it now | {}", WidgetUtil.getWidgetInfo(widget));
-        widget.setHidden(true);
-      }
-    }
+  protected boolean isHidden(Widget widget) {
+    return widget.getOpacity() == config.hideOpacity() || WidgetUtil.isEmpty(widget);
   }
 
   @SuppressWarnings("UnstableApiUsage")

@@ -37,12 +37,16 @@ public final class WidgetUtil {
   }
 
   /**
-   * Item is fully transparent, not visible
+   * Item is fully transparent, i.e., not visible
    */
   public static final int FULLY_TRANSPARENT = 255;
-  public static final int HALF_TRANSPARENT = FULLY_TRANSPARENT / 2;
+  public static final int NEARLY_TRANSPARENT = 200;
   /**
-   * Item is fully opaque, visible
+   * Semi transparent item, same opacity as when entering bank pin
+   */
+  public static final int HALF_TRANSPARENT = 100;
+  /**
+   * Item is fully opaque, i.e., visible
    */
   public static final int FULLY_OPAQUE = 0;
 

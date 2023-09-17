@@ -37,7 +37,9 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.Range;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.util.WidgetUtil;
 
 @ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {
@@ -77,7 +79,7 @@ public interface InstantInventoryConfig extends Config {
     keyName = DEPOSIT_CONFIG_KEY,
     section = FEATURE_SECTION,
     name = "Deposit Items Instantly",
-    description = "Deposit items into your bank (almost) instantly."
+    description = "Deposit items into your bank instantly."
       + "<p>"
       + "<p>Note that how many items that can be deposited at a time is limited by how osrs works. It appears"
       + "<p>that only four items can be deposited in a single game tick, so if you deposit more than four items at "
@@ -110,6 +112,10 @@ public interface InstantInventoryConfig extends Config {
     return true;
   }
 
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
   @ConfigItem(
     keyName = "maxUnmodifiedTicks",
     name = "Max Unmodified Ticks",
@@ -125,5 +131,32 @@ public interface InstantInventoryConfig extends Config {
   )
   default int maxUnmodifiedTicks() {
     return InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
+  }
+
+  @ConfigItem(
+    keyName = "hideOpacity",
+    name = "Hide opacity",
+    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " and " + WidgetUtil.FULLY_TRANSPARENT + "." +
+      "<p>Where 0 is fully visible and 255 is fully hidden." +
+      "<p>" +
+      "<p>This controls how visible an items when it will be dropped/removed the next game tick.",
+    position = 110
+  )
+  @Range(max = WidgetUtil.FULLY_TRANSPARENT)
+  default int hideOpacity() {
+    return WidgetUtil.NEARLY_TRANSPARENT;
+  }
+
+  @ConfigItem(
+    keyName = "changeOpacity",
+    name = "Change opacity",
+    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " (fully visible) and " + WidgetUtil.FULLY_TRANSPARENT + "(fully hidden)." +
+      "<p>" +
+      "<p>This controls how visible an items when it will be replaced with another item the next game tick.",
+    position = 111
+  )
+  @Range(max = WidgetUtil.FULLY_TRANSPARENT)
+  default int changeOpacity() {
+    return WidgetUtil.HALF_TRANSPARENT;
   }
 }
