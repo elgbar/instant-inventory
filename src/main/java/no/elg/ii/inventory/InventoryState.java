@@ -27,8 +27,6 @@
 package no.elg.ii.inventory;
 
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
-import static no.elg.ii.util.WidgetUtil.fullyUnhide;
-import static no.elg.ii.util.WidgetUtil.updateVisibleWidget;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
@@ -53,6 +51,7 @@ import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.InventorySlotState;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.IndexedWidget;
 
 /**
@@ -89,6 +88,9 @@ public class InventoryState {
 
   @Inject
   private InventoryService inventoryService;
+
+  @Inject
+  private WidgetService widgetService;
 
   {
     Arrays.fill(slots, InventorySlot.UNMODIFIED_SLOT);
@@ -164,27 +166,27 @@ public class InventoryState {
     if (isValidIndex(index)) {
       log.trace("Resetting index {}", index);
       slots[index] = InventorySlot.RESET_SLOT;
-      resetItemInSlot(index);
+      resetWidgetInSlot(index);
     } else {
       log.debug("Tried to reset invalid index {}", index);
     }
   }
 
-  private void resetItemInSlot(int index) {
+  private void resetWidgetInSlot(int slot) {
     ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
     if (inventoryContainer == null) {
       return;
     }
-    Item item = inventoryContainer.getItem(index);
-    Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllInventoryWidgets().filter(it -> it.getIndex() == index);
+    Item item = inventoryContainer.getItem(slot);
+    Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllInventoryWidgets().filter(it -> it.getIndex() == slot);
     if (item == null) {
       //Make sure items that are not in the inventory are hidden
       indexedWidgetStream.forEach(it -> it.getWidget().setHidden(true));
     } else {
       //Update the item to the actual item
       indexedWidgetStream.forEach(it -> {
-        fullyUnhide(it.getWidget());
-        updateVisibleWidget(it.getWidget(), item);
+        widgetService.setAsFullyOpaque(it.getWidget());
+        widgetService.updateVisibleWidget(it.getWidget(), item);
       });
     }
   }

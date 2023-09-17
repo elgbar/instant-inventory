@@ -28,7 +28,6 @@
 package no.elg.ii.feature.replace;
 
 import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
-import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Objects;
@@ -54,6 +53,7 @@ import net.runelite.http.api.item.ItemEquipmentStats;
 import net.runelite.http.api.item.ItemStats;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.WidgetUtil;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -76,6 +76,8 @@ public class EquipFeature implements Feature {
   @Inject
   @Getter
   private InventoryState state;
+  @Inject
+  private WidgetService widgetService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -110,15 +112,15 @@ public class EquipFeature implements Feature {
       if (extraItem != null) {
         var offhandWidget = findFirstEmptySlot(client, WidgetInfo.INVENTORY);
         if (offhandWidget != null) {
-          setFakeWidgetItem(widget, toReplaceItem);
-          setFakeWidgetItem(offhandWidget, extraItem);
+          widgetService.setFakeWidgetItem(widget, toReplaceItem);
+          widgetService.setFakeWidgetItem(offhandWidget, extraItem);
         } else {
           //There was no slot to put the offhand item in, so the items will not be equipped
           log.debug("Will not equip two-handed item, as there is no slot to put the offhand item in");
           return;
         }
       } else {
-        setFakeWidgetItem(widget, toReplaceItem);
+        widgetService.setFakeWidgetItem(widget, toReplaceItem);
       }
     } else {
       widget.setHidden(true);

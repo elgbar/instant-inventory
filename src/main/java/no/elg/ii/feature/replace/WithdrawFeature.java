@@ -27,11 +27,9 @@
 
 package no.elg.ii.feature.replace;
 
+import static no.elg.ii.util.InventoryUtil.BANK_WITHDRAW_AS_ITEM;
 import static no.elg.ii.util.InventoryUtil.findFirst;
 import static no.elg.ii.util.WidgetUtil.isEmpty;
-import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
-import static no.elg.ii.util.WidgetUtil.setQuantity;
-import static no.elg.ii.util.WidgetUtil.updateQuantity;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
@@ -43,13 +41,12 @@ import net.runelite.api.ItemComposition;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.util.InventoryUtil;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtil;
 
@@ -70,6 +67,8 @@ public class WithdrawFeature implements Feature {
   @Inject
   @Getter
   private InventoryState state;
+  @Inject
+  private WidgetService widgetService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -95,7 +94,7 @@ public class WithdrawFeature implements Feature {
     }
     getState().getActiveSlots().forEach(iis -> {
       var slot = iis.getSlot();
-      setFakeWidgetItem(bankInvContainer, slot.getItemId(), slot.getQuantity());
+      widgetService.setFakeWidgetItem(bankInvContainer, slot.getItemId(), slot.getQuantity());
       getState().resetState(iis.getIndex());
     });
   }
@@ -123,10 +122,10 @@ public class WithdrawFeature implements Feature {
       Widget inventoryWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> w.getItemId() == bankWidgetItemId);
       if (inventoryWidget != null) {
         //There is a matching widget, so we can just update the quantity
-        updateQuantity(bankWidget, -quantityToWithdraw);
-        updateQuantity(inventoryWidget, quantityToWithdraw);
+        widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
+        widgetService.updateQuantity(inventoryWidget, quantityToWithdraw);
         getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity());
-        InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, inventoryWidget.getIndex());
+//        InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, inventoryWidget.getIndex());
       } else {
         fillFirstEmpty(bankWidget, quantityToWithdraw);
       }
@@ -147,11 +146,12 @@ public class WithdrawFeature implements Feature {
   private boolean fillFirstEmpty(Widget bankWidget, int quantityToWithdraw) {
     var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> isEmpty(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
     if (emptyWidget != null) {
-      setFakeWidgetItem(emptyWidget, bankWidget);
-      setQuantity(emptyWidget, quantityToWithdraw);
-      updateQuantity(bankWidget, -quantityToWithdraw);
+      widgetService.setFakeWidgetItem(emptyWidget, bankWidget);
+      widgetService.setQuantity(emptyWidget, quantityToWithdraw);
+
+      widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
       getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw);
-      InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, emptyWidget.getIndex());
+//      InventoryUtil.copyWidgetFromContainer(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, WidgetInfo.INVENTORY, emptyWidget.getIndex());
       return false;
     }
     return true;
@@ -163,12 +163,9 @@ public class WithdrawFeature implements Feature {
    * @return Whether the bank is set to withdraw as a note
    */
   private boolean isWithdrawingAsNote() {
-    Widget widget = client.getWidget(WidgetID.BANK_GROUP_ID, BANK_WITHDRAW_AS_ITEM);
+    Widget widget = client.getWidget(BANK_WITHDRAW_AS_ITEM.getGroupId(), BANK_WITHDRAW_AS_ITEM.getChildId());
     return widget != null && widget.getOnOpListener() != null;
   }
-
-  static final int BANK_WITHDRAW_AS_ITEM = 22;
-  static final int BANK_WITHDRAW_AS_NOTE = 24;
 
   @Nonnull
   @Override

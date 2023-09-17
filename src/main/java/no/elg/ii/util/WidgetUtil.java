@@ -28,7 +28,6 @@
 package no.elg.ii.util;
 
 import javax.annotation.Nonnull;
-import net.runelite.api.Item;
 import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 
@@ -55,59 +54,6 @@ public final class WidgetUtil {
   @Nonnull
   public static String getWidgetInfo(@Nonnull Widget widget) {
     return widget.getName() + " id: " + widget.getItemId() + ", index: " + widget.getIndex() + ", quantity: " + widget.getItemQuantity() + " opacity: " + widget.getOpacity();
-  }
-
-  public static void halfUnhide(@Nonnull Widget widget) {
-    widget.setHidden(false);
-    widget.setOpacity(HALF_TRANSPARENT);
-  }
-
-  public static void fullyUnhide(@Nonnull Widget widget) {
-    widget.setHidden(false);
-    widget.setOpacity(FULLY_OPAQUE);
-  }
-
-  public static void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
-    dstWidget.setItemId(itemId);
-    dstWidget.setItemQuantity(amount);
-
-  }
-
-  public static void updateVisibleWidget(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
-    updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
-  }
-
-  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
-    halfUnhide(dstWidget);
-    updateVisibleWidget(dstWidget, itemId, amount);
-  }
-
-  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
-    setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity());
-  }
-
-  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Widget srcWidget) {
-    setFakeWidgetItem(dstWidget, srcWidget.getItemId(), srcWidget.getItemQuantity());
-
-    dstWidget.setItemQuantityMode(dstWidget.getItemQuantityMode());
-    dstWidget.setName(dstWidget.getName());
-  }
-
-  /**
-   * Add {@code delta} from the quantity of {@code widget}
-   *
-   * @param widget the widget to update
-   * @param delta  the amount to add
-   */
-  public static void updateQuantity(@Nonnull Widget widget, int delta) {
-    setQuantity(widget, widget.getItemQuantity() + delta);
-  }
-
-  public static void setQuantity(@Nonnull Widget widget, int quantity) {
-    widget.setItemQuantity(quantity);
-    if (widget.getItemQuantity() == 0) {
-      widget.setOpacity(HALF_TRANSPARENT);
-    }
   }
 
   /**
