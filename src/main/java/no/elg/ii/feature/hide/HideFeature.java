@@ -31,11 +31,14 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.WidgetUtil;
@@ -59,15 +62,30 @@ public abstract class HideFeature implements Feature {
   @Inject
   private WidgetService widgetService;
 
+  @Inject
+  private InventoryService inventoryService;
+
   protected void hide(Widget widget) {
-    clientThread.invokeAtTickEnd(() -> {
-      log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
-      widgetService.setAsChangeOpacity(widget);
-      getState().setSlot(widget);
-    });
+    log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
+    getState().setSlot(widget); // Will be hidden by onBeforeRender
   }
 
-  protected boolean isHidden(Widget widget) {
-    return widget.getOpacity() == config.hideOpacity() || WidgetUtil.isEmpty(widget);
+  /* (non-Javadoc)
+   *
+   * The clicked item changes opacity when.
+   * If this is not actively corrected the item will be fully visible.
+   * This only applies to the clicked item, but it is not known **when** the item was clicked.
+   * So this is a brute-force method to ensure that the item is hidden.
+   */
+  @Subscribe
+  public void onBeforeRender(BeforeRender event) {
+    getState().getActiveSlots()
+      .forEach(iis -> inventoryService.getAllInventoryWidgets()
+        .filter(slotWidget -> slotWidget.getIndex() == iis.getIndex() && isNotHidden(slotWidget.getWidget()))
+        .forEach(slotWidget -> widgetService.setAsHideOpacity(slotWidget.getWidget())));
+  }
+
+  protected boolean isNotHidden(Widget widget) {
+    return widget.getOpacity() != config.hideOpacity() && !WidgetUtil.isEmpty(widget);
   }
 }

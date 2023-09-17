@@ -73,7 +73,7 @@ public class DepositFeature extends HideFeature {
           log.debug("Hiding " + toTake + " items");
 
           Set<IndexedWidget> itemToTake = inventoryService.getAllInventoryWidgets()
-            .filter(it -> it.getIndex() == clickedIndex || (it.getWidget().getItemId() == eventItemId && !isHidden(it.getWidget())))
+            .filter(it -> it.getIndex() == clickedIndex || (it.getWidget().getItemId() == eventItemId && isNotHidden(it.getWidget())))
             .sorted()
             .limit(toTake)
             .collect(Collectors.toUnmodifiableSet());
