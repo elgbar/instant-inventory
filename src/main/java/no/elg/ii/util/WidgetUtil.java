@@ -55,17 +55,26 @@ public final class WidgetUtil {
     widget.setOpacity(HALF_TRANSPARENT);
   }
 
-  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
-    unhide(dstWidget);
+  public static void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
     dstWidget.setItemId(itemId);
     dstWidget.setItemQuantity(amount);
+
   }
 
-  public static void setFakeWidgetItem(@Nonnull Item srcItem, @Nonnull Widget dstWidget) {
+  public static void updateVisibleWidget(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
+    updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
+  }
+
+  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
+    unhide(dstWidget);
+    updateVisibleWidget(dstWidget, itemId, amount);
+  }
+
+  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
     setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity());
   }
 
-  public static void setFakeWidgetItem(@Nonnull Widget srcWidget, @Nonnull Widget dstWidget) {
+  public static void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Widget srcWidget) {
     setFakeWidgetItem(dstWidget, srcWidget.getItemId(), srcWidget.getItemQuantity());
 
     dstWidget.setItemQuantityMode(dstWidget.getItemQuantityMode());

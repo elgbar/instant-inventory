@@ -103,15 +103,16 @@ public class EquipFeature implements Feature {
       if (offhandItem != null) {
         var offhandWidget = findFirstEmptySlot(client, WidgetInfo.INVENTORY);
         if (offhandWidget != null) {
-          setFakeWidgetItem(mainIndexedItem.getItem(), widget);
-          setFakeWidgetItem(offhandItem, offhandWidget);
+          setFakeWidgetItem(widget, mainIndexedItem.getItem());
+          setFakeWidgetItem(offhandWidget, offhandItem);
           offhandIndexedItem = IndexedItem.of(offhandWidget.getIndex(), offhandItem);
         } else {
           //There was no slot to put the offhand item in, so the items will not be equipped
+          log.debug("Will not equip two-handed item, as there is no slot to put the offhand item in");
           return;
         }
       } else {
-        setFakeWidgetItem(mainIndexedItem.getItem(), widget);
+        setFakeWidgetItem(widget, mainIndexedItem.getItem());
       }
     } else {
       widget.setHidden(true);

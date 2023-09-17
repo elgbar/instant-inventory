@@ -72,7 +72,7 @@ public final class InventoryUtil {
     Widget srcWidget = srcWidgetContainer.getChild(index);
     Widget dstWidget = dstWidgetContainer.getChild(index);
 
-    setFakeWidgetItem(srcWidget, dstWidget);
+    setFakeWidgetItem(dstWidget, srcWidget);
   }
 
   @Nullable

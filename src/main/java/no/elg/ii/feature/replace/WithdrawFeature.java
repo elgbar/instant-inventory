@@ -147,7 +147,7 @@ public class WithdrawFeature implements Feature {
   private boolean fillFirstEmpty(Widget bankWidget, int quantityToWithdraw) {
     var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> isEmpty(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
     if (emptyWidget != null) {
-      setFakeWidgetItem(bankWidget, emptyWidget);
+      setFakeWidgetItem(emptyWidget, bankWidget);
       setQuantity(emptyWidget, quantityToWithdraw);
       updateQuantity(bankWidget, -quantityToWithdraw);
       getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw);
