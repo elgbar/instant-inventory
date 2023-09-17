@@ -98,15 +98,20 @@ public class EquipFeature implements Feature {
     @Nullable IndexedItem mainIndexedItem = IndexedItem.of(widget.getIndex(), itemIds.getLeft());
     @Nullable IndexedItem offhandIndexedItem = null;
     if (mainIndexedItem != null) {
-      setFakeWidgetItem(mainIndexedItem.getItem(), widget);
 
       Item offhandItem = itemIds.getRight();
       if (offhandItem != null) {
         var offhandWidget = findFirstEmptySlot(client, WidgetInfo.INVENTORY);
         if (offhandWidget != null) {
+          setFakeWidgetItem(mainIndexedItem.getItem(), widget);
           setFakeWidgetItem(offhandItem, offhandWidget);
           offhandIndexedItem = IndexedItem.of(offhandWidget.getIndex(), offhandItem);
+        } else {
+          //There was no slot to put the offhand item in, so the items will not be equipped
+          return;
         }
+      } else {
+        setFakeWidgetItem(mainIndexedItem.getItem(), widget);
       }
     } else {
       widget.setHidden(true);
