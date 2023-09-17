@@ -123,7 +123,7 @@ public class EquipFeature implements Feature {
         widgetService.setFakeWidgetItem(widget, toReplaceItem);
       }
     } else {
-      widget.setHidden(true);
+      widgetService.setAsHideOpacity(widget);
     }
     getState().setSlot(widget.getIndex(), widget.getItemId(), widget.getItemQuantity());
   }

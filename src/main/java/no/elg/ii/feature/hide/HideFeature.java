@@ -37,6 +37,7 @@ import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.WidgetUtil;
 
 @Slf4j
@@ -55,11 +56,13 @@ public abstract class HideFeature implements Feature {
 
   @Inject
   public Client client;
+  @Inject
+  private WidgetService widgetService;
 
   protected void hide(Widget widget) {
     clientThread.invokeAtTickEnd(() -> {
       log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
-      widget.setOpacity(config.hideOpacity());
+      widgetService.setAsChangeOpacity(widget);
       getState().setSlot(widget);
     });
   }
