@@ -38,6 +38,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Range;
+import net.runelite.client.config.Units;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.util.WidgetUtil;
 
@@ -129,6 +130,7 @@ public interface InstantInventoryConfig extends Config {
         + "<p>When in PvP or Bossing it is recommended to set this to 1.",
     position = 100
   )
+  @Units(Units.TICKS)
   default int maxUnmodifiedTicks() {
     return InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
   }
