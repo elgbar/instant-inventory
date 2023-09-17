@@ -31,10 +31,12 @@ import static net.runelite.api.widgets.WidgetInfo.BANK_ITEM_CONTAINER;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.Util;
 
@@ -46,6 +48,9 @@ public class DepositFeature extends HideFeature {
   public static final String ADD_ALL_OPTION = "Add all";
   public static final String DEPOSIT_CONFIG_KEY = "instantDeposit";
 
+  @Inject
+  private InventoryService inventoryService;
+
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
@@ -53,7 +58,7 @@ public class DepositFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DEPOSIT_ALL_OPTION.equals(menuOption) || ADD_ALL_OPTION.equals(menuOption)) {
         log.debug("Hiding all items");
-        getState().inventoryItems().forEach(indexedWidget -> hide(indexedWidget.getWidget()));
+        inventoryService.getAllInventoryWidgets().forEach(indexedWidget -> hide(indexedWidget.getWidget()));
         return;
       }
       int eventItemId = event.getItemId();
@@ -67,7 +72,7 @@ public class DepositFeature extends HideFeature {
         if (toTake >= widget.getItemQuantity()) {
           log.debug("Hiding " + toTake + " items");
 
-          Set<IndexedWidget> itemToTake = getState().inventoryItemsStream()
+          Set<IndexedWidget> itemToTake = inventoryService.getAllInventoryWidgets()
             .filter(it -> it.getIndex() == clickedIndex || (it.getWidget().getItemId() == eventItemId && !isHidden(it.getWidget())))
             .sorted()
             .limit(toTake)

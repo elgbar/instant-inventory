@@ -26,15 +26,12 @@
  */
 package no.elg.ii.inventory;
 
-import static no.elg.ii.util.IndexedWidget.indexWidget;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+import static no.elg.ii.util.WidgetUtil.fullyUnhide;
 import static no.elg.ii.util.WidgetUtil.updateVisibleWidget;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Streams;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -57,7 +54,6 @@ import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.InventorySlotState;
 import no.elg.ii.util.IndexedWidget;
-import no.elg.ii.util.InventoryUtil;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -90,6 +86,9 @@ public class InventoryState {
   @Inject
   @VisibleForTesting
   Client client;
+
+  @Inject
+  private InventoryService inventoryService;
 
   {
     Arrays.fill(slots, InventorySlot.UNMODIFIED_SLOT);
@@ -180,17 +179,8 @@ public class InventoryState {
     inventoryItemsStream().filter(it -> it.getIndex() == index).forEach(it -> updateVisibleWidget(it.getWidget(), item));
   }
 
-  @Nonnull
-  @SuppressWarnings("UnstableApiUsage")
-  public final Stream<IndexedWidget> inventoryItemsStream() {
-    return InventoryUtil.getOpenWidgetItemContainer(client)
-      .flatMap(container -> Streams.mapWithIndex(Arrays.stream(container.getDynamicChildren()), indexWidget));
   }
 
-  @Nonnull
-  public final Set<IndexedWidget> inventoryItems() {
-    return inventoryItemsStream().collect(Collectors.toSet());
-  }
 
   /**
    * Validate and modify the state of an item for a given index.

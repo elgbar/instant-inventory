@@ -30,7 +30,6 @@ package no.elg.ii.util;
 import static no.elg.ii.util.WidgetUtil.setFakeWidgetItem;
 
 import java.util.List;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.runelite.api.Client;
@@ -113,13 +112,6 @@ public final class InventoryUtil {
     GROUP_ITEM_CONTAINER,
     DEPOSIT_BOX_ITEM_CONTAINER
   );
-
-  @Nonnull
-  public static Stream<Widget> getOpenWidgetItemContainer(Client client) {
-    return INVENTORY_ITEMS_CONTAINERS.stream()
-      .map(widgetInfo -> client.getWidget(widgetInfo.getGroupId(), widgetInfo.getChildId()))
-      .filter(widget -> widget != null && !widget.isHidden());
-  }
 
   /**
    * @param inventoryId {@link net.runelite.api.InventoryID}
