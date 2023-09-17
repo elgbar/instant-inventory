@@ -42,37 +42,9 @@ public final class InventoryUtil {
    */
   public static final int INVENTORY_SIZE = 28;
 
-  public static boolean isInvalidInventoryIndex(int index) {
-    return index < 0 || index >= INVENTORY_SIZE;
-  }
-
   public interface Filter<T> {
     boolean filter(T t);
   }
-
-//  /**
-//   * Copy a widget from one container to another
-//   *
-//   * @param client      The client
-//   * @param source      The source container
-//   * @param destination The destination container
-//   * @param index       The index in the destination container to copy to
-//   */
-//  public static void copyWidgetFromContainer(@Nonnull Client client, @Nonnull WidgetInfo source, @Nonnull WidgetInfo destination, int index) {
-//    Widget srcWidgetContainer = client.getWidget(source);
-//    Widget dstWidgetContainer = client.getWidget(destination);
-//    if (srcWidgetContainer == null || dstWidgetContainer == null) {
-//      return;
-//    }
-//    int length = dstWidgetContainer.getDynamicChildren().length;
-//    if (srcWidgetContainer.getDynamicChildren().length != length || index < 0 || index >= length) {
-//      return;
-//    }
-//    Widget srcWidget = srcWidgetContainer.getChild(index);
-//    Widget dstWidget = dstWidgetContainer.getChild(index);
-//
-//    setFakeWidgetItem(dstWidget, srcWidget);
-//  }
 
   @Nullable
   public static Widget findFirst(@Nonnull Client client, @Nonnull WidgetInfo widgetInfo, @Nonnull Filter<Widget> filter) {
