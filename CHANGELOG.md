@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Only reset all features when the game stage changes to `LOGGED_IN`
 * Simplify the clean feature by editing inventory widgets directly, instead of using an overlay
+* Update configuration sections
 
 ### Fixed
 
