@@ -28,6 +28,7 @@ package no.elg.ii.feature.hide;
 
 import static net.runelite.api.widgets.WidgetInfo.BANK_ITEM_CONTAINER;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -36,7 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
 import no.elg.ii.inventory.InventoryService;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.Util;
 
@@ -50,6 +53,13 @@ public class DepositFeature extends HideFeature {
 
   @Inject
   private InventoryService inventoryService;
+
+  @Inject
+  @VisibleForTesting
+  private ItemManager itemManager;
+
+  @Inject
+  private WidgetService widgetService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -86,11 +96,14 @@ public class DepositFeature extends HideFeature {
           actualTaken = toTake;
         }
 
+        int canonItemId = itemManager.canonicalize(eventItemId);
+        //Update widget in bank
         Widget bankInventoryContainer = client.getWidget(BANK_ITEM_CONTAINER);
         if (bankInventoryContainer != null) {
           for (Widget bankWidget : bankInventoryContainer.getDynamicChildren()) {
-            if (bankWidget.getItemId() == eventItemId) {
+            if (itemManager.canonicalize(bankWidget.getItemId()) == canonItemId) {
               bankWidget.setItemQuantity(bankWidget.getItemQuantity() + actualTaken);
+              return;
             }
           }
         }
