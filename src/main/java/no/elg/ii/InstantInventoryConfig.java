@@ -161,4 +161,16 @@ public interface InstantInventoryConfig extends Config {
   default int changeOpacity() {
     return WidgetUtil.HALF_TRANSPARENT;
   }
+
+  @ConfigItem(
+    keyName = "allowWidgetForcing",
+    name = "Allow Widget Forcing",
+    description = "Force the state of widgets to the predicted next state." +
+      "<p>This allows for a more seamless experience, but may cause problems as the client may update the widgets after the plugin has done so.",
+    warning = "Disabling this will cause the clicked widgets to not be properly updated.<p>Only disable if there is issues with the plugin.",
+    position = 120
+  )
+  default boolean allowWidgetForcing() {
+    return true;
+  }
 }

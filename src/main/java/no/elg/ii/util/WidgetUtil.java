@@ -62,4 +62,8 @@ public final class WidgetUtil {
   public static boolean isEmpty(@Nonnull Widget widget) {
     return widget.isHidden() || widget.getName().isEmpty() || widget.getOpacity() == FULLY_TRANSPARENT || widget.getItemId() == THE_EMPTY_ITEM_ID;
   }
+
+  public static boolean isNotEmpty(@Nonnull Widget widget) {
+    return !isEmpty(widget);
+  }
 }

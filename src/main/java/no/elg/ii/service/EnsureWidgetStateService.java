@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Elg
+ * Copyright (c) 2023 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,58 +24,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.hide;
 
-import com.google.common.annotations.VisibleForTesting;
+package no.elg.ii.service;
+
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import javax.inject.Inject;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.callback.ClientThread;
-import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.service.EnsureWidgetStateService;
-import no.elg.ii.service.WidgetService;
-import no.elg.ii.util.WidgetUtil;
 
-@Slf4j
-public abstract class HideFeature implements Feature {
+public class EnsureWidgetStateService {
+  @Inject
+  InventoryService inventoryService;
+  @Inject
+  InstantInventoryConfig config;
 
-  @Inject
-  public InstantInventoryPlugin plugin;
-  @Inject
-  @VisibleForTesting
-  protected InstantInventoryConfig config;
-  @Inject
-  public ClientThread clientThread;
-  @Inject
-  @Getter
-  private InventoryState state;
-
-  @Inject
-  public Client client;
-  @Inject
-  private WidgetService widgetService;
-
-  @Inject
-  private EnsureWidgetStateService ensureWidgetStateService;
-
-  protected void hide(Widget widget) {
-    log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
-    getState().setSlot(widget); // Will be hidden by onBeforeRender
+  /**
+   * Force widget to look a certain way. Sometimes the widgets get updated by client code, but this will override
+   * any other (clientside) changes to inventory widgets.
+   * <p>
+   * If this is not actively corrected the item will be fully visible.
+   * This only applies to the clicked item, but it is not known <b>when</b> the item was clicked.
+   * So this is a brute-force method to ensure that the item is hidden.
+   */
+  public void forceWidgetState(InventoryState state, Predicate<Widget> widgetFilter, Consumer<Widget> force) {
+    if (config.allowWidgetForcing()) {
+      state.getActiveSlots()
+        .forEach(iis -> inventoryService.getAllInventoryWidgets()
+          .filter(slotWidget -> slotWidget.getIndex() == iis.getIndex() && widgetFilter.test(slotWidget.getWidget()))
+          .forEach(slotWidget -> force.accept(slotWidget.getWidget())));
+    }
   }
 
-  @Subscribe
-  public void onBeforeRender(BeforeRender event) {
-    ensureWidgetStateService.forceWidgetState(getState(), this::isNotHidden, widgetService::setAsHideOpacity);
-  }
-
-  protected boolean isNotHidden(Widget widget) {
-    return widget.getOpacity() != config.hideOpacity() && !WidgetUtil.isEmpty(widget);
-  }
 }
