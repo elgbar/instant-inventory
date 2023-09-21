@@ -61,14 +61,6 @@ public interface InstantInventoryConfig extends Config {
   )
   String COMMON_SECTION = "instant-inventory-common";
 
-  @ConfigSection(
-    name = "Advanced",
-    description = "Advanced settings not recommended to change unless you know what you are doing",
-    position = 100,
-    closedByDefault = true
-  )
-  String ADVANCED_SECTION = "instant-inventory-advanced";
-
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @ConfigItem(
@@ -182,21 +174,4 @@ public interface InstantInventoryConfig extends Config {
     return WidgetUtil.HALF_TRANSPARENT;
   }
 
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-  @ConfigItem(
-    section = ADVANCED_SECTION,
-    keyName = "allowWidgetForcing",
-    name = "Allow Widget Forcing",
-    description =
-      "Force the state of widgets to the predicted next state." +
-        "<p>This allows for a more seamless experience, but may cause problems as the client may update the widgets after the plugin has done so.",
-    warning = "Disabling this will cause the clicked widgets to not be properly updated.<p>Only disable if there is issues with the plugin.",
-    position = 120
-  )
-  default boolean allowWidgetForcing() {
-    return true;
-  }
 }

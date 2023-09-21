@@ -31,15 +31,12 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import net.runelite.api.widgets.Widget;
-import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 
 public class EnsureWidgetStateService {
   @Inject
   InventoryService inventoryService;
-  @Inject
-  InstantInventoryConfig config;
 
   /**
    * Force widget to look a certain way. Sometimes the widgets get updated by client code, but this will override
@@ -50,12 +47,10 @@ public class EnsureWidgetStateService {
    * So this is a brute-force method to ensure that the item is hidden.
    */
   public void forceWidgetState(InventoryState state, Predicate<Widget> widgetFilter, Consumer<Widget> force) {
-    if (config.allowWidgetForcing()) {
-      state.getActiveSlots()
-        .forEach(iis -> inventoryService.getAllInventoryWidgets()
-          .filter(slotWidget -> slotWidget.getIndex() == iis.getIndex() && widgetFilter.test(slotWidget.getWidget()))
-          .forEach(slotWidget -> force.accept(slotWidget.getWidget())));
-    }
+    state.getActiveSlots()
+      .forEach(iis -> inventoryService.getAllInventoryWidgets()
+        .filter(slotWidget -> slotWidget.getIndex() == iis.getIndex() && widgetFilter.test(slotWidget.getWidget()))
+        .forEach(slotWidget -> force.accept(slotWidget.getWidget())));
   }
 
 }
