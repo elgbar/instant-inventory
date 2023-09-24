@@ -47,16 +47,14 @@ public class WidgetService {
    * Make the widget fully visible
    */
   public void setAsChangeOpacity(@Nonnull Widget widget) {
-    widget.setHidden(false);
-    widget.setOpacity(config.changeOpacity());
+    setOpacity(widget, config.changeOpacity());
   }
 
   /**
    * Make the widget fully visible
    */
   public void setAsHideOpacity(@Nonnull Widget widget) {
-    widget.setHidden(false);
-    widget.setOpacity(config.hideOpacity());
+    setOpacity(widget, config.hideOpacity());
   }
 
   /**
@@ -65,14 +63,20 @@ public class WidgetService {
    * @param widget
    */
   public void setAsFullyOpaque(@Nonnull Widget widget) {
-    widget.setHidden(false);
-    widget.setOpacity(FULLY_OPAQUE);
+    setOpacity(widget, FULLY_OPAQUE);
   }
 
+  public void setOpacity(@Nonnull Widget widget, int opacity) {
+    widget.setHidden(false);
+    widget.setOpacity(opacity);
+  }
+
+  /**
+   * Set the itemId and quantity of a widget without changing the opacity or any other attributes
+   */
   public void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
     dstWidget.setItemId(itemId);
     dstWidget.setItemQuantity(amount);
-
   }
 
   public void updateVisibleWidget(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
@@ -80,8 +84,8 @@ public class WidgetService {
   }
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
-    setAsChangeOpacity(dstWidget);
     updateVisibleWidget(dstWidget, itemId, amount);
+    setAsChangeOpacity(dstWidget);
   }
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
@@ -90,13 +94,6 @@ public class WidgetService {
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull InventorySlot srcItem) {
     setFakeWidgetItem(dstWidget, srcItem.getItemId(), srcItem.getQuantity());
-  }
-
-  public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Widget srcWidget) {
-    setFakeWidgetItem(dstWidget, srcWidget.getItemId(), srcWidget.getItemQuantity());
-
-    dstWidget.setItemQuantityMode(dstWidget.getItemQuantityMode());
-    dstWidget.setName(dstWidget.getName());
   }
 
   /**
@@ -109,6 +106,9 @@ public class WidgetService {
     setQuantity(widget, widget.getItemQuantity() + delta);
   }
 
+  /**
+   * Set the quantity of {@code widget} to {@code quantity}
+   */
   public void setQuantity(@Nonnull Widget widget, int quantity) {
     widget.setItemQuantity(quantity);
     if (widget.getItemQuantity() == 0) {

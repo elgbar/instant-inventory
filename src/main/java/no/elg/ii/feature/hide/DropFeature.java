@@ -27,16 +27,27 @@
 package no.elg.ii.feature.hide;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
+import no.elg.ii.util.VarbitsService;
 
 @Slf4j
 public class DropFeature extends HideFeature {
 
   public static final String DROP_OPTION = "Drop";
   public static final String DROP_CONFIG_KEY = "instantDrop";
+
+  @Inject
+  private Client client;
+  @Inject
+  private ItemManager itemManager;
+  @Inject
+  private VarbitsService varbitsService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -45,7 +56,11 @@ public class DropFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
         log.debug("Dropped item at index {} id {}", widget.getIndex(), widget.getName());
-        hide(widget);
+        if (varbitsService.willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
+          log.debug("Drop warning will be shown, will not hide item");
+        } else {
+          hide(widget);
+        }
       }
     }
   }
