@@ -44,6 +44,11 @@ public final class WidgetUtil {
    * Semi transparent item, same opacity as when entering bank pin
    */
   public static final int HALF_TRANSPARENT = 100;
+
+  /**
+   * The opacity of a bank item with a quantity of zero
+   */
+  public static final int ZERO_QUANTITY_BANK_ITEM_OPACITY = 120;
   /**
    * Item is fully opaque, i.e., visible
    */

@@ -28,6 +28,7 @@
 package no.elg.ii.feature.replace;
 
 import static no.elg.ii.util.InventoryUtil.findFirst;
+import static no.elg.ii.util.WidgetUtil.ZERO_QUANTITY_BANK_ITEM_OPACITY;
 import static no.elg.ii.util.WidgetUtil.isEmpty;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,6 +47,7 @@ import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.Util;
+import no.elg.ii.util.VarbitsService;
 import no.elg.ii.util.WidgetUtil;
 
 @Slf4j
@@ -67,6 +69,8 @@ public class WithdrawFeature implements Feature {
   private InventoryState state;
   @Inject
   private WidgetService widgetService;
+  @Inject
+  private VarbitsService varbitsService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -88,11 +92,11 @@ public class WithdrawFeature implements Feature {
     int bankWidgetItemId;
     ItemComposition bankWidgetComposition;
 
-    //If we're withdrawing as a note, we need to get the item id of the note as the banked item is never the noted item
-    boolean isWithdrawingAsNote = isWithdrawingAsNote();
     int originalItemId = bankWidget.getItemId();
     ItemComposition originalComposition = itemManager.getItemComposition(originalItemId);
-    if (isWithdrawingAsNote) {
+
+    //If we're withdrawing as a note, we need to get the item id of the note as the banked item is never the noted item
+    if (isWithdrawingAsNote() && isItemNotable(originalComposition)) {
       bankWidgetItemId = originalComposition.getLinkedNoteId();
       bankWidgetComposition = itemManager.getItemComposition(bankWidgetItemId);
     } else {
@@ -107,16 +111,16 @@ public class WithdrawFeature implements Feature {
       Widget inventoryWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> w.getItemId() == bankWidgetItemId);
       if (inventoryWidget != null) {
         //There is a matching widget, so we can just update the quantity
-        widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
+        updateBankItem(bankWidget, quantityToWithdraw);
         widgetService.updateQuantity(inventoryWidget, quantityToWithdraw);
         getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity());
       } else {
-        fillFirstEmpty(bankWidget, quantityToWithdraw);
+        fillFirstEmpty(bankWidget, bankWidgetItemId, quantityToWithdraw);
       }
     } else {
       //Item is not stackable, so we have to fill the inventory with the item until we run out of space or items
       for (int i = 0; i < quantityToWithdraw; i++) {
-        boolean outOfSpace = fillFirstEmpty(bankWidget, 1);
+        boolean outOfSpace = fillFirstEmpty(bankWidget, bankWidgetItemId, 1);
         if (outOfSpace) {
           break;
         }
@@ -125,30 +129,51 @@ public class WithdrawFeature implements Feature {
   }
 
   /**
+   * @return Whether the item can be noted
+   */
+  private boolean isItemNotable(ItemComposition itemComposition) {
+    return itemComposition.getLinkedNoteId() > 0;
+  }
+
+  /**
    * @return {@code false} if there is no more space in the inventory, {@code true} otherwise
    */
-  private boolean fillFirstEmpty(Widget bankWidget, int quantityToWithdraw) {
+  private boolean fillFirstEmpty(Widget bankWidget, int actualItemId, int quantityToWithdraw) {
     var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> isEmpty(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
     if (emptyWidget != null) {
-      widgetService.setFakeWidgetItem(emptyWidget, bankWidget);
-      widgetService.setQuantity(emptyWidget, quantityToWithdraw);
-
-      widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
+      widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw);
+      updateBankItem(bankWidget, quantityToWithdraw);
       getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw);
       return false;
     }
     return true;
   }
 
+  private void updateBankItem(Widget bankWidget, int quantityToWithdraw) {
+    int newQuantity = bankWidget.getItemQuantity() - quantityToWithdraw;
+    widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
+    if (newQuantity == 0) {
+      if (isPlaceholdersDisabled()) {
+        log.debug("Hiding bank widget, new quantity is 0 and placeholders are disabled");
+        widgetService.setAsHideOpacity(bankWidget);
+      } else {
+        widgetService.setOpacity(bankWidget, ZERO_QUANTITY_BANK_ITEM_OPACITY);
+      }
+    } else {
+      widgetService.setAsChangeOpacity(bankWidget);
+    }
+  }
+
   /**
    * @return Whether the bank is set to withdraw as a note
    */
   private boolean isWithdrawingAsNote() {
-    return client.getVarbitValue(VARBIT_WITHDRAW_AS_NOTE) == VARBIT_WITHDRAW_AS_NOTE_VALUE_TRUE;
+    return varbitsService.isVarbitTrue(VarbitsService.BOOLEAN_WITHDRAW_AS_NOTE);
   }
 
-  public static final int VARBIT_WITHDRAW_AS_NOTE = 3958;
-  public static final int VARBIT_WITHDRAW_AS_NOTE_VALUE_TRUE = 1;
+  private boolean isPlaceholdersDisabled() {
+    return varbitsService.isVarbitFalse(VarbitsService.BOOLEAN_ALWAYS_SET_BANK_PLACEHOLDER);
+  }
 
   @Nonnull
   @Override
