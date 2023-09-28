@@ -27,46 +27,49 @@
 
 package no.elg.ii.inventory.slot;
 
-public interface InventorySlot {
+import lombok.Data;
+
+@Data
+public class InventorySlot {
 
   /**
    * Indicate that the item is not a real item, but rather a placeholder
    */
-  int INVALID_ITEM_ID = -1;
-  int RESET_ITEM_ID = -2;
+  public static final int INVALID_ITEM_ID = -1;
+  public static final int RESET_ITEM_ID = -2;
 
   /**
    * Indicate the item has not been modified
    */
-  int NO_CHANGED_TICK = -1;
+  public static final int NO_CHANGED_TICK = -1;
 
-  InventorySlot UNMODIFIED_SLOT = new InventorySlotState(NO_CHANGED_TICK, INVALID_ITEM_ID, 0);
-  InventorySlot RESET_SLOT = new InventorySlotState(NO_CHANGED_TICK, RESET_ITEM_ID, 0);
-
-  /**
-   * @return When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
-   */
-  int getChangedTick();
+  public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0);
+  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0);
 
   /**
-   * @return The item id of this slot, or {@link InventorySlot#INVALID_ITEM_ID} if this slot is not a real item
+   * When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
    */
-  int getItemId();
-
-  int getQuantity();
-
+  private final int changedTick;
+  /**
+   * The item id of this slot, or {@link InventorySlot#INVALID_ITEM_ID} if this slot is not a real item
+   */
+  private final int itemId;
+  /**
+   * How many of the item in this slot
+   */
+  private final int quantity;
 
   /**
    * @return Whether this slot is valid, i.e. has an item id
    */
-  default boolean hasValidItemId() {
+  public boolean hasValidItemId() {
     return getItemId() >= 0;
   }
 
   /**
    * @return Whether this slot has been modified
    */
-  default boolean hasChangedTick() {
+  public boolean hasChangedTick() {
     return getChangedTick() >= 0;
   }
 

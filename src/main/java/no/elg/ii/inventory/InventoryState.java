@@ -52,7 +52,6 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
-import no.elg.ii.inventory.slot.InventorySlotState;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.WidgetUtil;
@@ -104,7 +103,7 @@ public class InventoryState {
    */
   public void setSlot(Widget widget) {
     int index = widget.getIndex();
-    setSlot(index, new InventorySlotState(client.getTickCount(), widget.getItemId(), widget.getItemQuantity()));
+    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity()));
   }
 
   /**
@@ -114,7 +113,7 @@ public class InventoryState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setSlot(int index, int itemId, int quantity) {
-    setSlot(index, new InventorySlotState(client.getTickCount(), itemId, quantity));
+    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity));
   }
 
   public void setSlot(int index, @Nonnull InventorySlot slot) {
