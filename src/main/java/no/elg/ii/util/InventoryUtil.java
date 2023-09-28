@@ -31,7 +31,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetID;
 import net.runelite.api.widgets.WidgetInfo;
@@ -84,22 +83,6 @@ public final class InventoryUtil {
     GROUP_ITEM_CONTAINER,
     DEPOSIT_BOX_ITEM_CONTAINER
   );
-
-  /**
-   * @param inventoryId {@link net.runelite.api.InventoryID}
-   * @return The widget info for the given inventory id or {@code null} if there is no such widget
-   * @see net.runelite.api.InventoryID
-   */
-  @Nullable
-  public static WidgetInfo inventoryIdToWidget(int inventoryId) {
-    if (inventoryId == InventoryID.INVENTORY.getId()) {
-      return WidgetInfo.INVENTORY;
-    } else if (inventoryId == InventoryID.BANK.getId()) {
-      return WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER;
-    } else {
-      return null;
-    }
-  }
 
   private InventoryUtil() {
   }
