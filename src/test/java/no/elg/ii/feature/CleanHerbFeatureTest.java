@@ -25,12 +25,12 @@
  *
  */
 
-package no.elg.ii.feature.clean;
+package no.elg.ii.feature;
 
 import static net.runelite.api.ItemID.FIRE_CAPE;
 import static net.runelite.api.ItemID.GRIMY_GUAM_LEAF;
-import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_CONFIG_KEY;
-import static no.elg.ii.feature.clean.CleanHerbFeature.CLEAN_OPTION;
+import static no.elg.ii.feature.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.feature.CleanHerbFeature.CLEAN_OPTION;
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

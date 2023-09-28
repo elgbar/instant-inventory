@@ -25,9 +25,9 @@
  *
  */
 
-package no.elg.ii.feature.hide;
+package no.elg.ii.feature;
 
-import static no.elg.ii.feature.hide.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.feature.DropFeature.DROP_CONFIG_KEY;
 import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

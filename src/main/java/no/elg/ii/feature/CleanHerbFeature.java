@@ -24,50 +24,63 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.hide;
+package no.elg.ii.feature;
 
+import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.Skill;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.game.ItemManager;
-import no.elg.ii.util.VarbitsService;
+import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.WidgetService;
+import no.elg.ii.util.HerbInfo;
 
-@Slf4j
-public class DropFeature extends HideFeature {
+public class CleanHerbFeature implements Feature {
 
-  public static final String DROP_OPTION = "Drop";
-  public static final String DROP_CONFIG_KEY = "instantDrop";
+  public static final String CLEAN_OPTION = "Clean";
+  public static final String CLEAN_CONFIG_KEY = "instantClean";
 
   @Inject
-  private Client client;
+  @VisibleForTesting
+  public Client client;
+
   @Inject
-  private ItemManager itemManager;
+  private InventoryState state;
   @Inject
-  private VarbitsService varbitsService;
+  private WidgetService widgetService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
-      if (DROP_OPTION.equals(menuOption)) {
-        log.debug("Dropped item at index {} id {}", widget.getIndex(), widget.getName());
-        if (varbitsService.willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
-          log.debug("Drop warning will be shown, will not hide item");
-        } else {
-          hide(widget);
+      if (CLEAN_OPTION.equals(menuOption)) {
+        int itemId = event.getItemId();
+        HerbInfo herbInfo = HerbInfo.HERBS.get(itemId);
+        if (herbInfo == null) {
+          return;
+        }
+        int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
+        if (herbloreLevel >= herbInfo.getMinLevel()) {
+          getState().setSlot(widget);
+          widgetService.setFakeWidgetItem(widget, herbInfo.getCleanItemId(), 1);
         }
       }
     }
   }
 
+  @Override
+  @Nonnull
+  public InventoryState getState() {
+    return state;
+  }
+
   @Nonnull
   @Override
   public String getConfigKey() {
-    return DROP_CONFIG_KEY;
+    return CLEAN_CONFIG_KEY;
   }
 }

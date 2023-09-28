@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.feature.hide;
+package no.elg.ii.feature;
 
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;

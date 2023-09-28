@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.clean;
+package no.elg.ii.util;
 
 import java.util.HashMap;
 import java.util.Map;

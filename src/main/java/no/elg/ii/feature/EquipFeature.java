@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.feature.replace;
+package no.elg.ii.feature;
 
 import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
 
@@ -52,7 +52,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.http.api.item.ItemEquipmentStats;
 import net.runelite.http.api.item.ItemStats;
-import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.WidgetService;

@@ -24,63 +24,57 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.clean;
+package no.elg.ii.feature;
 
 import com.google.common.annotations.VisibleForTesting;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Skill;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.WidgetService;
+import no.elg.ii.util.WidgetUtil;
 
-public class CleanHerbFeature implements Feature {
+@Slf4j
+public abstract class HideFeature implements Feature {
 
-  public static final String CLEAN_OPTION = "Clean";
-  public static final String CLEAN_CONFIG_KEY = "instantClean";
-
+  @Inject
+  public InstantInventoryPlugin plugin;
   @Inject
   @VisibleForTesting
-  public Client client;
+  protected InstantInventoryConfig config;
+  @Inject
+  public ClientThread clientThread;
+  @Inject
+  @Getter
+  private InventoryState state;
 
   @Inject
-  private InventoryState state;
+  public Client client;
   @Inject
   private WidgetService widgetService;
 
+  @Inject
+  private EnsureWidgetStateService ensureWidgetStateService;
+
+  protected void hide(Widget widget) {
+    log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
+    getState().setSlot(widget); // Will be hidden by onBeforeRender
+  }
+
   @Subscribe
-  public void onMenuOptionClicked(final MenuOptionClicked event) {
-    Widget widget = event.getWidget();
-    if (widget != null) {
-      String menuOption = event.getMenuOption();
-      if (CLEAN_OPTION.equals(menuOption)) {
-        int itemId = event.getItemId();
-        HerbInfo herbInfo = HerbInfo.HERBS.get(itemId);
-        if (herbInfo == null) {
-          return;
-        }
-        int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
-        if (herbloreLevel >= herbInfo.getMinLevel()) {
-          getState().setSlot(widget);
-          widgetService.setFakeWidgetItem(widget, herbInfo.getCleanItemId(), 1);
-        }
-      }
-    }
+  public void onBeforeRender(BeforeRender event) {
+    ensureWidgetStateService.forceWidgetState(getState(), this::isNotHidden, widgetService::setAsHideOpacity);
   }
 
-  @Override
-  @Nonnull
-  public InventoryState getState() {
-    return state;
-  }
-
-  @Nonnull
-  @Override
-  public String getConfigKey() {
-    return CLEAN_CONFIG_KEY;
+  protected boolean isNotHidden(Widget widget) {
+    return widget.getOpacity() != config.hideOpacity() && !WidgetUtil.isEmpty(widget);
   }
 }

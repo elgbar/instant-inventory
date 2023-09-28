@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.hide;
+package no.elg.ii.feature;
 
 import static net.runelite.api.widgets.WidgetInfo.BANK_ITEM_CONTAINER;
 

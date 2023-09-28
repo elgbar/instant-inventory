@@ -24,58 +24,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.hide;
+package no.elg.ii.feature;
 
-import com.google.common.annotations.VisibleForTesting;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.events.BeforeRender;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.feature.Feature;
-import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.service.EnsureWidgetStateService;
-import no.elg.ii.service.WidgetService;
-import no.elg.ii.util.WidgetUtil;
+import net.runelite.client.game.ItemManager;
+import no.elg.ii.util.VarbitsService;
 
 @Slf4j
-public abstract class HideFeature implements Feature {
+public class DropFeature extends HideFeature {
+
+  public static final String DROP_OPTION = "Drop";
+  public static final String DROP_CONFIG_KEY = "instantDrop";
 
   @Inject
-  public InstantInventoryPlugin plugin;
+  private Client client;
   @Inject
-  @VisibleForTesting
-  protected InstantInventoryConfig config;
+  private ItemManager itemManager;
   @Inject
-  public ClientThread clientThread;
-  @Inject
-  @Getter
-  private InventoryState state;
-
-  @Inject
-  public Client client;
-  @Inject
-  private WidgetService widgetService;
-
-  @Inject
-  private EnsureWidgetStateService ensureWidgetStateService;
-
-  protected void hide(Widget widget) {
-    log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
-    getState().setSlot(widget); // Will be hidden by onBeforeRender
-  }
+  private VarbitsService varbitsService;
 
   @Subscribe
-  public void onBeforeRender(BeforeRender event) {
-    ensureWidgetStateService.forceWidgetState(getState(), this::isNotHidden, widgetService::setAsHideOpacity);
+  public void onMenuOptionClicked(final MenuOptionClicked event) {
+    Widget widget = event.getWidget();
+    if (widget != null) {
+      String menuOption = event.getMenuOption();
+      if (DROP_OPTION.equals(menuOption)) {
+        log.debug("Dropped item at index {} id {}", widget.getIndex(), widget.getName());
+        if (varbitsService.willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
+          log.debug("Drop warning will be shown, will not hide item");
+        } else {
+          hide(widget);
+        }
+      }
+    }
   }
 
-  protected boolean isNotHidden(Widget widget) {
-    return widget.getOpacity() != config.hideOpacity() && !WidgetUtil.isEmpty(widget);
+  @Nonnull
+  @Override
+  public String getConfigKey() {
+    return DROP_CONFIG_KEY;
   }
 }
