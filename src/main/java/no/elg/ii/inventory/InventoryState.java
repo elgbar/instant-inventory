@@ -26,6 +26,7 @@
  */
 package no.elg.ii.inventory;
 
+import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -35,6 +36,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -68,6 +70,7 @@ import no.elg.ii.util.WidgetUtil;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
+@Singleton
 public class InventoryState {
 
   /**
@@ -165,23 +168,42 @@ public class InventoryState {
    * @param index The index of the item
    */
   public void resetState(int index) {
+    resetState(index, null, false);
+  }
+
+  /**
+   * Reset a given index to the initial state
+   *
+   * @param index The index of the item
+   */
+  private void resetState(int index, @Nullable Item item, boolean hasItem) {
     if (isValidIndex(index)) {
       log.trace("Resetting index {}", index);
       slots[index] = InventorySlot.RESET_SLOT;
-      resetWidgetInSlot(index);
+      resetWidgetInSlot(index, item, hasItem);
     } else {
       log.debug("Tried to reset invalid index {}", index);
     }
   }
 
-  private void resetWidgetInSlot(int slot) {
-    ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
-    if (inventoryContainer == null) {
-      return;
+  /**
+   * Update all inventory widgets to reflect the actual state of the inventory
+   */
+  private void resetWidgetInSlot(int index, @Nullable Item maybeItem, boolean hasItem) {
+    Item item;
+    if (hasItem) {
+      item = maybeItem;
+    } else {
+      ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+      if (inventoryContainer == null) {
+        return;
+      }
+      item = inventoryContainer.getItem(index);
     }
-    Item item = inventoryContainer.getItem(slot);
-    Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllInventoryWidgets().filter(it -> it.getIndex() == slot);
+
+    Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllInventoryWidgets().filter(it -> it.getIndex() == index);
     if (item == null || item.getId() < 0) {
+      //There is no item at this index, so we hide the widget
       //Make sure items that are not in the inventory are hidden
       indexedWidgetStream.forEach(it -> it.getWidget().setOpacity(WidgetUtil.FULLY_OPAQUE));
     } else {
@@ -219,8 +241,8 @@ public class InventoryState {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }
-    int actualItemId = item == null ? -1 : item.getId();
-    int actualQuantity = item == null ? -1 : item.getQuantity();
+    int actualItemId = item == null ? INVALID_ITEM_ID : item.getId();
+    int actualQuantity = item == null ? INVALID_ITEM_ID : item.getQuantity();
 
     int itemId = slot.getItemId();
     int quantity = slot.getQuantity();
@@ -228,7 +250,7 @@ public class InventoryState {
     // Item at index changed so we must reset the slot
     if (slot.hasValidItemId() && (itemId != actualItemId || quantity != actualQuantity)) {
       log.debug("Item at index {} changed from item id {} to {} or from quantity {} to {}, resetting the item", index, itemId, actualItemId, quantity, actualQuantity);
-      resetState(index);
+      resetState(index, item, true);
       return;
     }
 
@@ -236,7 +258,7 @@ public class InventoryState {
     int ticksSinceModified = client.getTickCount() - modifiedTick;
     if (slot.hasChangedTick() && ticksSinceModified >= config.maxUnmodifiedTicks()) {
       log.debug("Item at index {} has not changed in {} tick, resetting the item", index, ticksSinceModified);
-      resetState(index);
+      resetState(index, item, true);
     }
   }
 }

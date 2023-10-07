@@ -52,6 +52,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.util.AdditionalWidgetInfo;
 
 @Slf4j
@@ -78,6 +79,9 @@ public class InstantInventoryPlugin extends Plugin {
   @VisibleForTesting
   protected FeatureManager featureManager;
 
+  @Inject
+  protected InventoryState inventoryState;
+
   @Override
   protected void startUp() {
     featureManager.updateAllFeatureStatus();
@@ -94,16 +98,13 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe
   public void onGameTick(GameTick event) {
-    Set<Feature> activeFeatures = featureManager.getActiveFeatures();
     ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
     if (itemContainer == null) {
       return;
     }
     for (int index = 0; index < INVENTORY_SIZE; index++) {
       Item item = itemContainer.getItem(index);
-      for (Feature feature : activeFeatures) {
-        feature.getState().validateState(index, item);
-      }
+      inventoryState.validateState(index, item);
     }
   }
 

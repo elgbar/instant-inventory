@@ -40,6 +40,6 @@ public class DepositFeatureTest extends FeatureTestMother<DepositFeature> {
 
   @Test
   public void afterEnablingItWillBeShownOnSomeWidget() {
-    HideFeature dropFeature = createNewInstance();
+    DepositFeature dropFeature = createNewInstance();
   }
 }
