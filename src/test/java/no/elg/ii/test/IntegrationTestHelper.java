@@ -28,7 +28,6 @@
 package no.elg.ii.test;
 
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import net.runelite.api.Client;
@@ -46,33 +45,35 @@ import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.WidgetService;
 import org.junit.Before;
+import org.mockito.Answers;
+import org.mockito.Mock;
 
 public class IntegrationTestHelper {
 
   protected InstantInventoryPlugin plugin;
+  @Mock(answer = Answers.CALLS_REAL_METHODS)
+  protected InstantInventoryConfig instantInventoryConfig;
+  @Mock
+  protected EventBus eventBus;
+  @Mock
+  protected Client client;
+  @Mock
+  protected InventoryService inventoryService;
+  @Mock
+  protected WidgetService widgetService;
+
+  protected FeatureManager featureManager;
+  protected Features features;
+
   protected DropFeature dropFeature;
   protected CleanHerbFeature cleanHerbFeature;
   protected DepositFeature depositFeature;
   protected EquipFeature equipFeature;
   protected WithdrawFeature withdrawFeature;
-  protected InstantInventoryConfig instantInventoryConfig;
-  protected EventBus eventBus;
-  protected Client client;
-  protected FeatureManager featureManager;
-  protected Features features;
+  protected InventoryState inventoryState;
 
   @Before
   public void setUp() {
-    eventBus = mock(EventBus.class);
-    client = mock(Client.class);
-    instantInventoryConfig = spy(new InstantInventoryConfig() {
-    });
-    doReturn(true).when(instantInventoryConfig).instantDrop();
-    doReturn(true).when(instantInventoryConfig).instantClean();
-    doReturn(true).when(instantInventoryConfig).instantDeposit();
-    doReturn(true).when(instantInventoryConfig).instantEquip();
-    doReturn(true).when(instantInventoryConfig).instantWithdraw();
-
     features = new Features(
       TestSetup.createNewDropFeature(),
       TestSetup.createNewCleanHerbFeature(),
@@ -88,15 +89,11 @@ public class IntegrationTestHelper {
 
     featureManager = spy(new FeatureManager(eventBus, instantInventoryConfig, features));
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager));
-//    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
-
-    Client client = mock(Client.class);
-    var inventoryService = mock(InventoryService.class);
-    var widgetService = mock(WidgetService.class);
-    InventoryState inventoryState = new InventoryState(instantInventoryConfig, client, inventoryService, widgetService);
+    inventoryState = new InventoryState(instantInventoryConfig, client, inventoryService, widgetService);
     doReturn(inventoryState).when(dropFeature).getState();
     doReturn(inventoryState).when(cleanHerbFeature).getState();
     doReturn(inventoryState).when(depositFeature).getState();
+
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState));
   }
 }
