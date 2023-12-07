@@ -26,14 +26,13 @@
  */
 package no.elg.ii.feature;
 
-import static net.runelite.api.widgets.WidgetInfo.BANK_ITEM_CONTAINER;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -92,7 +91,7 @@ public class DepositFeature extends HideFeature {
 
         int canonItemId = itemManager.canonicalize(eventItemId);
         //Update widget in bank
-        Widget bankInventoryContainer = client.getWidget(BANK_ITEM_CONTAINER);
+        Widget bankInventoryContainer = client.getWidget(ComponentID.BANK_ITEM_CONTAINER);
         if (bankInventoryContainer != null) {
           for (Widget bankWidget : bankInventoryContainer.getDynamicChildren()) {
             if (itemManager.canonicalize(bankWidget.getItemId()) == canonItemId) {

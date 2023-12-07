@@ -27,7 +27,7 @@
 
 package no.elg.ii.service;
 
-import static no.elg.ii.util.WidgetUtil.FULLY_OPAQUE;
+import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

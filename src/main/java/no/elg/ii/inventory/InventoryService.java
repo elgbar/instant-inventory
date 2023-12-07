@@ -51,7 +51,7 @@ public class InventoryService {
   @Nonnull
   private Stream<Widget> getOpenWidgetItemContainer() {
     return INVENTORY_ITEMS_CONTAINERS.stream()
-      .map(widgetInfo -> client.getWidget(widgetInfo.getGroupId(), widgetInfo.getChildId()))
+      .map(componentId -> client.getWidget(componentId))
       .filter(widget -> widget != null && !widget.isHidden());
   }
 

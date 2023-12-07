@@ -27,19 +27,13 @@
 
 package no.elg.ii;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.events.ConfigChanged;
 import no.elg.ii.test.IntegrationTestHelper;
 import org.junit.Test;
@@ -81,18 +75,6 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
     configChanged.setGroup("");
     plugin.onConfigChanged(configChanged);
     verify(featureManager, never()).updateAllFeatureStatus();
-  }
-
-  @Test
-  public void inventoryItems_returns_widgets_list_on_inventory_exists() {
-    Widget inventoryWidget = mock(Widget.class);
-    Widget[] widgets = {mock(Widget.class)};
-    doReturn(widgets).when(inventoryWidget).getDynamicChildren();
-    doReturn(inventoryWidget).when(client).getWidget(WidgetInfo.INVENTORY);
-    doCallRealMethod().when(plugin).inventoryItems(WidgetInfo.INVENTORY);
-
-    assertArrayEquals(widgets, plugin.inventoryItems(WidgetInfo.INVENTORY));
-    assertSame(widgets, plugin.inventoryItems(WidgetInfo.INVENTORY));
   }
 
   @Test

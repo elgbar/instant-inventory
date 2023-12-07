@@ -31,7 +31,6 @@ import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -44,7 +43,6 @@ import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -53,7 +51,6 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.util.AdditionalWidgetInfo;
 
 @Slf4j
 @AllArgsConstructor
@@ -127,27 +124,6 @@ public class InstantInventoryPlugin extends Plugin {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
       featureManager.updateAllFeatureStatus();
     }
-  }
-
-  /**
-   * @return An array of items in the players inventory, or an empty inventory if there is no
-   * inventory widget
-   */
-  @Nonnull
-  public Widget[] inventoryItems(@Nonnull WidgetInfo widgetInfo) {
-    return inventoryItems(widgetInfo.getGroupId(), widgetInfo.getChildId());
-  }
-
-  public Widget[] inventoryItems(@Nonnull AdditionalWidgetInfo widgetInfo) {
-    return inventoryItems(widgetInfo.getGroupId(), widgetInfo.getChildId());
-  }
-
-  public Widget[] inventoryItems(int groupId, int childId) {
-    Widget widget = client.getWidget(groupId, childId);
-    if (widget != null) {
-      return widget.getDynamicChildren();
-    }
-    return EMPTY_WIDGET;
   }
 
   @Provides

@@ -46,8 +46,8 @@ import net.runelite.api.ItemContainer;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.http.api.item.ItemEquipmentStats;
@@ -55,7 +55,7 @@ import net.runelite.http.api.item.ItemStats;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.WidgetService;
-import no.elg.ii.util.WidgetUtil;
+import no.elg.ii.util.WidgetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Singleton
@@ -85,7 +85,7 @@ public class EquipFeature implements Feature {
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
-    ensureWidgetStateService.forceWidgetState(getState(), WidgetUtil::isNotEmpty, widgetService::setAsChangeOpacity);
+    ensureWidgetStateService.forceWidgetState(getState(), WidgetUtils::isNotEmpty, widgetService::setAsChangeOpacity);
   }
 
   @Subscribe
@@ -94,7 +94,7 @@ public class EquipFeature implements Feature {
     if (widget != null) {
       String menuOption = event.getMenuOption();
       if (WIELD_OPTION.equals(menuOption) || WEAR_OPTION.equals(menuOption)) {
-        log.debug("Equipped item {}", WidgetUtil.getWidgetInfo(widget));
+        log.debug("Equipped item {}", WidgetUtils.debugWidgetString(widget));
         equip(widget);
       }
     }
@@ -119,7 +119,7 @@ public class EquipFeature implements Feature {
     if (toReplaceItem != null) {
       Item extraItem = itemIds.getRight();
       if (extraItem != null) {
-        var offhandWidget = findFirstEmptySlot(client, WidgetInfo.INVENTORY);
+        var offhandWidget = findFirstEmptySlot(client, InterfaceID.INVENTORY);
         if (offhandWidget != null) {
           widgetService.setFakeWidgetItem(widget, toReplaceItem);
           widgetService.setFakeWidgetItem(offhandWidget, extraItem);

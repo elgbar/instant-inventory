@@ -56,7 +56,7 @@ import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.IndexedWidget;
-import no.elg.ii.util.WidgetUtil;
+import no.elg.ii.util.WidgetUtils;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -205,7 +205,7 @@ public class InventoryState {
     if (item == null || item.getId() < 0) {
       //There is no item at this index, so we hide the widget
       //Make sure items that are not in the inventory are hidden
-      indexedWidgetStream.forEach(it -> it.getWidget().setOpacity(WidgetUtil.FULLY_OPAQUE));
+      indexedWidgetStream.forEach(it -> it.getWidget().setOpacity(WidgetUtils.FULLY_OPAQUE));
     } else {
       //Update the item to the actual item
       indexedWidgetStream.forEach(it -> {

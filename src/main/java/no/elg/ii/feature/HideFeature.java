@@ -40,7 +40,7 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.WidgetService;
-import no.elg.ii.util.WidgetUtil;
+import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
 public abstract class HideFeature implements Feature {
@@ -65,7 +65,7 @@ public abstract class HideFeature implements Feature {
   private EnsureWidgetStateService ensureWidgetStateService;
 
   protected void hide(Widget widget) {
-    log.debug("Hiding widget {}", WidgetUtil.getWidgetInfo(widget));
+    log.debug("Hiding widget {}", WidgetUtils.debugWidgetString(widget));
     getState().setSlot(widget); // Will be hidden by onBeforeRender
   }
 
@@ -75,6 +75,6 @@ public abstract class HideFeature implements Feature {
   }
 
   protected boolean isNotHidden(Widget widget) {
-    return widget.getOpacity() != config.hideOpacity() && !WidgetUtil.isEmpty(widget);
+    return widget.getOpacity() != config.hideOpacity() && !WidgetUtils.isEmpty(widget);
   }
 }

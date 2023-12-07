@@ -40,7 +40,7 @@ import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.util.WidgetUtil;
+import no.elg.ii.util.WidgetUtils;
 
 @ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {
@@ -149,28 +149,28 @@ public interface InstantInventoryConfig extends Config {
     section = COMMON_SECTION,
     keyName = "hideOpacity",
     name = "Hide opacity",
-    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " (fully visible) and " + WidgetUtil.FULLY_TRANSPARENT + " (fully hidden)." +
+    description = "A number between " + WidgetUtils.FULLY_OPAQUE + " (fully visible) and " + WidgetUtils.FULLY_TRANSPARENT + " (fully hidden)." +
       "<p>" +
       "<p>This controls how visible an items when it will be dropped/removed the next game tick.",
     position = 110
   )
-  @Range(max = WidgetUtil.FULLY_TRANSPARENT)
+  @Range(max = WidgetUtils.FULLY_TRANSPARENT)
   default int hideOpacity() {
-    return WidgetUtil.NEARLY_TRANSPARENT;
+    return WidgetUtils.NEARLY_TRANSPARENT;
   }
 
   @ConfigItem(
     section = COMMON_SECTION,
     keyName = "changeOpacity",
     name = "Change opacity",
-    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " (fully visible) and " + WidgetUtil.FULLY_TRANSPARENT + " (fully hidden)." +
+    description = "A number between " + WidgetUtils.FULLY_OPAQUE + " (fully visible) and " + WidgetUtils.FULLY_TRANSPARENT + " (fully hidden)." +
       "<p>" +
       "<p>This controls how visible an items when it will be replaced with another item the next game tick.",
     position = 111
   )
-  @Range(max = WidgetUtil.FULLY_TRANSPARENT)
+  @Range(max = WidgetUtils.FULLY_TRANSPARENT)
   default int changeOpacity() {
-    return WidgetUtil.HALF_TRANSPARENT;
+    return WidgetUtils.HALF_TRANSPARENT;
   }
 
 }

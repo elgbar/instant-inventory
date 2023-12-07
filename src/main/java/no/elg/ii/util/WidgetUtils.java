@@ -31,8 +31,8 @@ import javax.annotation.Nonnull;
 import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 
-public final class WidgetUtil {
-  private WidgetUtil() {
+public final class WidgetUtils {
+  private WidgetUtils() {
   }
 
   /**
@@ -57,7 +57,7 @@ public final class WidgetUtil {
   public static final int THE_EMPTY_ITEM_ID = NullItemID.NULL_6512;
 
   @Nonnull
-  public static String getWidgetInfo(@Nonnull Widget widget) {
+  public static String debugWidgetString(@Nonnull Widget widget) {
     return widget.getName() + " id: " + widget.getItemId() + ", index: " + widget.getIndex() + ", quantity: " + widget.getItemQuantity() + " opacity: " + widget.getOpacity();
   }
 
@@ -65,7 +65,10 @@ public final class WidgetUtil {
    * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
    */
   public static boolean isEmpty(@Nonnull Widget widget) {
-    return widget.isHidden() || widget.getName().isEmpty() || widget.getOpacity() == FULLY_TRANSPARENT || widget.getItemId() == THE_EMPTY_ITEM_ID;
+    return widget.isHidden()
+      || widget.getName().isEmpty()
+      || widget.getOpacity() == FULLY_TRANSPARENT
+      || widget.getItemId() == THE_EMPTY_ITEM_ID;
   }
 
   public static boolean isNotEmpty(@Nonnull Widget widget) {

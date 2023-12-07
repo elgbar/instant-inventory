@@ -28,26 +28,28 @@
 package no.elg.ii.feature;
 
 import static no.elg.ii.util.InventoryUtil.findFirst;
-import static no.elg.ii.util.WidgetUtil.ZERO_QUANTITY_BANK_ITEM_OPACITY;
-import static no.elg.ii.util.WidgetUtil.isEmpty;
+import static no.elg.ii.util.WidgetUtils.ZERO_QUANTITY_BANK_ITEM_OPACITY;
+import static no.elg.ii.util.WidgetUtils.isEmpty;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.VarbitsService;
-import no.elg.ii.util.WidgetUtil;
+import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
 public class WithdrawFeature implements Feature {
@@ -81,20 +83,19 @@ public class WithdrawFeature implements Feature {
         if (amount == Util.NO_MENU_OPTION_NUMBER) {
           return;
         }
-        log.debug("Withdrawing item {}", WidgetUtil.getWidgetInfo(bankWidget));
+        log.debug("Withdrawing item {}", WidgetUtils.debugWidgetString(bankWidget));
         withdraw(bankWidget, amount);
       }
     }
   }
 
   private void withdraw(Widget bankWidget, int amount) {
-    int bankWidgetItemId;
-    ItemComposition bankWidgetComposition;
-
     int originalItemId = bankWidget.getItemId();
     ItemComposition originalComposition = itemManager.getItemComposition(originalItemId);
 
     //If we're withdrawing as a note, we need to get the item id of the note as the banked item is never the noted item
+    int bankWidgetItemId;
+    ItemComposition bankWidgetComposition;
     if (isWithdrawingAsNote() && isItemNotable(originalComposition)) {
       bankWidgetItemId = originalComposition.getLinkedNoteId();
       bankWidgetComposition = itemManager.getItemComposition(bankWidgetItemId);
@@ -107,7 +108,7 @@ public class WithdrawFeature implements Feature {
     int quantityToWithdraw = Math.min(bankWidget.getItemQuantity(), amount);
 
     if (bankWidgetComposition.isStackable()) {
-      Widget inventoryWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> w.getItemId() == bankWidgetItemId);
+      Widget inventoryWidget = findFirst(client, ComponentID.BANK_INVENTORY_ITEM_CONTAINER, w -> w.getItemId() == bankWidgetItemId);
       if (inventoryWidget != null) {
         //There is a matching widget, so we can just update the quantity
         updateBankItem(bankWidget, quantityToWithdraw);
@@ -138,7 +139,11 @@ public class WithdrawFeature implements Feature {
    * @return {@code false} if there is no more space in the inventory, {@code true} otherwise
    */
   private boolean fillFirstEmpty(Widget bankWidget, int actualItemId, int quantityToWithdraw) {
-    var emptyWidget = findFirst(client, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER, w -> isEmpty(w) && !getState().getSlot(w.getIndex()).hasValidItemId());
+    var emptyWidget = findFirst(client, ComponentID.BANK_INVENTORY_ITEM_CONTAINER, widget -> {
+      @Nullable
+      InventorySlot slot = getState().getSlot(widget.getIndex());
+      return isEmpty(widget) && slot != null && !slot.hasValidItemId();
+    });
     if (emptyWidget != null) {
       widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw);
       updateBankItem(bankWidget, quantityToWithdraw);
