@@ -149,8 +149,7 @@ public interface InstantInventoryConfig extends Config {
     section = COMMON_SECTION,
     keyName = "hideOpacity",
     name = "Hide opacity",
-    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " and " + WidgetUtil.FULLY_TRANSPARENT + "." +
-      "<p>Where 0 is fully visible and 255 is fully hidden." +
+    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " (fully visible) and " + WidgetUtil.FULLY_TRANSPARENT + " (fully hidden)." +
       "<p>" +
       "<p>This controls how visible an items when it will be dropped/removed the next game tick.",
     position = 110
@@ -164,7 +163,7 @@ public interface InstantInventoryConfig extends Config {
     section = COMMON_SECTION,
     keyName = "changeOpacity",
     name = "Change opacity",
-    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " (fully visible) and " + WidgetUtil.FULLY_TRANSPARENT + "(fully hidden)." +
+    description = "A number between " + WidgetUtil.FULLY_OPAQUE + " (fully visible) and " + WidgetUtil.FULLY_TRANSPARENT + " (fully hidden)." +
       "<p>" +
       "<p>This controls how visible an items when it will be replaced with another item the next game tick.",
     position = 111
