@@ -13,7 +13,7 @@ repositories {
 }
 
 var runeLiteVersion = 'latest.release'
-var lombokVersion = '1.18.20'
+var lombokVersion = '1.18.30'
 
 dependencies {
   compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
