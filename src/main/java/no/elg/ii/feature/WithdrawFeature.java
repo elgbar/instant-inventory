@@ -159,12 +159,12 @@ public class WithdrawFeature implements Feature {
     if (bankWidget.getItemQuantity() == 0) {
       if (isPlaceholdersDisabled()) {
         log.debug("Hiding bank widget, new quantity is 0 and placeholders are disabled");
-        widgetService.setAsHideOpacity(bankWidget);
+        widgetService.setAsHideOpacity(bankWidget, false);
       } else {
-        widgetService.setOpacity(bankWidget, ZERO_QUANTITY_BANK_ITEM_OPACITY);
+        widgetService.setOpacity(bankWidget, ZERO_QUANTITY_BANK_ITEM_OPACITY, false);
       }
     } else {
-      widgetService.setAsChangeOpacity(bankWidget);
+      widgetService.setAsChangeOpacity(bankWidget, false);
     }
   }
 

@@ -84,13 +84,15 @@ public class WidgetService {
 
   /**
    * Set the opacity of the widget to the user specified hide opacity
+   *
+   * @param hideFully If the widget item id can be changed if the opacity is fully transparent
    */
-  public void setAsHideOpacity(@Nonnull Widget widget) {
-    setOpacity(widget, getHideOpacity());
+  public void setAsHideOpacity(@Nonnull Widget widget, boolean hideFully) {
+    setOpacity(widget, getHideOpacity(), hideFully);
   }
 
   public void setAsHideOpacity(@Nonnull Widget widget) {
-    setOpacity(widget, getHideOpacity());
+    setOpacity(widget, getHideOpacity(), true);
   }
 
   /**
@@ -100,7 +102,16 @@ public class WidgetService {
     setOpacity(widget, FULLY_OPAQUE, false);
   }
 
-  public void setOpacity(@Nonnull Widget widget, int opacity) {
+  /**
+   * Change the opacity of the widget to {@code opacity}
+   *
+   * @param hideFully If the widget item id can be changed if the opacity is fully transparent
+   */
+  public void setOpacity(@Nonnull Widget widget, int opacity, boolean hideFully) {
+    if (hideFully && opacity == FULLY_TRANSPARENT) {
+      //When the opacity should be fully transparent we want to change the widget to not display overlay for the given item
+      setEmptyItem(widget);
+    }
     widget.setHidden(false);
     widget.setOpacity(opacity);
   }
@@ -117,9 +128,13 @@ public class WidgetService {
     updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
   }
 
+  public void setEmptyItem(@Nonnull Widget dstWidget) {
+    setFakeWidgetItem(dstWidget, THE_EMPTY_ITEM_ID, 1);
+  }
+
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
     updateVisibleWidget(dstWidget, itemId, amount);
-    setAsChangeOpacity(dstWidget);
+    setAsChangeOpacity(dstWidget, false); //this can never be true as it will cause an infinite loop
   }
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
@@ -146,7 +161,7 @@ public class WidgetService {
   public void setQuantity(@Nonnull Widget widget, int quantity) {
     widget.setItemQuantity(quantity);
     if (widget.getItemQuantity() == 0) {
-      setAsChangeOpacity(widget);
+      setAsHideOpacity(widget, true);
     }
   }
 }
