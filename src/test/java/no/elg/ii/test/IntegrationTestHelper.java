@@ -31,6 +31,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import net.runelite.api.Client;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import no.elg.ii.FeatureManager;
 import no.elg.ii.Features;
@@ -71,6 +72,7 @@ public class IntegrationTestHelper {
   protected EquipFeature equipFeature;
   protected WithdrawFeature withdrawFeature;
   protected InventoryState inventoryState;
+  protected ClientThread clientThread;
 
   @Before
   public void setUp() {
@@ -87,7 +89,7 @@ public class IntegrationTestHelper {
     equipFeature = features.getEquipFeature();
     withdrawFeature = features.getWithdrawFeature();
 
-    featureManager = spy(new FeatureManager(eventBus, instantInventoryConfig, features));
+    featureManager = spy(new FeatureManager(eventBus, instantInventoryConfig, features, clientThread));
 
     inventoryState = new InventoryState(instantInventoryConfig, client, inventoryService, widgetService);
     doReturn(inventoryState).when(dropFeature).getState();

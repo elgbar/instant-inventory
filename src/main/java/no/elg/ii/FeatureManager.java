@@ -38,6 +38,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import no.elg.ii.feature.Feature;
 
@@ -51,8 +52,8 @@ public class FeatureManager {
    * The currently loaded features
    */
   @VisibleForTesting
-  protected final Set<Feature> featureSet = ConcurrentHashMap.newKeySet();
-  private final Set<Feature> featureSetView = Collections.unmodifiableSet(featureSet);
+  protected final Set<Feature> activeFeatures = ConcurrentHashMap.newKeySet();
+  private final Set<Feature> activeFeaturesView = Collections.unmodifiableSet(activeFeatures);
 
 
   @Inject
@@ -65,6 +66,9 @@ public class FeatureManager {
 
   @Inject
   protected Features featureInstances;
+
+  @Inject
+  protected ClientThread clientThread;
 
   /**
    * Make sure all features are in its correct state
@@ -79,7 +83,7 @@ public class FeatureManager {
   }
 
   public void disableAllFeatures() {
-    HashSet<Feature> copy = new HashSet<>(featureSet);
+    HashSet<Feature> copy = new HashSet<>(activeFeatures);
     for (Feature feature : copy) {
       disableFeature(feature);
     }
@@ -89,7 +93,7 @@ public class FeatureManager {
    * @return Thread safe view of the currently active features
    */
   public Set<Feature> getActiveFeatures() {
-    return featureSetView;
+    return activeFeaturesView;
   }
 
   /**
@@ -101,7 +105,7 @@ public class FeatureManager {
    */
   @VisibleForTesting
   void updateFeatureStatus(@Nonnull Feature feature, boolean isEnabledInConfig) {
-    boolean wasEnabled = featureSet.contains(feature);
+    boolean wasEnabled = activeFeatures.contains(feature);
 
     if (!wasEnabled && isEnabledInConfig) {
       enableFeature(feature);
@@ -117,11 +121,13 @@ public class FeatureManager {
    */
   @VisibleForTesting
   void enableFeature(@Nonnull Feature feature) {
-    log.debug("Enabling " + feature.getConfigKey());
-    eventBus.register(feature);
-    featureSet.add(feature);
-    feature.onEnable();
-    feature.reset();
+    clientThread.invoke(() -> {
+      log.debug("Enabling " + feature.getConfigKey());
+      eventBus.register(feature);
+      activeFeatures.add(feature);
+      feature.onEnable();
+      feature.reset();
+    });
   }
 
   /**
@@ -131,10 +137,12 @@ public class FeatureManager {
    */
   @VisibleForTesting
   void disableFeature(@Nonnull Feature feature) {
-    log.debug("Disabling " + feature.getConfigKey());
-    eventBus.unregister(feature);
-    featureSet.remove(feature);
-    feature.onDisable();
-    feature.reset();
+    clientThread.invoke(() -> {
+      log.debug("Disabling " + feature.getConfigKey());
+      eventBus.unregister(feature);
+      activeFeatures.remove(feature);
+      feature.onDisable();
+      feature.reset();
+    });
   }
 }
