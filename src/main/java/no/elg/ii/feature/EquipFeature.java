@@ -82,10 +82,13 @@ public class EquipFeature implements Feature {
   @Inject
   private EnsureWidgetStateService ensureWidgetStateService;
 
+  protected boolean isNotHidden(Widget widget) {
+    return widget.getOpacity() != widgetService.getHideOpacity() && !WidgetUtils.isEmpty(widget);
+  }
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
-    ensureWidgetStateService.forceWidgetState(getState(), WidgetUtils::isNotEmpty, widgetService::setAsChangeOpacity);
+    ensureWidgetStateService.forceWidgetState(getState(), this::isNotHidden, widgetService::setAsChangeOpacity);
   }
 
   @Subscribe
@@ -94,7 +97,7 @@ public class EquipFeature implements Feature {
     if (widget != null) {
       String menuOption = event.getMenuOption();
       if (WIELD_OPTION.equals(menuOption) || WEAR_OPTION.equals(menuOption)) {
-        log.debug("Equipped item {}", WidgetUtils.debugWidgetString(widget));
+        log.debug("Equipped item {}", WidgetUtils.debugInfo(widget));
         equip(widget);
       }
     }
@@ -112,11 +115,13 @@ public class EquipFeature implements Feature {
     Pair<Item, Item> itemIds = getEquipmentToReplace(widget);
     ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
     if (inventoryContainer == null) {
+      log.debug("Failed to find the inventory container");
       return;
     }
 
     @Nullable Item toReplaceItem = itemIds.getLeft();
     if (toReplaceItem != null) {
+      log.trace("An item was equipped in the slot (to replace: {}), will replace it with {}", WidgetUtils.debugInfo(toReplaceItem), WidgetUtils.debugInfo(widget));
       Item extraItem = itemIds.getRight();
       if (extraItem != null) {
         var offhandWidget = findFirstEmptySlot(client, InterfaceID.INVENTORY);
@@ -129,10 +134,12 @@ public class EquipFeature implements Feature {
           return;
         }
       } else {
+        log.trace("No off-hand item to replace, will only change the clicked slot");
         widgetService.setFakeWidgetItem(widget, toReplaceItem);
       }
     } else {
-      widgetService.setAsHideOpacity(widget);
+      log.trace("No other item to replace, will show the slot as empty");
+      widgetService.setEmptyItem(widget);
     }
     getState().setSlot(widget.getIndex(), widget.getItemId(), widget.getItemQuantity());
   }
