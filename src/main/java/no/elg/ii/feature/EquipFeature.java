@@ -46,7 +46,7 @@ import net.runelite.api.ItemContainer;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.widgets.InterfaceID;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -124,7 +124,8 @@ public class EquipFeature implements Feature {
       log.trace("An item was equipped in the slot (to replace: {}), will replace it with {}", WidgetUtils.debugInfo(toReplaceItem), WidgetUtils.debugInfo(widget));
       Item extraItem = itemIds.getRight();
       if (extraItem != null) {
-        var offhandWidget = findFirstEmptySlot(client, InterfaceID.INVENTORY);
+        log.trace("There is also something in the off-slot ({}), will replace that too", WidgetUtils.debugInfo(extraItem));
+        @Nullable Widget offhandWidget = findFirstEmptySlot(client, ComponentID.INVENTORY_CONTAINER);
         if (offhandWidget != null) {
           widgetService.setFakeWidgetItem(widget, toReplaceItem);
           widgetService.setFakeWidgetItem(offhandWidget, extraItem);
