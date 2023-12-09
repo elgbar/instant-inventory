@@ -148,26 +148,28 @@ public interface InstantInventoryConfig extends Config {
     section = COMMON_SECTION,
     keyName = "hideOpacityPercent",
     name = "Hidden items opacity",
-    description = "How transparent items are when removed from the inventory or bank<p><p>0% is fully transparent",
+    description = "How transparent items are when removed from the inventory or bank" +
+      "<p>A lower value will cause items to be more transparent",
     position = 110
   )
   @Range(max = 100)
   @Units(Units.PERCENT)
   default int hideOpacityPercent() {
-    return 75; //% transparent
+    return 50; //% transparent
   }
 
   @ConfigItem(
     section = COMMON_SECTION,
     keyName = "changeOpacityPercent",
     name = "Changed items opacity",
-    description = "How transparent items are when replaced with another item",
+    description = "How transparent items are when replaced with another item." +
+      "<p>A lower value will cause items to be more transparent",
     position = 111
   )
   @Range(max = 100)
   @Units(Units.PERCENT)
   default int changeOpacityPercent() {
-    return 25; //% transparent
+    return 75; //% transparent
   }
 
 }

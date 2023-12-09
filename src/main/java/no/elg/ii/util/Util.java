@@ -39,6 +39,10 @@ public class Util {
     }
   }
 
+  public static int coerceIn(int value, int min, int max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
   private Util() {
   }
 }

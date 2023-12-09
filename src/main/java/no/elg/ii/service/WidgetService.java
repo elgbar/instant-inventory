@@ -38,6 +38,8 @@ import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.util.Util;
+import no.elg.ii.util.WidgetUtils;
 
 @Singleton
 public class WidgetService {
@@ -48,14 +50,23 @@ public class WidgetService {
   private static final int FULLY_OPAQUE_INT_PERCENT = 100;
   private static final int FULLY_TRANSPARENT_INT_PERCENT = 0;
 
+  /**
+   * Convert a number between {@link #FULLY_TRANSPARENT_INT_PERCENT} and {@link #FULLY_OPAQUE_INT_PERCENT} to the
+   * corresponding opacity value between {@link WidgetUtils#FULLY_OPAQUE} and {@link WidgetUtils#FULLY_TRANSPARENT}
+   */
+  private static int intPercentToOpacityValue(int opacityPercent) {
+    int validOpacityIntPercent = Util.coerceIn(opacityPercent, FULLY_TRANSPARENT_INT_PERCENT, FULLY_OPAQUE_INT_PERCENT);
+    double percent = validOpacityIntPercent / (double) FULLY_OPAQUE_INT_PERCENT;
+    return (int) ((1d - percent) * FULLY_TRANSPARENT);
+  }
+
   public int getChangeOpacity() {
-    return (int) ((1d - (config.changeOpacityPercent() / 100d)) * FULLY_TRANSPARENT);
+    return intPercentToOpacityValue(config.changeOpacityPercent());
   }
 
   public int getHideOpacity() {
-    return (int) ((1d - (config.hideOpacityPercent() / 100d)) * FULLY_TRANSPARENT);
+    return intPercentToOpacityValue(config.hideOpacityPercent());
   }
-
 
   /**
    * Set the opacity of the widget to the user specified change opacity
