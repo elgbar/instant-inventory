@@ -75,6 +75,6 @@ public abstract class HideFeature implements Feature {
   }
 
   protected boolean isNotHidden(Widget widget) {
-    return widget.getOpacity() != config.hideOpacity() && !WidgetUtils.isEmpty(widget);
+    return widget.getOpacity() != widgetService.getHideOpacity() && !WidgetUtils.isEmpty(widget);
   }
 }

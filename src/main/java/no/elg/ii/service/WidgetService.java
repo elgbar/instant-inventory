@@ -28,6 +28,8 @@
 package no.elg.ii.service;
 
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
+import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
+import static no.elg.ii.util.WidgetUtils.THE_EMPTY_ITEM_ID;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -43,27 +45,48 @@ public class WidgetService {
   @Inject
   private InstantInventoryConfig config;
 
-  /**
-   * Make the widget fully visible
-   */
-  public void setAsChangeOpacity(@Nonnull Widget widget) {
-    setOpacity(widget, config.changeOpacity());
+  private static final int FULLY_OPAQUE_INT_PERCENT = 100;
+  private static final int FULLY_TRANSPARENT_INT_PERCENT = 0;
+
+  public int getChangeOpacity() {
+    return (int) ((1d - (config.changeOpacityPercent() / 100d)) * FULLY_TRANSPARENT);
   }
 
+  public int getHideOpacity() {
+    return (int) ((1d - (config.hideOpacityPercent() / 100d)) * FULLY_TRANSPARENT);
+  }
+
+
   /**
-   * Make the widget fully visible
+   * Set the opacity of the widget to the user specified change opacity
+   *
+   * @param hideFully If the widget item id can be changed if the opacity is fully transparent
+   */
+  public void setAsChangeOpacity(@Nonnull Widget widget, boolean hideFully) {
+    setOpacity(widget, getChangeOpacity(), hideFully);
+  }
+
+  public void setAsChangeOpacity(@Nonnull Widget widget) {
+    setOpacity(widget, getChangeOpacity(), true);
+  }
+
+
+  /**
+   * Set the opacity of the widget to the user specified hide opacity
    */
   public void setAsHideOpacity(@Nonnull Widget widget) {
-    setOpacity(widget, config.hideOpacity());
+    setOpacity(widget, getHideOpacity());
+  }
+
+  public void setAsHideOpacity(@Nonnull Widget widget) {
+    setOpacity(widget, getHideOpacity());
   }
 
   /**
    * Make the widget fully visible
-   *
-   * @param widget
    */
   public void setAsFullyOpaque(@Nonnull Widget widget) {
-    setOpacity(widget, FULLY_OPAQUE);
+    setOpacity(widget, FULLY_OPAQUE, false);
   }
 
   public void setOpacity(@Nonnull Widget widget, int opacity) {
