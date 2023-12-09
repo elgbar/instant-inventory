@@ -28,6 +28,7 @@
 package no.elg.ii.util;
 
 import javax.annotation.Nonnull;
+import net.runelite.api.Item;
 import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 
@@ -57,8 +58,13 @@ public final class WidgetUtils {
   public static final int THE_EMPTY_ITEM_ID = NullItemID.NULL_6512;
 
   @Nonnull
-  public static String debugWidgetString(@Nonnull Widget widget) {
+  public static String debugInfo(@Nonnull Widget widget) {
     return widget.getName() + " id: " + widget.getItemId() + ", index: " + widget.getIndex() + ", quantity: " + widget.getItemQuantity() + " opacity: " + widget.getOpacity();
+  }
+
+  @Nonnull
+  public static String debugInfo(@Nonnull Item item) {
+    return "id: " + item.getId() + ", quantity: " + item.getQuantity();
   }
 
   /**

@@ -83,7 +83,7 @@ public class WithdrawFeature implements Feature {
         if (amount == Util.NO_MENU_OPTION_NUMBER) {
           return;
         }
-        log.debug("Withdrawing item {}", WidgetUtils.debugWidgetString(bankWidget));
+        log.debug("Withdrawing item {}", WidgetUtils.debugInfo(bankWidget));
         withdraw(bankWidget, amount);
       }
     }
@@ -154,9 +154,9 @@ public class WithdrawFeature implements Feature {
   }
 
   private void updateBankItem(Widget bankWidget, int quantityToWithdraw) {
-    int newQuantity = bankWidget.getItemQuantity() - quantityToWithdraw;
     widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
-    if (newQuantity == 0) {
+    log.debug("Removing {} from bank widget {}", quantityToWithdraw, WidgetUtils.debugInfo(bankWidget));
+    if (bankWidget.getItemQuantity() == 0) {
       if (isPlaceholdersDisabled()) {
         log.debug("Hiding bank widget, new quantity is 0 and placeholders are disabled");
         widgetService.setAsHideOpacity(bankWidget);
