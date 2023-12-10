@@ -43,6 +43,7 @@ import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -78,6 +79,8 @@ public class InstantInventoryPlugin extends Plugin {
 
   @Inject
   protected InventoryState inventoryState;
+  @Inject
+  protected ClientThread clientThread;
 
   @Override
   protected void startUp() {
@@ -91,18 +94,22 @@ public class InstantInventoryPlugin extends Plugin {
   }
 
   /* (non-javadoc)
-   * When an item is different in the inventory, unmark it as being hidden
+   * When an item is different in the inventory, unmark it as being hidden.
+   *
+   * This should run after client ticking to prevent flickering of items
    */
-  @Subscribe
+  @Subscribe(priority = Integer.MAX_VALUE)
   public void onGameTick(GameTick event) {
-    ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
-    if (itemContainer == null) {
-      return;
-    }
-    for (int index = 0; index < INVENTORY_SIZE; index++) {
-      Item item = itemContainer.getItem(index);
-      inventoryState.validateState(index, item);
-    }
+    clientThread.invokeLater(() -> {
+      ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
+      if (itemContainer == null) {
+        return;
+      }
+      for (int index = 0; index < INVENTORY_SIZE; index++) {
+        Item item = itemContainer.getItem(index);
+        inventoryState.validateState(index, item);
+      }
+    });
   }
 
   /* (non-javadoc)
