@@ -89,12 +89,10 @@ public class VarbitsService {
    */
   public static final int INT_DEFAULT_X_QUANTITY = 3960;
 
-
   /**
    * Whether placeholders will be shown in the bank
    */
   public static final int BOOLEAN_ALWAYS_SET_BANK_PLACEHOLDER = 3755;
-
 
   public static final int VARBIT_VALUE_TRUE = 1;
   public static final int VARBIT_VALUE_FALSE = 0;

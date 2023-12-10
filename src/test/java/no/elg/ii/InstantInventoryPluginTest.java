@@ -27,8 +27,6 @@
 
 package no.elg.ii;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -75,12 +73,5 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
     configChanged.setGroup("");
     plugin.onConfigChanged(configChanged);
     verify(featureManager, never()).updateAllFeatureStatus();
-  }
-
-  @Test
-  public void inventoryItems_returns_empty_list_on_no_inventory() {
-    doReturn(null).when(client).getWidget(any());
-//    doCallRealMethod().when(plugin).inventoryItems(any());
-//    assertSame(EMPTY_WIDGET, plugin.inventoryItems(any()));
   }
 }
