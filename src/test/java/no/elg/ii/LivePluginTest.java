@@ -27,14 +27,32 @@
 
 package no.elg.ii;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import java.util.Arrays;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
+import org.slf4j.LoggerFactory;
 
 public class LivePluginTest {
 
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
     ExternalPluginManager.loadBuiltin(InstantInventoryPlugin.class);
-    RuneLite.main(args);
+    var argsList = Arrays.asList(args);
+    if (argsList.contains("--trace")) {
+
+      final Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+      logger.setLevel(Level.TRACE);
+
+      //Spams too much
+      final Logger taskScheduler = (Logger) LoggerFactory.getLogger("net.runelite.client.task.Scheduler");
+      taskScheduler.setLevel(Level.DEBUG);
+
+      String[] argsNoTrace = Arrays.stream(args).filter(s -> !s.equalsIgnoreCase("--trace")).toArray(String[]::new);
+      RuneLite.main(argsNoTrace);
+    } else {
+      RuneLite.main(args);
+    }
   }
 }
