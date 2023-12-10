@@ -43,6 +43,8 @@ public class InventorySlot {
    */
   public static final int NO_CHANGED_TICK = -1;
 
+  public static final int TICK_LENGTH_MS = 600;
+
   public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0);
   public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0);
 
@@ -50,6 +52,10 @@ public class InventorySlot {
    * When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
    */
   private final int changedTick;
+  /**
+   * When this slot was modified in milliseconds. This is to remove flickering
+   */
+  private final long changedMs = System.currentTimeMillis();
   /**
    * The item id of this slot, or {@link InventorySlot#INVALID_ITEM_ID} if this slot is not a real item
    */
@@ -67,10 +73,19 @@ public class InventorySlot {
   }
 
   /**
-   * @return Whether this slot has been modified
+   * @return Whether this slot has been modified, if so when it was will be reflected in {@link #getChangedTick()}
    */
   public boolean hasChangedTick() {
     return getChangedTick() >= 0;
+  }
+
+  /**
+   * A slot shou
+   *
+   * @return If this inventory slot has still "Invulnerability Frames" left
+   */
+  public boolean isTooEarlyToReset() {
+    return System.currentTimeMillis() - getChangedMs() < TICK_LENGTH_MS;
   }
 
 }

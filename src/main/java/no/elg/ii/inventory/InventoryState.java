@@ -241,6 +241,10 @@ public class InventoryState {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }
+    if (slot.isTooEarlyToReset()) {
+      log.trace("Not resetting slot {} as it is too early", index);
+      return;
+    }
     int actualItemId = item == null ? INVALID_ITEM_ID : item.getId();
     int actualQuantity = item == null ? INVALID_ITEM_ID : item.getQuantity();
 

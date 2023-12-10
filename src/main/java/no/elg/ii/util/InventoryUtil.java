@@ -73,7 +73,7 @@ public final class InventoryUtil {
   public static final int BANK_WITHDRAW_AS_NOTE = WidgetUtil.packComponentId(InterfaceID.BANK, 24);
 
   public static final List<Integer> INVENTORY_ITEMS_CONTAINERS = List.of(
-    InterfaceID.INVENTORY,
+    ComponentID.INVENTORY_CONTAINER,
     ComponentID.EQUIPMENT_INVENTORY_ITEM_CONTAINER,
     ComponentID.BANK_INVENTORY_ITEM_CONTAINER,
     ComponentID.GRAND_EXCHANGE_INVENTORY_INVENTORY_ITEM_CONTAINER,
