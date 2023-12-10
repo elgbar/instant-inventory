@@ -43,7 +43,6 @@ import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.ComponentID;
@@ -53,7 +52,6 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.http.api.item.ItemEquipmentStats;
 import net.runelite.http.api.item.ItemStats;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.WidgetUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -79,17 +77,6 @@ public class EquipFeature implements Feature {
   private InventoryState state;
   @Inject
   private WidgetService widgetService;
-  @Inject
-  private EnsureWidgetStateService ensureWidgetStateService;
-
-  protected boolean isNotHidden(Widget widget) {
-    return widget.getOpacity() != widgetService.getHideOpacity() && !WidgetUtils.isEmpty(widget);
-  }
-
-  @Subscribe
-  public void onBeforeRender(BeforeRender event) {
-    ensureWidgetStateService.forceWidgetState(getState(), this::isNotHidden, widgetService::setAsChangeOpacity);
-  }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {

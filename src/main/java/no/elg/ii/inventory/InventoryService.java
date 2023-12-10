@@ -38,8 +38,13 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.eventbus.Subscribe;
+import no.elg.ii.service.EnsureWidgetStateService;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.util.WidgetUtils;
 
 @Singleton
 @Slf4j
@@ -47,6 +52,13 @@ public class InventoryService {
 
   @Inject
   private Client client;
+  @Inject
+  private EnsureWidgetStateService ensureWidgetStateService;
+  @Inject
+  private WidgetService widgetService;
+  @Inject
+  private InventoryState inventoryState;
+
 
   @Nonnull
   private Stream<Widget> getOpenWidgetItemContainer() {
@@ -60,5 +72,14 @@ public class InventoryService {
   public final Stream<IndexedWidget> getAllInventoryWidgets() {
     return getOpenWidgetItemContainer()
       .flatMap(container -> Streams.mapWithIndex(Arrays.stream(container.getDynamicChildren()), indexWidget));
+  }
+
+  public boolean isNotHidden(Widget widget) {
+    return widget.getOpacity() != widgetService.getHideOpacity() && !WidgetUtils.isEmpty(widget);
+  }
+
+  @Subscribe
+  public void onBeforeRender(BeforeRender event) {
+    ensureWidgetStateService.forceWidgetState(inventoryState, this::isNotHidden, widgetService::setAsChangeOpacity);
   }
 }

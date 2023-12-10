@@ -31,15 +31,11 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.service.EnsureWidgetStateService;
-import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
@@ -47,34 +43,23 @@ public abstract class HideFeature implements Feature {
 
   @Inject
   public InstantInventoryPlugin plugin;
+
   @Inject
   @VisibleForTesting
   protected InstantInventoryConfig config;
+
   @Inject
   public ClientThread clientThread;
+
   @Inject
   @Getter
   private InventoryState state;
 
   @Inject
   public Client client;
-  @Inject
-  private WidgetService widgetService;
-
-  @Inject
-  private EnsureWidgetStateService ensureWidgetStateService;
 
   protected void hide(Widget widget) {
     log.debug("Hiding widget {}", WidgetUtils.debugInfo(widget));
     getState().setSlot(widget); // Will be hidden by onBeforeRender
-  }
-
-  @Subscribe
-  public void onBeforeRender(BeforeRender event) {
-    ensureWidgetStateService.forceWidgetState(getState(), this::isNotHidden, widgetService::setAsHideOpacity);
-  }
-
-  protected boolean isNotHidden(Widget widget) {
-    return widget.getOpacity() != widgetService.getHideOpacity() && !WidgetUtils.isEmpty(widget);
   }
 }
