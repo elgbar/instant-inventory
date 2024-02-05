@@ -65,6 +65,8 @@ import no.elg.ii.util.WidgetUtils;
  * A {@link Feature} uses this class to handle how to render the changes on the client. Typically, a
  * feature will modify the rendering of a given item in the inventory of the player when the
  * {@link #getSlot(int)} is different to {@link InventorySlot#INVALID_ITEM_ID}.
+ * <p>
+ * The state should only be modified by the client thread
  */
 @EqualsAndHashCode
 @Slf4j
@@ -120,6 +122,7 @@ public class InventoryState {
   }
 
   public void setSlot(int index, @Nonnull InventorySlot slot) {
+    assert this.client.isClientThread();
     if (isValidIndex(index)) {
       log.trace("Setting index {} to {}", index, slot);
       slots[index] = slot;
@@ -130,6 +133,7 @@ public class InventoryState {
 
   @Nullable
   public InventorySlot getSlot(int index) {
+    assert this.client.isClientThread();
     if (isInvalidIndex(index)) {
       log.debug("Tried to get invalid index {}", index);
       return null;
@@ -149,6 +153,7 @@ public class InventoryState {
    * @return The slots and its index we're currently modifying
    */
   public Stream<IndexedInventorySlot> getActiveSlots() {
+    assert this.client.isClientThread();
     //noinspection DataFlowIssue Safe as we are always within the size of the inventory
     return IntStream.range(0, slots.length).mapToObj(i -> new IndexedInventorySlot(i, getSlot(i))).filter((iis) -> iis.getSlot().hasValidItemId());
   }
@@ -177,6 +182,7 @@ public class InventoryState {
    * @param index The index of the item
    */
   private void resetState(int index, @Nullable Item item, boolean hasItem) {
+    assert this.client.isClientThread();
     if (isValidIndex(index)) {
       log.trace("Resetting index {}", index);
       slots[index] = InventorySlot.RESET_SLOT;
@@ -236,6 +242,7 @@ public class InventoryState {
    * @param item  The actual item which is in the inventory
    */
   public void validateState(int index, @Nullable Item item) {
+    assert this.client.isClientThread();
     InventorySlot slot = getSlot(index);
     if (slot == null || slot == InventorySlot.UNMODIFIED_SLOT || slot == InventorySlot.RESET_SLOT) {
       // This item is not modified (or at least not by us) so we do not need to do anything
