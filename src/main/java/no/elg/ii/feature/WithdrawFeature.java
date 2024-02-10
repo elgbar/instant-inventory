@@ -79,7 +79,7 @@ public class WithdrawFeature implements Feature {
     if (bankWidget != null) {
       String menuOption = event.getMenuOption();
       if (menuOption != null && menuOption.startsWith(WITHDRAW_PREFIX_OPTION)) {
-        int amount = Util.getNumberFromMenuOption(menuOption);
+        int amount = Util.getNumberFromMenuOption(menuOption, bankWidget);
         if (amount == Util.NO_MENU_OPTION_NUMBER) {
           return;
         }

@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix the quantity of the item in the bank not being updated client-side when depositing items
 * Fix missing unit in config
 * Do not try to hide dropped items that are considered valuable
-* Parse `-All` in the menu entry as max integer value
+* Parse `-All` and `-All-but-1` in the menu entry correctly
 
 ### Removed
 

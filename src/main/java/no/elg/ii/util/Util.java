@@ -27,16 +27,25 @@
 
 package no.elg.ii.util;
 
+import javax.annotation.Nonnull;
+import net.runelite.api.widgets.Widget;
+
 public class Util {
   public static final int NO_MENU_OPTION_NUMBER = -1;
 
-  public static int getNumberFromMenuOption(String text) {
+  public static int getNumberFromMenuOption(String text, @Nonnull Widget widget) {
     try {
-      String substring = text.substring(text.lastIndexOf('-') + 1);
+      String substring = text.substring(text.indexOf('-') + 1);
+      int quantity;
       if ("All".equals(substring)) {
-        return Integer.MAX_VALUE;
+        quantity = widget.getItemQuantity();
+      } else if ("All-but-1".equalsIgnoreCase(substring)) {
+        quantity = widget.getItemQuantity() - 1;
+      } else {
+        quantity = Integer.parseInt(substring);
       }
-      return Integer.parseInt(substring);
+      assert quantity > 0;
+      return quantity;
     } catch (NumberFormatException | IndexOutOfBoundsException e) {
       return NO_MENU_OPTION_NUMBER;
     }

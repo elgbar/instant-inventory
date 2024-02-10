@@ -74,7 +74,7 @@ public class DepositFeature extends HideFeature {
       int eventItemId = event.getItemId();
       int clickedIndex = widget.getIndex();
       if (menuOption != null && (menuOption.startsWith(DEPOSIT_PREFIX_OPTION))) {
-        int toTake = Util.getNumberFromMenuOption(menuOption);
+        int toTake = Util.getNumberFromMenuOption(menuOption, widget);
         if (toTake == Util.NO_MENU_OPTION_NUMBER) {
           return;
         }
