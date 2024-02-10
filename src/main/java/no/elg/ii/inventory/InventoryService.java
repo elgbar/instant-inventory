@@ -43,6 +43,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.service.EnsureWidgetStateService;
+import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.WidgetUtils;
 
@@ -54,6 +55,8 @@ public class InventoryService {
   private Client client;
   @Inject
   private EnsureWidgetStateService ensureWidgetStateService;
+  @Inject
+  private WidgetService widgetService;
 
   @Nonnull
   private Stream<Widget> getOpenWidgetItemContainer() {
@@ -69,16 +72,20 @@ public class InventoryService {
       .flatMap(container -> Streams.mapWithIndex(Arrays.stream(container.getDynamicChildren()), indexWidget));
   }
 
-  public boolean hasDifferentOpacity(Widget widget, InventorySlot slot) {
-    return slot.hasValidItemId() && widget.getOpacity() != slot.getOpacity() && !WidgetUtils.isEmpty(widget);
+  public boolean isDifferent(Widget widget, InventorySlot slot) {
+    return slot.hasValidItemId() && !WidgetUtils.isEmpty(widget)
+      && (widget.getItemId() != slot.getItemId()
+      || widget.getItemQuantity() != slot.getQuantity()
+      || widget.getOpacity() != slot.getOpacity());
   }
 
-  public void setWidgetOpacityFromSlot(Widget widget, InventorySlot slot) {
-    widget.setOpacity(slot.getOpacity());
+  public void setWidgetFromSlot(Widget widget, InventorySlot slot) {
+    widgetService.updateVisibleWidget(widget, slot.getItemId(), slot.getQuantity());
+    widgetService.setOpacity(widget, slot.getOpacity(), true);
   }
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
-    ensureWidgetStateService.forceWidgetState(this::hasDifferentOpacity, this::setWidgetOpacityFromSlot);
+    ensureWidgetStateService.forceWidgetState(this::isDifferent, this::setWidgetFromSlot);
   }
 }
