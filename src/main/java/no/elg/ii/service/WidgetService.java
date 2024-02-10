@@ -78,11 +78,6 @@ public class WidgetService {
     setOpacity(widget, getChangeOpacity(), hideFully);
   }
 
-  public void setAsChangeOpacity(@Nonnull Widget widget) {
-    setOpacity(widget, getChangeOpacity(), true);
-  }
-
-
   /**
    * Set the opacity of the widget to the user specified hide opacity
    *
@@ -90,10 +85,6 @@ public class WidgetService {
    */
   public void setAsHideOpacity(@Nonnull Widget widget, boolean hideFully) {
     setOpacity(widget, getHideOpacity(), hideFully);
-  }
-
-  public void setAsHideOpacity(@Nonnull Widget widget) {
-    setOpacity(widget, getHideOpacity(), true);
   }
 
   /**

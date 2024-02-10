@@ -210,6 +210,7 @@ public class InventoryState {
    * Update all inventory widgets to reflect the actual state of the inventory
    */
   private void resetWidgetInSlot(int index, @Nullable Item maybeItem, boolean hasItem) {
+    assert this.client.isClientThread();
     Item item;
     if (hasItem) {
       item = maybeItem;
