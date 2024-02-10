@@ -153,8 +153,5 @@ public class WidgetService {
    */
   public void setQuantity(@Nonnull Widget widget, int quantity) {
     widget.setItemQuantity(quantity);
-    if (widget.getItemQuantity() == 0) {
-      setAsHideOpacity(widget, true);
-    }
   }
 }
