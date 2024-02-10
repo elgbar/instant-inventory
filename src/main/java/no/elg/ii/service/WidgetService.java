@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.runelite.api.Item;
+import net.runelite.api.widgets.ItemQuantityMode;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.inventory.slot.InventorySlot;
@@ -128,8 +129,9 @@ public class WidgetService {
     updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
   }
 
-  public void setEmptyItem(@Nonnull Widget dstWidget) {
-    setFakeWidgetItem(dstWidget, THE_EMPTY_ITEM_ID, 1);
+  public void setEmptyItem(@Nonnull Widget widget) {
+    widget.setItemQuantityMode(ItemQuantityMode.NEVER);
+    setFakeWidgetItem(widget, THE_EMPTY_ITEM_ID, 1);
   }
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
