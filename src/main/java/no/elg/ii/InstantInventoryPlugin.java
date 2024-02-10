@@ -42,7 +42,6 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
@@ -51,6 +50,7 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 
 @Slf4j
@@ -58,8 +58,6 @@ import no.elg.ii.inventory.InventoryState;
 @NoArgsConstructor
 @PluginDescriptor(name = "Instant Inventory")
 public class InstantInventoryPlugin extends Plugin {
-
-  public static final Widget[] EMPTY_WIDGET = new Widget[0];
 
   @Inject
   @VisibleForTesting
@@ -82,15 +80,20 @@ public class InstantInventoryPlugin extends Plugin {
   @Inject
   protected ClientThread clientThread;
 
+  @Inject
+  InventoryService inventoryService;
+
   @Override
   protected void startUp() {
     featureManager.updateAllFeatureStatus();
+    eventBus.register(inventoryService);
   }
 
   @Override
   protected void shutDown() {
     // Disable all features when the plugin shuts down
     featureManager.disableAllFeatures();
+    eventBus.unregister(inventoryService);
   }
 
   /* (non-javadoc)
