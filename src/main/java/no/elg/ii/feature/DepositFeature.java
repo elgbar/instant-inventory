@@ -85,7 +85,7 @@ public class DepositFeature extends HideFeature {
           Set<IndexedWidget> itemToTake = inventoryService.getAllInventoryWidgets()
             .filter(it -> {
               InventorySlot slot = inventoryState.getSlot(it.getWidget().getIndex());
-              return it.getIndex() <= clickedIndex && slot != null && !slot.hasValidItemId() && it.getWidget().getItemId() == eventItemId;
+              return it.getIndex() == clickedIndex || slot != null && !slot.hasValidItemId() && it.getWidget().getItemId() == eventItemId;
             })
             .sorted()
             .limit(toTake)
