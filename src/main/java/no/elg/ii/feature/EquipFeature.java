@@ -30,6 +30,8 @@ package no.elg.ii.feature;
 import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -78,6 +80,11 @@ public class EquipFeature implements Feature {
   @Inject
   private WidgetService widgetService;
 
+  /**
+   * The last tick each slot was equipped
+   */
+  private final Map</*slotIdx*/ Integer, /*last tick count changed*/ Integer> lastEquipped = new HashMap<>(EquipmentInventorySlot.values().length);
+
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
@@ -99,10 +106,13 @@ public class EquipFeature implements Feature {
   }
 
   protected void equip(@Nonnull Widget widget) {
-    Pair<Item, Item> itemIds = getEquipmentToReplace(widget);
     ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
     if (inventoryContainer == null) {
       log.debug("Failed to find the inventory container");
+      return;
+    }
+    @Nullable Pair<Item, Item> itemIds = getEquipmentToReplace(widget);
+    if (itemIds == null) {
       return;
     }
 
@@ -140,11 +150,11 @@ public class EquipFeature implements Feature {
    * @return The item that was equipped (left) and potentially the off-hand item that was equipped (right) if it will be unequipped
    */
   @VisibleForTesting
-  @Nonnull
+  @Nullable
   public Pair<Item, Item> getEquipmentToReplace(Widget widget) {
     final ItemStats itemStats = itemManager.getItemStats(widget.getItemId(), false);
     if (itemStats == null || !itemStats.isEquipable()) {
-      return Pair.of(null, null);
+      return null;
     }
     Item toReplace = null;
     Item extra = null;
@@ -153,6 +163,10 @@ public class EquipFeature implements Feature {
 
     ItemContainer equipmentContainer = client.getItemContainer(InventoryID.EQUIPMENT);
     if (clickedEquipment != null && equipmentContainer != null) {
+      if (lastEquipped.getOrDefault(clickedEquipment.getSlot(), 0) == client.getTickCount()) {
+        log.debug("We have already equipped an item in the same slot this tick, will not replace it");
+        return null;
+      }
       final int slotOfClickedItem = clickedEquipment.getSlot();
       toReplace = equipmentContainer.getItem(slotOfClickedItem);
 
@@ -173,6 +187,7 @@ public class EquipFeature implements Feature {
           }
         }
       }
+      lastEquipped.put(clickedEquipment.getSlot(), client.getTickCount());
     }
     if (extra != null && toReplace == null) {
       //
