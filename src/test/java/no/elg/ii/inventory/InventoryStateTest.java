@@ -33,6 +33,7 @@ import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
@@ -72,7 +73,7 @@ public class InventoryStateTest {
 
   private void setAll(int itemId) {
     for (int index = 0; index < INVENTORY_SIZE; index++) {
-      inventoryState.setSlot(index, itemId, 0);
+      inventoryState.setSlot(index, itemId, 0, FULLY_OPAQUE);
     }
   }
 
@@ -108,7 +109,7 @@ public class InventoryStateTest {
   @Test
   public void validateState_differentItemIdFromCurrent_resets() {
     doReturn(2).when(client).getTickCount();
-    inventoryState.setSlot(index, itemId, 0);
+    inventoryState.setSlot(index, itemId, 0, FULLY_OPAQUE);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(2, inventoryState.getSlot(index).getChangedTick());
@@ -121,7 +122,7 @@ public class InventoryStateTest {
 
   @Test
   public void validateState_timeout_resets_default_is_2() {
-    inventoryState.setSlot(index, itemId, quantity);
+    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
 
     assertEquals(1, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
@@ -138,7 +139,7 @@ public class InventoryStateTest {
   public void validateState_timeout_resets_not_before_configurable_ticks() {
 
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS + 1).when(config).maxUnmodifiedTicks();
-    inventoryState.setSlot(index, itemId, quantity);
+    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
@@ -155,7 +156,7 @@ public class InventoryStateTest {
   public void validateState_timeout_resets_customizable_time() {
     int maxUnmodifiedTicks = DEFAULT_MAX_UNMODIFIED_TICKS + 1;
     doReturn(maxUnmodifiedTicks).when(config).maxUnmodifiedTicks();
-    inventoryState.setSlot(index, itemId, 0);
+    inventoryState.setSlot(index, itemId, 0, FULLY_OPAQUE);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
@@ -183,7 +184,7 @@ public class InventoryStateTest {
 
   @Test
   public void validateState_not_timeout_and_same_item_does_not_reset() {
-    inventoryState.setSlot(index, itemId, quantity);
+    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(quantity, inventoryState.getSlot(index).getQuantity());

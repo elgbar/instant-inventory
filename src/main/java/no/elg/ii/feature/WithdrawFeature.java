@@ -113,7 +113,7 @@ public class WithdrawFeature implements Feature {
         //There is a matching widget, so we can just update the quantity
         updateBankItem(bankWidget, quantityToWithdraw);
         widgetService.updateQuantity(inventoryWidget, quantityToWithdraw);
-        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity());
+        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity(), widgetService.getChangeOpacity());
       } else {
         fillFirstEmpty(bankWidget, bankWidgetItemId, quantityToWithdraw);
       }
@@ -147,7 +147,7 @@ public class WithdrawFeature implements Feature {
     if (emptyWidget != null) {
       widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw);
       updateBankItem(bankWidget, quantityToWithdraw);
-      getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw);
+      getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw, widgetService.getChangeOpacity());
       return false;
     }
     return true;

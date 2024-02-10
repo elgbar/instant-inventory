@@ -27,6 +27,8 @@
 
 package no.elg.ii.inventory.slot;
 
+import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
+
 import lombok.Data;
 
 @Data
@@ -45,8 +47,8 @@ public class InventorySlot {
 
   public static final int TICK_LENGTH_MS = 600;
 
-  public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0);
-  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0);
+  public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, FULLY_TRANSPARENT);
+  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0, FULLY_TRANSPARENT);
 
   /**
    * When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
@@ -64,6 +66,10 @@ public class InventorySlot {
    * How many of the item in this slot
    */
   private final int quantity;
+  /**
+   * The opacity this slot should be rendered with
+   */
+  private final int opacity;
 
   /**
    * @return Whether this slot is valid, i.e. has an item id

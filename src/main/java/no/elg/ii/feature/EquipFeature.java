@@ -98,7 +98,7 @@ public class EquipFeature implements Feature {
     }
   }
 
-  protected void equip(Widget widget) {
+  protected void equip(@Nonnull Widget widget) {
     Pair<Item, Item> itemIds = getEquipmentToReplace(widget);
     ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
     if (inventoryContainer == null) {
@@ -107,6 +107,7 @@ public class EquipFeature implements Feature {
     }
 
     @Nullable Item toReplaceItem = itemIds.getLeft();
+    int opacity;
     if (toReplaceItem != null) {
       log.trace("An item was equipped in the slot (to replace: {}), will replace it with {}", WidgetUtils.debugInfo(toReplaceItem), WidgetUtils.debugInfo(widget));
       Item extraItem = itemIds.getRight();
@@ -125,11 +126,13 @@ public class EquipFeature implements Feature {
         log.trace("No off-hand item to replace, will only change the clicked slot");
         widgetService.setFakeWidgetItem(widget, toReplaceItem);
       }
+      opacity = widgetService.getChangeOpacity();
     } else {
       log.trace("No other item to replace, will show the slot as empty");
       widgetService.setEmptyItem(widget);
+      opacity = widgetService.getHideOpacity();
     }
-    getState().setSlot(widget.getIndex(), widget.getItemId(), widget.getItemQuantity());
+    getState().setSlot(widget, opacity);
   }
 
   /**

@@ -106,9 +106,23 @@ public class InventoryState {
   /**
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
    */
-  public void setSlot(Widget widget) {
+  public void setSlotAsHidden(Widget widget) {
+    setSlot(widget, widgetService.getHideOpacity());
+  }
+
+  /**
+   * Update the {@code itemId} at {@code index} will also update which tick the item was modified
+   */
+  public void setSlotAsChanged(Widget widget) {
+    setSlot(widget, widgetService.getChangeOpacity());
+  }
+
+  /**
+   * Update the {@code itemId} at {@code index} will also update which tick the item was modified
+   */
+  public void setSlot(Widget widget, int opacity) {
     int index = widget.getIndex();
-    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity()));
+    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity));
   }
 
   /**
@@ -117,11 +131,11 @@ public class InventoryState {
    * @param index  The index of the item
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
-  public void setSlot(int index, int itemId, int quantity) {
-    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity));
+  public void setSlot(int index, int itemId, int quantity, int opacity) {
+    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, opacity));
   }
 
-  public void setSlot(int index, @Nonnull InventorySlot slot) {
+  private void setSlot(int index, @Nonnull InventorySlot slot) {
     assert this.client.isClientThread();
     if (isValidIndex(index)) {
       log.trace("Setting index {} to {}", index, slot);

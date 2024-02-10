@@ -27,16 +27,20 @@
 
 package no.elg.ii.service;
 
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import javax.inject.Inject;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
 
 public class EnsureWidgetStateService {
   @Inject
   InventoryService inventoryService;
+
+  @Inject
+  InventoryState state;
 
   /**
    * Force widget to look a certain way. Sometimes the widgets get updated by client code, but this will override
@@ -46,11 +50,11 @@ public class EnsureWidgetStateService {
    * This only applies to the clicked item, but it is not known <b>when</b> the item was clicked.
    * So this is a brute-force method to ensure that the item is hidden.
    */
-  public void forceWidgetState(InventoryState state, Predicate<Widget> widgetFilter, Consumer<Widget> force) {
+  public void forceWidgetState(BiPredicate<Widget, InventorySlot> widgetFilter, BiConsumer<Widget, InventorySlot> force) {
     state.getActiveSlots()
       .forEach(iis -> inventoryService.getAllInventoryWidgets()
-        .filter(slotWidget -> slotWidget.getIndex() == iis.getIndex() && widgetFilter.test(slotWidget.getWidget()))
-        .forEach(slotWidget -> force.accept(slotWidget.getWidget())));
+        .filter(slotWidget -> slotWidget.getIndex() == iis.getIndex() && widgetFilter.test(slotWidget.getWidget(), iis.getSlot()))
+        .forEach(slotWidget -> force.accept(slotWidget.getWidget(), iis.getSlot())));
   }
 
 }
