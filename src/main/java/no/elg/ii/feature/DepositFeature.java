@@ -39,6 +39,7 @@ import net.runelite.client.game.ItemManager;
 import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.Util;
+import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
 public class DepositFeature extends HideFeature {
@@ -61,7 +62,9 @@ public class DepositFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DEPOSIT_ALL_OPTION.equals(menuOption) || ADD_ALL_OPTION.equals(menuOption)) {
         log.debug("Hiding all items");
-        inventoryService.getAllInventoryWidgets().forEach(indexedWidget -> hide(indexedWidget.getWidget()));
+        inventoryService.getAllInventoryWidgets()
+          .filter(iw -> WidgetUtils.isNotEmpty(iw.getWidget()))
+          .forEach(indexedWidget -> hide(indexedWidget.getWidget()));
         return;
       }
       int eventItemId = event.getItemId();
