@@ -153,7 +153,7 @@ public class WithdrawFeature implements Feature {
     return true;
   }
 
-  private void updateBankItem(Widget bankWidget, int quantityToWithdraw) {
+  private void updateBankItem(@Nonnull Widget bankWidget, int quantityToWithdraw) {
     widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
     log.debug("Removing {} from bank widget {}", quantityToWithdraw, WidgetUtils.debugInfo(bankWidget));
     if (bankWidget.getItemQuantity() == 0) {

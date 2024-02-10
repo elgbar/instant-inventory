@@ -46,9 +46,7 @@ import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
@@ -233,16 +231,6 @@ public class InventoryState {
         widgetService.updateVisibleWidget(it.getWidget(), item);
       });
     }
-  }
-
-  @Subscribe
-  public void onItemContainerChanged(final ItemContainerChanged event) {
-    getActiveSlots().forEach(iis -> {
-      var slot = iis.getSlot();
-      inventoryService.getAllInventoryWidgets()
-        .filter(widget -> widget.getIndex() == iis.getIndex())
-        .forEach(it -> widgetService.setFakeWidgetItem(it.getWidget(), slot));
-    });
   }
 
   /**
