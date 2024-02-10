@@ -91,11 +91,11 @@ public class DepositFeature extends HideFeature {
             .limit(toTake)
             .collect(Collectors.toUnmodifiableSet());
           itemToTake.forEach(indexedWidget -> hide(indexedWidget.getWidget()));
-          actualTaken = itemToTake.stream().mapToInt(indexedWidget1 -> indexedWidget1.getWidget().getItemQuantity()).sum();
+          actualTaken = itemToTake.stream().mapToInt(iw -> iw.getWidget().getItemQuantity()).sum();
         } else {
           int ui = widget.getItemQuantity() - toTake;
           log.debug("Updating item quantity from " + widget.getItemQuantity() + " be " + ui);
-          widget.setItemQuantity(ui);
+          getState().setSlot(widget.getIndex(), widget.getItemId(), ui, widgetService.getChangeOpacity());
           actualTaken = toTake;
         }
 
