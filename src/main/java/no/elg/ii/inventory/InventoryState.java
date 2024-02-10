@@ -263,7 +263,7 @@ public class InventoryState {
       return;
     }
     if (slot.isTooEarlyToReset()) {
-      log.trace("Not resetting slot {} as it is too early", index);
+      log.debug("Not resetting slot {} as it is too early", index);
       return;
     }
     int actualItemId = item == null ? INVALID_ITEM_ID : item.getId();

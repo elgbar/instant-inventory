@@ -86,12 +86,10 @@ public class InventorySlot {
   }
 
   /**
-   * A slot shou
-   *
    * @return If this inventory slot has still "Invulnerability Frames" left
    */
   public boolean isTooEarlyToReset() {
-    return System.currentTimeMillis() - getChangedMs() < TICK_LENGTH_MS;
+    return System.currentTimeMillis() - getChangedMs() < TICK_LENGTH_MS / 2;
   }
 
 }
