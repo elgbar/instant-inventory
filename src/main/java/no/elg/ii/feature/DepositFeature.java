@@ -37,6 +37,8 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import no.elg.ii.inventory.InventoryService;
+import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtils;
@@ -54,6 +56,8 @@ public class DepositFeature extends HideFeature {
 
   @Inject
   private ItemManager itemManager;
+  @Inject
+  private InventoryState inventoryState;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -79,7 +83,10 @@ public class DepositFeature extends HideFeature {
           log.debug("Hiding " + toTake + " items");
 
           Set<IndexedWidget> itemToTake = inventoryService.getAllInventoryWidgets()
-            .filter(it -> it.getIndex() == clickedIndex || (it.getWidget().getItemId() == eventItemId && inventoryService.isNotHidden(it.getWidget())))
+            .filter(it -> {
+              InventorySlot slot = inventoryState.getSlot(it.getWidget().getIndex());
+              return it.getIndex() <= clickedIndex && slot != null && !slot.hasValidItemId() && it.getWidget().getItemId() == eventItemId;
+            })
             .sorted()
             .limit(toTake)
             .collect(Collectors.toUnmodifiableSet());
