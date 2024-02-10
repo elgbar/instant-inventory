@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Elg
+ * Copyright (c) 2023-2024 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,9 @@ public class Util {
   public static int getNumberFromMenuOption(String text) {
     try {
       String substring = text.substring(text.lastIndexOf('-') + 1);
+      if ("All".equals(substring)) {
+        return Integer.MAX_VALUE;
+      }
       return Integer.parseInt(substring);
     } catch (NumberFormatException | IndexOutOfBoundsException e) {
       return NO_MENU_OPTION_NUMBER;
