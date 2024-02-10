@@ -105,7 +105,7 @@ public class DepositFeature extends HideFeature {
         if (bankInventoryContainer != null) {
           for (Widget bankWidget : bankInventoryContainer.getDynamicChildren()) {
             if (itemManager.canonicalize(bankWidget.getItemId()) == canonItemId) {
-              bankWidget.setItemQuantity(bankWidget.getItemQuantity() + actualTaken);
+              widgetService.setQuantity(bankWidget, bankWidget.getItemQuantity() + actualTaken);
               return;
             }
           }
