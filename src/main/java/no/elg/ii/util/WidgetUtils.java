@@ -40,21 +40,24 @@ public final class WidgetUtils {
    * Item is fully transparent, i.e., not visible
    */
   public static final int FULLY_TRANSPARENT = 255;
-  public static final int NEARLY_TRANSPARENT = 200;
-  /**
-   * Semi transparent item, same opacity as when entering bank pin
-   */
-  public static final int HALF_TRANSPARENT = 100;
 
   /**
    * The opacity of a bank item with a quantity of zero
    */
   public static final int ZERO_QUANTITY_BANK_ITEM_OPACITY = 120;
+
   /**
    * Item is fully opaque, i.e., visible
    */
   public static final int FULLY_OPAQUE = 0;
 
+  /**
+   * This is the item id used by {@code clientscript}s to set a slot as empty
+   *
+   * @see <a href="https://github.com/runelite/runelite/wiki/Working-with-client-scripts">Working with client scripts</a>
+   * @see <a href="https://github.com/Joshua-F/cs2-scripts">cs2-scripts</a>
+   * @see <a href="https://github.com/Joshua-F/cs2-scripts/blob/master/scripts/%5Bproc,bankmain_drawitem%5D.cs2#L41">Example: [proc,bankmain_drawitem].cs2</a>
+   */
   public static final int THE_EMPTY_ITEM_ID = NullItemID.NULL_6512;
 
   @Nonnull
