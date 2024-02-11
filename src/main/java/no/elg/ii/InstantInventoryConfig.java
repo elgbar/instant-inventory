@@ -190,13 +190,16 @@ public interface InstantInventoryConfig extends Config {
     keyName = "minChangedMs",
     name = "Min Changed Millis",
     description =
-      "How many milliseconds a clicked item should stay before it can be reverted back."
+      "How many milliseconds a clicked item should minimum stay hidden/changed before it can be reverted back to what it really is."
+        + "<p>"
+        + "<p>This setting is affected by the ping and performance of the server. If you see items flicker back into existence, increase this value."
+        + "<p>"
         + "<p>This overwrites the \"Max Unmodified Ticks\" setting.",
     position = 20
   )
   @Units(Units.MILLISECONDS)
   default int minChangedMs() {
-    return Util.TICK_LENGTH_MS / 4;
+    return Util.TICK_LENGTH_MS / 2;
   }
 
 }
