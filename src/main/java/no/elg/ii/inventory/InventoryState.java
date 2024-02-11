@@ -103,20 +103,6 @@ public class InventoryState {
   /**
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
    */
-  public void setSlotAsHidden(Widget widget) {
-    setSlot(widget, widgetService.getHideOpacity());
-  }
-
-  /**
-   * Update the {@code itemId} at {@code index} will also update which tick the item was modified
-   */
-  public void setSlotAsChanged(Widget widget) {
-    setSlot(widget, widgetService.getChangeOpacity());
-  }
-
-  /**
-   * Update the {@code itemId} at {@code index} will also update which tick the item was modified
-   */
   public void setSlot(Widget widget, int opacity) {
     int index = widget.getIndex();
     setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity));
@@ -258,7 +244,7 @@ public class InventoryState {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }
-    
+
     if (isTooEarlyToReset(slot)) {
       log.debug("Not resetting slot {} as it is too early", index);
       return;

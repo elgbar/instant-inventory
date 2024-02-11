@@ -68,7 +68,7 @@ public abstract class HideFeature implements Feature {
       log.debug("Widget {} is already being hidden", WidgetUtils.debugInfo(widget));
     } else {
       log.debug("Hiding widget {}", WidgetUtils.debugInfo(widget));
-      getState().setSlotAsHidden(widget); // Will be hidden by onBeforeRender
+      getState().setSlot(widget, widgetService.getHideOpacity()); // Will be hidden by onBeforeRender
     }
   }
 
