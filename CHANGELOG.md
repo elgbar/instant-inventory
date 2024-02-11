@@ -11,6 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+## 1.2.0 - 2024-02-11
+
+### Added
+
 * Add Equip feature
   * Updates the inventory to how it shows when the item is equipped
 * Add Withdraw feature
@@ -31,8 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix missing unit in config
 * Do not try to hide dropped items that are considered valuable
 * Parse `-All` and `-All-but-1` in the menu entry correctly
-
-### Removed
 
 ---
 
