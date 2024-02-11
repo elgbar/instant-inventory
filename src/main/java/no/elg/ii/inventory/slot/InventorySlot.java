@@ -45,8 +45,6 @@ public class InventorySlot {
    */
   public static final int NO_CHANGED_TICK = -1;
 
-  public static final int TICK_LENGTH_MS = 600;
-
   public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, FULLY_TRANSPARENT);
   public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0, FULLY_TRANSPARENT);
 
@@ -84,12 +82,4 @@ public class InventorySlot {
   public boolean hasChangedTick() {
     return getChangedTick() >= 0;
   }
-
-  /**
-   * @return If this inventory slot has still "Invulnerability Frames" left
-   */
-  public boolean isTooEarlyToReset() {
-    return System.currentTimeMillis() - getChangedMs() < TICK_LENGTH_MS / 2;
-  }
-
 }

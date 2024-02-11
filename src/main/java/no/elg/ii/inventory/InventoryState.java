@@ -233,6 +233,14 @@ public class InventoryState {
     }
   }
 
+
+  /**
+   * @return If this inventory slot has still "Invulnerability Frames" left
+   */
+  public boolean isTooEarlyToReset(InventorySlot slot) {
+    return System.currentTimeMillis() - slot.getChangedMs() < config.minChangedMs();
+  }
+
   /**
    * Validate and modify the state of an item for a given index.
    * <p>
@@ -250,7 +258,8 @@ public class InventoryState {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }
-    if (slot.isTooEarlyToReset()) {
+    
+    if (isTooEarlyToReset(slot)) {
       log.debug("Not resetting slot {} as it is too early", index);
       return;
     }

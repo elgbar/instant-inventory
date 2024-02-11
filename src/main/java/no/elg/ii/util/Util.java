@@ -32,6 +32,7 @@ import net.runelite.api.widgets.Widget;
 
 public class Util {
   public static final int NO_MENU_OPTION_NUMBER = -1;
+  public static final int TICK_LENGTH_MS = 600;
 
   public static int getNumberFromMenuOption(String text, @Nonnull Widget widget) {
     try {

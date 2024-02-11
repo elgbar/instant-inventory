@@ -40,6 +40,7 @@ import net.runelite.client.config.ConfigSection;
 import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.util.Util;
 
 @ConfigGroup(GROUP)
 public interface InstantInventoryConfig extends Config {
@@ -54,11 +55,19 @@ public interface InstantInventoryConfig extends Config {
   String FEATURE_SECTION = "instant-inventory-features";
 
   @ConfigSection(
-    name = "Common",
-    description = "Common settings for all features",
+    name = "Appearance",
+    description = "How predicted widget will look",
     position = 10
   )
-  String COMMON_SECTION = "instant-inventory-common";
+  String APPEARANCE_SECTION = "instant-inventory-appearance";
+
+  @ConfigSection(
+    name = "Advanced",
+    description = "Advanced settings for all features",
+    position = 20,
+    closedByDefault = true
+  )
+  String ADVANCED_SECTION = "instant-inventory-advanced";
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -126,7 +135,39 @@ public interface InstantInventoryConfig extends Config {
 
 
   @ConfigItem(
-    section = COMMON_SECTION,
+    section = APPEARANCE_SECTION,
+    keyName = "hideOpacityPercent",
+    name = "Hidden items opacity",
+    description = "How transparent items are when removed from the inventory or bank" +
+      "<p>A lower value will cause items to be more transparent",
+    position = 10
+  )
+  @Range(max = 100)
+  @Units(Units.PERCENT)
+  default int hideOpacityPercent() {
+    return 20; //% transparent
+  }
+
+  @ConfigItem(
+    section = APPEARANCE_SECTION,
+    keyName = "changeOpacityPercent",
+    name = "Changed items opacity",
+    description = "How transparent items are when replaced with another item." +
+      "<p>A lower value will cause items to be more transparent",
+    position = 20
+  )
+  @Range(max = 100)
+  @Units(Units.PERCENT)
+  default int changeOpacityPercent() {
+    return 75; //% transparent
+  }
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  @ConfigItem(
+    section = ADVANCED_SECTION,
     keyName = "maxUnmodifiedTicks",
     name = "Max Unmodified Ticks",
     description =
@@ -137,7 +178,7 @@ public interface InstantInventoryConfig extends Config {
         + "<p>and when this is 2+ flickering rarely happens (i.e., only when the server lags)."
         + "<p>"
         + "<p>When in PvP or Bossing it is recommended to set this to 1.",
-    position = 100
+    position = 10
   )
   @Units(Units.TICKS)
   default int maxUnmodifiedTicks() {
@@ -145,31 +186,17 @@ public interface InstantInventoryConfig extends Config {
   }
 
   @ConfigItem(
-    section = COMMON_SECTION,
-    keyName = "hideOpacityPercent",
-    name = "Hidden items opacity",
-    description = "How transparent items are when removed from the inventory or bank" +
-      "<p>A lower value will cause items to be more transparent",
-    position = 110
+    section = ADVANCED_SECTION,
+    keyName = "minChangedMs",
+    name = "Min Changed Millis",
+    description =
+      "How many milliseconds a clicked item should stay before it can be reverted back."
+        + "<p>This overwrites the \"Max Unmodified Ticks\" setting.",
+    position = 20
   )
-  @Range(max = 100)
-  @Units(Units.PERCENT)
-  default int hideOpacityPercent() {
-    return 50; //% transparent
-  }
-
-  @ConfigItem(
-    section = COMMON_SECTION,
-    keyName = "changeOpacityPercent",
-    name = "Changed items opacity",
-    description = "How transparent items are when replaced with another item." +
-      "<p>A lower value will cause items to be more transparent",
-    position = 111
-  )
-  @Range(max = 100)
-  @Units(Units.PERCENT)
-  default int changeOpacityPercent() {
-    return 75; //% transparent
+  @Units(Units.MILLISECONDS)
+  default int minChangedMs() {
+    return Util.TICK_LENGTH_MS / 4;
   }
 
 }
