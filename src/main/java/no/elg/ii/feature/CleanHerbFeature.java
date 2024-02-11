@@ -65,8 +65,7 @@ public class CleanHerbFeature implements Feature {
         }
         int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
         if (herbloreLevel >= herbInfo.getMinLevel()) {
-          getState().setSlotAsChanged(widget);
-          widgetService.setFakeWidgetItem(widget, herbInfo.getCleanItemId(), 1);
+          getState().setSlot(widget.getIndex(), herbInfo.getCleanItemId(), widget.getItemQuantity(), widgetService.getChangeOpacity());
         }
       }
     }
