@@ -12,7 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Add Equip feature
+  * Updates the inventory to how it shows when the item is equipped
 * Add Withdraw feature
+  * Updates widget in bank and in inventory
 * Deposit all items in inventory into the bank instantly when clicking `Deposit inventory`
 * Hide and changed item opacity is configurable
 * Add instant deposit when clicking `Add all` in the guide prices interface
@@ -38,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fix #8 showing items other plugins have hidden
+* Fix issue #8 showing items other plugins have hidden
 
 ---
 
