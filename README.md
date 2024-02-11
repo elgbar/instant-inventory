@@ -19,7 +19,6 @@ No longer do you have to wait for your drops to be dropped or herbs to be cleane
 See [the changelog file](./CHANGELOG.md)
 
 ## Preview
-
-[equipment_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/84f4b6e0-f17a-4952-ad43-cbfb00b433a1)
+[equipment_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/5e5bf832-e335-4a6a-b8a7-2e2aa4a6c785)
 
 [bank_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/ffb93f2d-f57c-445a-b47d-1de9eab34f74)
