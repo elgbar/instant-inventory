@@ -5,8 +5,17 @@
 
 Perform inventory actions instantly.
 This is a quality of life improvement plugin aimed to make inventory management is OSRS a
-little less annoying.
-No longer do you have to wait for your drops to be dropped or herbs to be cleaned.
+little less annoying by predicting what the inventory will look like the next tick.
+
+Or explained by someone who can write:
+
+> Normally, most changes in your inventory apply on the next tick (as with most actions in the game). Instant inventory
+> will cause them to render in your inventory giving visual feedback before they actually apply. For example, you drop a
+> fish at the beginning of a tick. Normally it will take about 600 ms for the drop action to process and the item to
+> disappear from your inventory. With instant inventory, it will disappear from your inventory immediately (600 ms
+> sooner), but it won’t actually leave your inventory and hit the floor until the next tick when it normally would.
+
+- by [dell_arness2 on Reddit](https://www.reddit.com/r/2007scape/comments/142ljt5/comment/jn5794w)
 
 ## Features
 
