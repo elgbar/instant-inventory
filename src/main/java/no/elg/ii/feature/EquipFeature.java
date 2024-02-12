@@ -31,6 +31,7 @@ import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -62,8 +63,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @Slf4j
 public class EquipFeature implements Feature {
 
-  public static final String WEAR_OPTION = "Wear";
-  public static final String WIELD_OPTION = "Wield";
+  public static final List<String> EQUIP_OPTIONS = List.of("Wear", "Wield", "Equip");
   public static final String EQUIP_CONFIG_KEY = "instantEquip";
 
   @Inject
@@ -90,7 +90,7 @@ public class EquipFeature implements Feature {
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
-      if (WIELD_OPTION.equals(menuOption) || WEAR_OPTION.equals(menuOption)) {
+      if (EQUIP_OPTIONS.contains(menuOption)) {
         log.debug("Equipped item {}", WidgetUtils.debugInfo(widget));
         equip(widget);
       }
