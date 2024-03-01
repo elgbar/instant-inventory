@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix issue #13, incompatibility with customized shift-clicking from the Menu Swapper plugin
+
 ### Removed
 
 ---
