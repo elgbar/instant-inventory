@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fix issue #13, incompatibility with customized shift-clicking from the Menu Swapper plugin
+* Fix issue [#13](https://github.com/elgbar/instant-inventory/pull/13), incompatibility with customized shift-clicking
+  from the Menu Swapper plugin
 
 ### Removed
 
@@ -52,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fix issue #8 showing items other plugins have hidden
+* Fix issue [#8](https://github.com/elgbar/instant-inventory/pull/8) showing items other plugins have hidden
 
 ---
 
