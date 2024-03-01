@@ -15,10 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Removed
+
+---
+
+## 1.2.1 - 2024-03-01
+
+### Fixed
+
 * Fix issue [#13](https://github.com/elgbar/instant-inventory/pull/13), incompatibility with customized shift-clicking
   from the Menu Swapper plugin
-
-### Removed
 
 ---
 
