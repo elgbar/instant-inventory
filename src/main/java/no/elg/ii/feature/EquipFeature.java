@@ -50,6 +50,7 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.http.api.item.ItemEquipmentStats;
@@ -73,6 +74,9 @@ public class EquipFeature implements Feature {
   @Inject
   @VisibleForTesting
   Client client;
+  @Inject
+  @VisibleForTesting
+  ClientThread clientThread;
 
   @Inject
   @Getter
@@ -91,8 +95,8 @@ public class EquipFeature implements Feature {
     if (widget != null) {
       String menuOption = event.getMenuOption();
       if (EQUIP_OPTIONS.contains(menuOption)) {
-        log.debug("Equipped item {}", WidgetUtils.debugInfo(widget));
-        equip(widget);
+        log.debug("'{}' item {}", menuOption, WidgetUtils.debugInfo(widget));
+        clientThread.invokeAtTickEnd(() -> equip(widget));
       }
     }
   }
