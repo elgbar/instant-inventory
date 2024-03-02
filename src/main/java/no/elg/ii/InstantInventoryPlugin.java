@@ -37,7 +37,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
@@ -104,13 +103,12 @@ public class InstantInventoryPlugin extends Plugin {
   @Subscribe(priority = Integer.MAX_VALUE)
   public void onGameTick(GameTick event) {
     clientThread.invokeLater(() -> {
-      ItemContainer itemContainer = client.getItemContainer(InventoryID.INVENTORY);
-      if (itemContainer == null) {
-        return;
-      }
-      for (int index = 0; index < INVENTORY_SIZE; index++) {
-        Item item = itemContainer.getItem(index);
-        inventoryState.validateState(index, item);
+      ItemContainer itemContainer = inventoryService.getCurrentInventoryContainer();
+      if (itemContainer != null) {
+        for (int index = 0; index < INVENTORY_SIZE; index++) {
+          Item item = itemContainer.getItem(index);
+          inventoryState.validateState(index, item);
+        }
       }
     });
   }

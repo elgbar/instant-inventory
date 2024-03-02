@@ -28,6 +28,7 @@
 package no.elg.ii.inventory;
 
 import static no.elg.ii.util.IndexedWidget.indexWidget;
+import static no.elg.ii.util.InventoryUtil.GROUP_ITEM_CONTAINER;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_ITEMS_CONTAINERS;
 
 import com.google.common.collect.Streams;
@@ -35,9 +36,12 @@ import com.google.inject.Singleton;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.InventoryID;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -57,6 +61,18 @@ public class InventoryService {
   private EnsureWidgetStateService ensureWidgetStateService;
   @Inject
   private WidgetService widgetService;
+
+  @Nullable
+  public ItemContainer getCurrentInventoryContainer() {
+    Widget widget = client.getWidget(GROUP_ITEM_CONTAINER);
+    InventoryID itemContainer;
+    if (widget != null && !widget.isHidden()) {
+      itemContainer = InventoryID.GROUP_STORAGE_INV;
+    } else {
+      itemContainer = InventoryID.INVENTORY;
+    }
+    return client.getItemContainer(itemContainer);
+  }
 
   @Nonnull
   private Stream<Widget> getOpenWidgetItemContainer() {

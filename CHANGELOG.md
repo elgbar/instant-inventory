@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Fix issue [#13](https://github.com/elgbar/instant-inventory/pull/13), incompatibility with customized shift-clicking
   from the Menu Swapper plugin
+* Fix issue [#16](https://github.com/elgbar/instant-inventory/pull/16), depositing into the group ironman storage does
+  not work correctly
 
 ---
 
