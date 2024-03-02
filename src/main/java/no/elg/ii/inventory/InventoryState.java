@@ -219,12 +219,15 @@ public class InventoryState {
     }
   }
 
+  public long msSinceChange(InventorySlot slot) {
+    return System.currentTimeMillis() - slot.getChangedMs();
+  }
 
   /**
    * @return If this inventory slot has still "Invulnerability Frames" left
    */
   public boolean isTooEarlyToReset(InventorySlot slot) {
-    return System.currentTimeMillis() - slot.getChangedMs() < config.minChangedMs();
+    return msSinceChange(slot) < config.minChangedMs();
   }
 
   /**
@@ -265,7 +268,7 @@ public class InventoryState {
     // The item at the given index have not changes in some time, we reset to
     int ticksSinceModified = client.getTickCount() - modifiedTick;
     if (slot.hasChangedTick() && ticksSinceModified >= config.maxUnmodifiedTicks()) {
-      log.debug("Item at index {} has not changed in {} tick, resetting the item", index, ticksSinceModified);
+      log.debug("Item at index {} has not changed in {} tick ({} ms}, resetting the item", index, ticksSinceModified, msSinceChange(slot));
       resetState(index, item, true);
     }
   }
