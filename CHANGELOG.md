@@ -19,13 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## 1.2.1 - 2024-03-01
+## 1.2.1 - 2024-03-02
 
 ### Fixed
 
-* Fix issue [#13](https://github.com/elgbar/instant-inventory/pull/13), incompatibility with customized shift-clicking
+* Fix issue [#13](https://github.com/elgbar/instant-inventory/issues/13), incompatibility with customized shift-clicking
   from the Menu Swapper plugin
-* Fix issue [#16](https://github.com/elgbar/instant-inventory/pull/16), depositing into the group ironman storage does
+* Fix issue [#16](https://github.com/elgbar/instant-inventory/issues/16), depositing into the group ironman storage does
   not work correctly
 
 ---
@@ -34,11 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Add Equip feature
+* Add instant equip items feature, completes [#5](https://github.com/elgbar/instant-inventory/issues/5)
   * Updates the inventory to how it shows when the item is equipped
-* Add Withdraw feature
+* Add instant withdraw feature, completes rest of [#2](https://github.com/elgbar/instant-inventory/issues/2)
   * Updates widget in bank and in inventory
-* Deposit all items in inventory into the bank instantly when clicking `Deposit inventory`
+* Deposit all items in inventory into the bank instantly when clicking `Deposit inventory` (also part
+  of [#2](https://github.com/elgbar/instant-inventory/issues/2))
 * Hide and changed item opacity is configurable
 * Add instant deposit when clicking `Add all` in the guide prices interface
 
@@ -61,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fix issue [#8](https://github.com/elgbar/instant-inventory/pull/8) showing items other plugins have hidden
+* Fix issue [#8](https://github.com/elgbar/instant-inventory/issues/8) showing items other plugins have hidden
 
 ---
 
@@ -77,7 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Instant deposit items into the bank
+* Instant deposit items into the bank, completes part of [#2](https://github.com/elgbar/instant-inventory/issues/2)
 
 ### Changed
 
@@ -90,7 +91,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-* The number of ticks an item is hidden is customizable
+* The number of ticks an item is hidden is customizable,
+  completes [#4](https://github.com/elgbar/instant-inventory/issues/4)
 
 ### Changed
 
