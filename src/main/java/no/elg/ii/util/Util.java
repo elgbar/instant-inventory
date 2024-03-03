@@ -39,7 +39,7 @@ public class Util {
       String substring = text.substring(text.indexOf('-') + 1);
       int quantity;
       if ("All".equals(substring)) {
-        quantity = widget.getItemQuantity();
+        quantity = Integer.MAX_VALUE;
       } else if ("All-but-1".equalsIgnoreCase(substring)) {
         quantity = widget.getItemQuantity() - 1;
       } else {
