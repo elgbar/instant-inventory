@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from the Menu Swapper plugin
 * Fix issue [#16](https://github.com/elgbar/instant-inventory/issues/16), depositing into the group ironman storage does
   not work correctly
+* Fix wrong quantity when depositing `All` when the item is not stackable
 
 ---
 
