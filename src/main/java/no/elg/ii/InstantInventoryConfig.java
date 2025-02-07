@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,14 +50,14 @@ public interface InstantInventoryConfig extends Config {
   @ConfigSection(
     name = "Features",
     description = "Toggle different features of the plugin",
-    position = 0
+    position = 10
   )
   String FEATURE_SECTION = "instant-inventory-features";
 
   @ConfigSection(
     name = "Appearance",
     description = "How predicted widget will look",
-    position = 10
+    position = 0
   )
   String APPEARANCE_SECTION = "instant-inventory-appearance";
 
@@ -69,7 +69,7 @@ public interface InstantInventoryConfig extends Config {
   )
   String ADVANCED_SECTION = "instant-inventory-advanced";
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   @ConfigItem(
     keyName = DROP_CONFIG_KEY,
@@ -131,7 +131,7 @@ public interface InstantInventoryConfig extends Config {
   }
 
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
   @ConfigItem(
@@ -163,7 +163,7 @@ public interface InstantInventoryConfig extends Config {
   }
 
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
   @ConfigItem(

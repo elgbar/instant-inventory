@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,31 +30,53 @@ package no.elg.ii.service;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import javax.inject.Inject;
+import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.util.WidgetUtils;
 
+/**
+ * Force widget to look a certain way. Sometimes the widgets get updated by client code, but this will override
+ * any other (clientside) changes to inventory widgets.
+ * <p>
+ * If this is not actively corrected the item will be fully visible.
+ * This only applies to the clicked item, but it is not known <b>when</b> the item was clicked.
+ * So this is a brute-force method to ensure that the item is hidden.
+ */
 public class EnsureWidgetStateService {
   @Inject
   InventoryService inventoryService;
 
   @Inject
   InventoryState state;
+  @Inject
+  WidgetService widgetService;
 
-  /**
-   * Force widget to look a certain way. Sometimes the widgets get updated by client code, but this will override
-   * any other (clientside) changes to inventory widgets.
-   * <p>
-   * If this is not actively corrected the item will be fully visible.
-   * This only applies to the clicked item, but it is not known <b>when</b> the item was clicked.
-   * So this is a brute-force method to ensure that the item is hidden.
-   */
-  public void forceWidgetState(BiPredicate<Widget, InventorySlot> widgetFilter, BiConsumer<Widget, InventorySlot> force) {
+  @Subscribe
+  public void onBeforeRender(BeforeRender event) {
+    forceWidgetState(EnsureWidgetStateService::isDifferent, this::setWidgetFromSlot);
+  }
+
+  private void forceWidgetState(BiPredicate<Widget, InventorySlot> widgetFilter, BiConsumer<Widget, InventorySlot> force) {
     state.getActiveSlots()
-      .forEach(iis -> inventoryService.getAllInventoryWidgets()
+      .forEach(iis -> inventoryService.getAllOpenInventoryWidgets()
         .filter(slotWidget -> slotWidget.getIndex() == iis.getIndex() && widgetFilter.test(slotWidget.getWidget(), iis.getSlot()))
         .forEach(slotWidget -> force.accept(slotWidget.getWidget(), iis.getSlot())));
+  }
+
+  private static boolean isDifferent(Widget widget, InventorySlot slot) {
+    return slot.hasValidItemId() && !WidgetUtils.isEmpty(widget)
+      && (widget.getItemId() != slot.getItemId()
+      || widget.getItemQuantity() != slot.getQuantity()
+      || widget.getOpacity() != slot.getOpacity());
+  }
+
+  private void setWidgetFromSlot(Widget widget, InventorySlot slot) {
+    widgetService.updateVisibleWidget(widget, slot.getItemId(), slot.getQuantity());
+    widgetService.setOpacity(widget, slot.getOpacity(), true);
   }
 
 }

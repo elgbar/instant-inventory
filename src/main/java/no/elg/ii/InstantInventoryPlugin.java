@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.EnsureWidgetStateService;
 
 @Slf4j
 @AllArgsConstructor
@@ -82,17 +83,21 @@ public class InstantInventoryPlugin extends Plugin {
   @Inject
   InventoryService inventoryService;
 
+  //TODO If more services are added which only reacts to events, this should be redesigned to be more generic
+  @Inject
+  EnsureWidgetStateService ensureWidgetStateService;
+
   @Override
   protected void startUp() {
     featureManager.updateAllFeatureStatus();
-    eventBus.register(inventoryService);
+    eventBus.register(ensureWidgetStateService);
   }
 
   @Override
   protected void shutDown() {
     // Disable all features when the plugin shuts down
     featureManager.disableAllFeatures();
-    eventBus.unregister(inventoryService);
+    eventBus.unregister(ensureWidgetStateService);
   }
 
   /* (non-javadoc)

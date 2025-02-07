@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -205,7 +205,7 @@ public class InventoryState {
       item = inventoryContainer.getItem(index);
     }
 
-    Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllInventoryWidgets().filter(it -> it.getIndex() == index);
+    Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllOpenInventoryWidgets().filter(it -> it.getIndex() == index);
     if (item == null || item.getId() < 0) {
       //There is no item at this index, so we hide the widget
       //Make sure items that are not in the inventory are hidden

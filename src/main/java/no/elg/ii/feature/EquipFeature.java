@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,13 +27,11 @@
 
 package no.elg.ii.feature;
 
-import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
-
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -48,15 +46,16 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
-import net.runelite.http.api.item.ItemEquipmentStats;
-import net.runelite.http.api.item.ItemStats;
+import net.runelite.client.game.ItemStats;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.WidgetService;
+import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.WidgetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -64,7 +63,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @Slf4j
 public class EquipFeature implements Feature {
 
-  public static final List<String> EQUIP_OPTIONS = List.of("Wear", "Wield", "Equip");
+  public static final Set<String> EQUIP_OPTIONS = Set.of("Wear", "Wield", "Equip");
   public static final String EQUIP_CONFIG_KEY = "instantEquip";
 
   @Inject
@@ -83,6 +82,8 @@ public class EquipFeature implements Feature {
   private InventoryState state;
   @Inject
   private WidgetService widgetService;
+  @Inject
+  private InventoryService inventoryService;
 
   /**
    * The last tick each slot was equipped
@@ -101,16 +102,18 @@ public class EquipFeature implements Feature {
     }
   }
 
+  private static final String TOO_LOW_LEVEL_MESSAGE = "You are not a high enough level to use this item.";
+
   @Subscribe
   public void onChatMessage(ChatMessage event) {
-    if (event.getType() == ChatMessageType.GAMEMESSAGE && Objects.equals(event.getMessage(), "You are not a high enough level to use this item.")) {
-      log.debug("Failed to equip item?");
-      getState().getActiveSlots().filter(is -> is.getSlot().getChangedTick() == client.getTickCount()).forEach(is -> getState().resetState(is.getIndex()));
+    if (event.getType() == ChatMessageType.GAMEMESSAGE && TOO_LOW_LEVEL_MESSAGE.equals(event.getMessage())) {
+      log.debug("Failed to equip item");
+      state.getActiveSlots().filter(is -> is.getSlot().getChangedTick() == client.getTickCount()).forEach(is -> state.resetState(is.getIndex()));
     }
   }
 
   protected void equip(@Nonnull Widget widget) {
-    ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+    ItemContainer inventoryContainer = inventoryService.getCurrentInventoryContainer();
     if (inventoryContainer == null) {
       log.debug("Failed to find the inventory container");
       return;
@@ -127,10 +130,10 @@ public class EquipFeature implements Feature {
       Item extraItem = itemIds.getRight();
       if (extraItem != null) {
         log.trace("There is also something in the off-slot ({}), will replace that too", WidgetUtils.debugInfo(extraItem));
-        @Nullable Widget offhandWidget = findFirstEmptySlot(client, ComponentID.INVENTORY_CONTAINER);
-        if (offhandWidget != null) {
+        Optional<Widget> offhandWidget = inventoryService.getAllOpenInventoryWidgets().filter(WidgetUtils::isEmpty).findFirst().map(IndexedWidget::getWidget);
+        if (offhandWidget.isPresent()) {
           widgetService.setFakeWidgetItem(widget, toReplaceItem);
-          widgetService.setFakeWidgetItem(offhandWidget, extraItem);
+          widgetService.setFakeWidgetItem(offhandWidget.get(), extraItem);
         } else {
           //There was no slot to put the offhand item in, so the items will not be equipped
           log.debug("Will not equip two-handed item, as there is no slot to put the offhand item in");
@@ -146,7 +149,7 @@ public class EquipFeature implements Feature {
       widgetService.setEmptyItem(widget);
       opacity = widgetService.getHideOpacity();
     }
-    getState().setSlot(widget, opacity);
+    state.setSlot(widget, opacity);
   }
 
   /**
@@ -156,8 +159,9 @@ public class EquipFeature implements Feature {
   @VisibleForTesting
   @Nullable
   public Pair<Item, Item> getEquipmentToReplace(Widget widget) {
-    final ItemStats itemStats = itemManager.getItemStats(widget.getItemId(), false);
+    final ItemStats itemStats = itemManager.getItemStats(widget.getItemId());
     if (itemStats == null || !itemStats.isEquipable()) {
+      log.debug("Item has not status or is not equipable, will not equip it: {}", itemStats);
       return null;
     }
     Item toReplace = null;
@@ -181,7 +185,7 @@ public class EquipFeature implements Feature {
       } else if (isShieldSlot(slotOfClickedItem)) {
         var weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
         if (weaponItem != null) {
-          ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId(), false);
+          ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId());
           if (weaponStat != null && weaponStat.isEquipable()) {
             ItemEquipmentStats weaponStatEquipment = weaponStat.getEquipment();
             if (weaponStatEquipment != null && weaponStatEquipment.isTwoHanded()) {
@@ -194,7 +198,6 @@ public class EquipFeature implements Feature {
       lastEquipped.put(clickedEquipment.getSlot(), client.getTickCount());
     }
     if (extra != null && toReplace == null) {
-      //
       return Pair.of(extra, null);
     }
     return Pair.of(toReplace, extra);
