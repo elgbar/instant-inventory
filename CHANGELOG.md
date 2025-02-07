@@ -11,9 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Add support for locked inventory bank slots, completes #24
+* Add support for locked inventory bank slots (#24)
 
 ### Changed
+
+* Update badges to api.runelite.net (#23)
 
 ### Fixed
 
