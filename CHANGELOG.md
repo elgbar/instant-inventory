@@ -16,11 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Update badges to api.runelite.net, completes [#23](https://github.com/elgbar/instant-inventory/issues/23)
+* Move `Appearance` config section to the top above `Features`
 
 ### Fixed
 
 * Fix [#21](https://github.com/elgbar/instant-inventory/issues/21) equipping 2H when having one-handed and shield and a
   full inventory
+* Fix missing inventory containers, it appears to be different widgets for fixed and resizeable modes
 
 ### Removed
 
