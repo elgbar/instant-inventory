@@ -72,7 +72,7 @@ public class DepositFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DEPOSIT_ALL_OPTION.equals(menuOption) || ADD_ALL_OPTION.equals(menuOption)) {
         log.debug("Hiding all items");
-        inventoryService.getAllInventoryWidgets()
+        inventoryService.getAllOpenInventoryWidgets()
           .filter(iw -> WidgetUtils.isNotEmpty(iw.getWidget()))
           .filter(this::isSlotUnlocked)
           .forEach(indexedWidget -> hide(indexedWidget.getWidget()));
@@ -89,7 +89,7 @@ public class DepositFeature extends HideFeature {
         if (toTake >= widget.getItemQuantity()) {
           log.debug("Hiding {} items", toTake);
 
-          Set<IndexedWidget> itemToTake = inventoryService.getAllInventoryWidgets()
+          Set<IndexedWidget> itemToTake = inventoryService.getAllOpenInventoryWidgets()
             .filter(it -> {
               InventorySlot slot = inventoryState.getSlot(it.getWidget().getIndex());
               return it.getIndex() == clickedIndex || slot != null && !slot.hasValidItemId() && it.getWidget().getItemId() == eventItemId;

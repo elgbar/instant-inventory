@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,9 +81,12 @@ public class InventoryService {
       .filter(widget -> widget != null && !widget.isHidden());
   }
 
+  /**
+   * @return A stream of indexed widgets in the current open inventory
+   */
   @Nonnull
   @SuppressWarnings("UnstableApiUsage")
-  public final Stream<IndexedWidget> getAllInventoryWidgets() {
+  public final Stream<IndexedWidget> getAllOpenInventoryWidgets() {
     return getOpenWidgetItemContainer()
       .flatMap(container -> Streams.mapWithIndex(Arrays.stream(container.getDynamicChildren()), indexWidget));
   }
