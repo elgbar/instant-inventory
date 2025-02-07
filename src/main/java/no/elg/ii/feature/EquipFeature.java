@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,9 @@ package no.elg.ii.feature;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -63,7 +63,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @Slf4j
 public class EquipFeature implements Feature {
 
-  public static final List<String> EQUIP_OPTIONS = List.of("Wear", "Wield", "Equip");
+  public static final Set<String> EQUIP_OPTIONS = Set.of("Wear", "Wield", "Equip");
   public static final String EQUIP_CONFIG_KEY = "instantEquip";
 
   @Inject
@@ -102,11 +102,13 @@ public class EquipFeature implements Feature {
     }
   }
 
+  private static final String TOO_LOW_LEVEL_MESSAGE = "You are not a high enough level to use this item.";
+
   @Subscribe
   public void onChatMessage(ChatMessage event) {
-    if (event.getType() == ChatMessageType.GAMEMESSAGE && Objects.equals(event.getMessage(), "You are not a high enough level to use this item.")) {
-      log.debug("Failed to equip item?");
-      getState().getActiveSlots().filter(is -> is.getSlot().getChangedTick() == client.getTickCount()).forEach(is -> getState().resetState(is.getIndex()));
+    if (event.getType() == ChatMessageType.GAMEMESSAGE && TOO_LOW_LEVEL_MESSAGE.equals(event.getMessage())) {
+      log.debug("Failed to equip item");
+      state.getActiveSlots().filter(is -> is.getSlot().getChangedTick() == client.getTickCount()).forEach(is -> state.resetState(is.getIndex()));
     }
   }
 
@@ -147,7 +149,7 @@ public class EquipFeature implements Feature {
       widgetService.setEmptyItem(widget);
       opacity = widgetService.getHideOpacity();
     }
-    getState().setSlot(widget, opacity);
+    state.setSlot(widget, opacity);
   }
 
   /**
