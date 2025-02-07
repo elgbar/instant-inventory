@@ -11,7 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Add support for locked inventory bank slots, completes [#24](https://github.com/elgbar/instant-inventory/issues/24)
+### Changed
+
+### Fixed
+
+### Removed
+
+---
+
+## 1.2.2 - 2025-02-08
 
 ### Changed
 
@@ -20,11 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Add support for locked inventory bank slots, completes [#24](https://github.com/elgbar/instant-inventory/issues/24)
 * Fix [#21](https://github.com/elgbar/instant-inventory/issues/21) equipping 2H when having one-handed and shield and a
   full inventory
 * Fix missing inventory containers, it appears to be different widgets for fixed and resizeable modes
-
-### Removed
 
 ---
 
