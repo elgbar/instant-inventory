@@ -11,13 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Add support for locked inventory bank slots (#24)
+* Add support for locked inventory bank slots, completes [#24](https://github.com/elgbar/instant-inventory/issues/24)
 
 ### Changed
 
-* Update badges to api.runelite.net (#23)
+* Update badges to api.runelite.net, completes [#23](https://github.com/elgbar/instant-inventory/issues/23)
 
 ### Fixed
+
+* Fix [#21](https://github.com/elgbar/instant-inventory/issues/21) equipping 2H when having one-handed and shield and a
+  full inventory
 
 ### Removed
 

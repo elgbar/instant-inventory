@@ -27,13 +27,11 @@
 
 package no.elg.ii.feature;
 
-import static no.elg.ii.util.InventoryUtil.findFirstEmptySlot;
-
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -48,7 +46,6 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
@@ -58,6 +55,7 @@ import net.runelite.client.game.ItemStats;
 import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.WidgetService;
+import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.WidgetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -84,6 +82,8 @@ public class EquipFeature implements Feature {
   private InventoryState state;
   @Inject
   private WidgetService widgetService;
+  @Inject
+  private InventoryService inventoryService;
 
   /**
    * The last tick each slot was equipped
@@ -111,7 +111,7 @@ public class EquipFeature implements Feature {
   }
 
   protected void equip(@Nonnull Widget widget) {
-    ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+    ItemContainer inventoryContainer = inventoryService.getCurrentInventoryContainer();
     if (inventoryContainer == null) {
       log.debug("Failed to find the inventory container");
       return;
@@ -128,10 +128,10 @@ public class EquipFeature implements Feature {
       Item extraItem = itemIds.getRight();
       if (extraItem != null) {
         log.trace("There is also something in the off-slot ({}), will replace that too", WidgetUtils.debugInfo(extraItem));
-        @Nullable Widget offhandWidget = findFirstEmptySlot(client, ComponentID.INVENTORY_CONTAINER);
-        if (offhandWidget != null) {
+        Optional<Widget> offhandWidget = inventoryService.getAllOpenInventoryWidgets().filter(WidgetUtils::isEmpty).findFirst().map(IndexedWidget::getWidget);
+        if (offhandWidget.isPresent()) {
           widgetService.setFakeWidgetItem(widget, toReplaceItem);
-          widgetService.setFakeWidgetItem(offhandWidget, extraItem);
+          widgetService.setFakeWidgetItem(offhandWidget.get(), extraItem);
         } else {
           //There was no slot to put the offhand item in, so the items will not be equipped
           log.debug("Will not equip two-handed item, as there is no slot to put the offhand item in");

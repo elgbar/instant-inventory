@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ package no.elg.ii.util;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.annotations.Component;
 import net.runelite.api.widgets.ComponentID;
@@ -37,6 +38,7 @@ import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
 
+@Slf4j
 public final class InventoryUtil {
   /**
    * Number of items in an inventory
@@ -60,11 +62,6 @@ public final class InventoryUtil {
       }
     }
     return null;
-  }
-
-  @Nullable
-  public static Widget findFirstEmptySlot(@Nonnull Client client, @Component int componentId) {
-    return findFirst(client, componentId, WidgetUtils::isEmpty);
   }
 
   public static final int GROUP_ITEM_CONTAINER = WidgetUtil.packComponentId(InterfaceID.GROUP_STORAGE_INVENTORY, 0);

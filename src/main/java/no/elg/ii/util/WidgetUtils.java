@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,8 +55,8 @@ public final class WidgetUtils {
    * This is the item id used by {@code clientscript}s to set a slot as empty
    *
    * @see <a href="https://github.com/runelite/runelite/wiki/Working-with-client-scripts">Working with client scripts</a>
-   * @see <a href="https://github.com/Joshua-F/cs2-scripts">cs2-scripts</a>
-   * @see <a href="https://github.com/Joshua-F/cs2-scripts/blob/master/scripts/%5Bproc,bankmain_drawitem%5D.cs2#L41">Example: [proc,bankmain_drawitem].cs2</a>
+   * @see <a href="https://github.com/Joshua-F/osrs-dumps/tree/master/script">cs2-scripts</a>
+   * @see <a href="https://github.com/Joshua-F/osrs-dumps/tree/master/script/%5Bproc,bankmain_drawitem%5D.cs2#L41">Example: [proc,bankmain_drawitem].cs2</a>
    */
   public static final int THE_EMPTY_ITEM_ID = NullItemID.NULL_6512;
 
@@ -68,6 +68,13 @@ public final class WidgetUtils {
   @Nonnull
   public static String debugInfo(@Nonnull Item item) {
     return "id: " + item.getId() + ", quantity: " + item.getQuantity();
+  }
+
+  /**
+   * There is no method to call to check if a slot is not empty, so we just check if they appear to be empty
+   */
+  public static boolean isEmpty(@Nonnull IndexedWidget indexedWidget) {
+    return isEmpty(indexedWidget.getWidget());
   }
 
   /**
