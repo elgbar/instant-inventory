@@ -55,7 +55,7 @@ import no.elg.ii.inventory.InventoryState;
 @Slf4j
 @AllArgsConstructor
 @NoArgsConstructor
-@PluginDescriptor(name = "Instant Inventory")
+@PluginDescriptor(name = "Instant Inventory", description = "Perform inventory actions instantly", tags = {"qol", "client", "drop", "clean", "herb", "equip", "withdraw", "item"})
 public class InstantInventoryPlugin extends Plugin {
 
   @Inject

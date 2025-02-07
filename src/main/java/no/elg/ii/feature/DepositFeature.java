@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@ import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.Util;
+import no.elg.ii.util.VarbitsService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
@@ -53,11 +54,16 @@ public class DepositFeature extends HideFeature {
 
   @Inject
   private InventoryService inventoryService;
-
   @Inject
   private ItemManager itemManager;
   @Inject
   private InventoryState inventoryState;
+  @Inject
+  private VarbitsService varbitsService;
+
+  public boolean isSlotUnlocked(IndexedWidget indexedWidget) {
+    return varbitsService.isBankInventoryUnlocked(indexedWidget.getIndex());
+  }
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -68,6 +74,7 @@ public class DepositFeature extends HideFeature {
         log.debug("Hiding all items");
         inventoryService.getAllInventoryWidgets()
           .filter(iw -> WidgetUtils.isNotEmpty(iw.getWidget()))
+          .filter(this::isSlotUnlocked)
           .forEach(indexedWidget -> hide(indexedWidget.getWidget()));
         return;
       }
@@ -80,13 +87,14 @@ public class DepositFeature extends HideFeature {
         }
         int actualTaken;
         if (toTake >= widget.getItemQuantity()) {
-          log.debug("Hiding " + toTake + " items");
+          log.debug("Hiding {} items", toTake);
 
           Set<IndexedWidget> itemToTake = inventoryService.getAllInventoryWidgets()
             .filter(it -> {
               InventorySlot slot = inventoryState.getSlot(it.getWidget().getIndex());
               return it.getIndex() == clickedIndex || slot != null && !slot.hasValidItemId() && it.getWidget().getItemId() == eventItemId;
             })
+            .filter(this::isSlotUnlocked)
             .sorted()
             .limit(toTake)
             .collect(Collectors.toUnmodifiableSet());
@@ -94,7 +102,7 @@ public class DepositFeature extends HideFeature {
           actualTaken = itemToTake.stream().mapToInt(iw -> iw.getWidget().getItemQuantity()).sum();
         } else {
           int ui = widget.getItemQuantity() - toTake;
-          log.debug("Updating item quantity from " + widget.getItemQuantity() + " be " + ui);
+          log.debug("Updating item quantity from {} be {}", widget.getItemQuantity(), ui);
           getState().setSlot(widget.getIndex(), widget.getItemId(), ui, widgetService.getChangeOpacity());
           actualTaken = toTake;
         }
