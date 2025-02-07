@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@ import no.elg.ii.feature.EquipFeature;
 import no.elg.ii.feature.WithdrawFeature;
 import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.WidgetService;
 import org.junit.Before;
 import org.mockito.Answers;
@@ -60,6 +61,8 @@ public class IntegrationTestHelper {
   protected Client client;
   @Mock
   protected InventoryService inventoryService;
+  @Mock
+  protected EnsureWidgetStateService ensureWidgetStateService;
   @Mock
   protected WidgetService widgetService;
 
@@ -96,6 +99,6 @@ public class IntegrationTestHelper {
     doReturn(inventoryState).when(cleanHerbFeature).getState();
     doReturn(inventoryState).when(depositFeature).getState();
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, inventoryService));
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, inventoryService, ensureWidgetStateService));
   }
 }
