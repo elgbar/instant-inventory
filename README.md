@@ -1,7 +1,7 @@
 # Instant Inventory
 
-[![](https://img.shields.io/endpoint?url=https://i.pluginhub.info/shields/rank/plugin/instant-inventory)](https://runelite.net/plugin-hub/show/instant-inventory)
-[![](https://img.shields.io/endpoint?url=https://i.pluginhub.info/shields/installs/plugin/instant-inventory)](https://runelite.net/plugin-hub/show/instant-inventory)
+[![](https://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/rank/plugin/instant-inventory)](https://runelite.net/plugin-hub/show/instant-inventory)
+[![](https://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/installs/plugin/instant-inventory)](https://runelite.net/plugin-hub/show/instant-inventory)
 
 Perform inventory actions instantly.
 This is a quality of life improvement plugin aimed to make inventory management is OSRS a
