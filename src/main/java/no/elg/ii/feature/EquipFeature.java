@@ -52,9 +52,10 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
-import net.runelite.http.api.item.ItemEquipmentStats;
-import net.runelite.http.api.item.ItemStats;
+import net.runelite.client.game.ItemStats;
+import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.WidgetUtils;
@@ -156,8 +157,9 @@ public class EquipFeature implements Feature {
   @VisibleForTesting
   @Nullable
   public Pair<Item, Item> getEquipmentToReplace(Widget widget) {
-    final ItemStats itemStats = itemManager.getItemStats(widget.getItemId(), false);
+    final ItemStats itemStats = itemManager.getItemStats(widget.getItemId());
     if (itemStats == null || !itemStats.isEquipable()) {
+      log.debug("Item has not status or is not equipable, will not equip it: {}", itemStats);
       return null;
     }
     Item toReplace = null;
@@ -181,7 +183,7 @@ public class EquipFeature implements Feature {
       } else if (isShieldSlot(slotOfClickedItem)) {
         var weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
         if (weaponItem != null) {
-          ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId(), false);
+          ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId());
           if (weaponStat != null && weaponStat.isEquipable()) {
             ItemEquipmentStats weaponStatEquipment = weaponStat.getEquipment();
             if (weaponStatEquipment != null && weaponStatEquipment.isTwoHanded()) {
@@ -194,7 +196,6 @@ public class EquipFeature implements Feature {
       lastEquipped.put(clickedEquipment.getSlot(), client.getTickCount());
     }
     if (extra != null && toReplace == null) {
-      //
       return Pair.of(extra, null);
     }
     return Pair.of(toReplace, extra);
