@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
+import net.runelite.client.plugins.defaultworld.DefaultWorldPlugin;
 import org.slf4j.LoggerFactory;
 
 public class LivePluginTest {
@@ -48,7 +49,7 @@ public class LivePluginTest {
 
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
-    ExternalPluginManager.loadBuiltin(InstantInventoryPlugin.class);
+    ExternalPluginManager.loadBuiltin(InstantInventoryPlugin.class, DefaultWorldPlugin.class);
     var argsList = Arrays.asList(args);
     if (argsList.contains("--trace")) {
 

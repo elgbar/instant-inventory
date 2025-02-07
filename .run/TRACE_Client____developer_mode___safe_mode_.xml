@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TRACE Client [--developer-mode --safe-mode]" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="no.elg.ii.LivePluginTest" />
+    <module name="instant-inventory.test" />
+    <option name="PROGRAM_PARAMETERS" value="--developer-mode --safe-mode --trace" />
+    <option name="VM_PARAMETERS" value="-ea" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="no.elg.ii.inventory.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
