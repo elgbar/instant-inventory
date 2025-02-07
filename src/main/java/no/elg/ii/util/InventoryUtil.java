@@ -27,7 +27,7 @@
 
 package no.elg.ii.util;
 
-import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
@@ -64,12 +64,15 @@ public final class InventoryUtil {
     return null;
   }
 
-  public static final int GROUP_ITEM_CONTAINER = WidgetUtil.packComponentId(InterfaceID.GROUP_STORAGE_INVENTORY, 0);
-  public static final int DEPOSIT_BOX_ITEM_CONTAINER = WidgetUtil.packComponentId(268, 0);
   public static final int BANK_WITHDRAW_AS_ITEM = WidgetUtil.packComponentId(InterfaceID.BANK, 22);
   public static final int BANK_WITHDRAW_AS_NOTE = WidgetUtil.packComponentId(InterfaceID.BANK, 24);
 
-  public static final List<Integer> INVENTORY_ITEMS_CONTAINERS = List.of(
+  public static final int GROUP_ITEM_CONTAINER = WidgetUtil.packComponentId(InterfaceID.GROUP_STORAGE_INVENTORY, 0);
+  public static final int DEPOSIT_BOX_ITEM_CONTAINER = WidgetUtil.packComponentId(268, 0);
+  public static final int RESIZABLE_GUIDE_PRICES_INVENTORY_ITEM_CONTAINER = WidgetUtil.packComponentId(238, 0);
+  public static final int RESIZABLE_VIEW_EQUIPMENT_STATUS_INVENTORY_ITEM_CONTAINER = WidgetUtil.packComponentId(85, 0);
+
+  public static final Set<Integer> INVENTORY_ITEMS_CONTAINERS = Set.of(
     ComponentID.INVENTORY_CONTAINER,
     ComponentID.EQUIPMENT_INVENTORY_ITEM_CONTAINER,
     ComponentID.BANK_INVENTORY_ITEM_CONTAINER,
@@ -78,9 +81,14 @@ public final class InventoryUtil {
     ComponentID.SHOP_INVENTORY_ITEM_CONTAINER,
     ComponentID.SMITHING_INVENTORY_ITEM_CONTAINER,
     ComponentID.GUIDE_PRICES_INVENTORY_ITEM_CONTAINER,
+    RESIZABLE_GUIDE_PRICES_INVENTORY_ITEM_CONTAINER,
     ComponentID.SEED_VAULT_INVENTORY_ITEM_CONTAINER,
+    ComponentID.BANK_INVENTORY_EQUIPMENT_ITEM_CONTAINER,
+    ComponentID.FIXED_VIEWPORT_INVENTORY_CONTAINER,
+    ComponentID.FIXED_VIEWPORT_BANK_CONTAINER,
     GROUP_ITEM_CONTAINER,
-    DEPOSIT_BOX_ITEM_CONTAINER
+    DEPOSIT_BOX_ITEM_CONTAINER,
+    RESIZABLE_VIEW_EQUIPMENT_STATUS_INVENTORY_ITEM_CONTAINER
   );
 
   private InventoryUtil() {
