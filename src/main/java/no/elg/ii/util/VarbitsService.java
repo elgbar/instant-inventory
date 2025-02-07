@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -94,6 +94,19 @@ public class VarbitsService {
    */
   public static final int BOOLEAN_ALWAYS_SET_BANK_PLACEHOLDER = 3755;
 
+  /**
+   * Whether inventory slots are locks when clicking the 'deposit all'.
+   *
+   * <p>0 = Disposition will ignore locked slots
+   * <p>1 = Disposition works as normal
+   */
+  public static final int BOOLEAN_DISABLE_BANK_INVENTORY_LOCKS = 5450;
+
+  /**
+   * Bitmask of the bank inventory slots that are locked
+   */
+  public static final int INT_LOCKED_BANK_INVENTORY_SLOTS = 5422;
+
   public static final int VARBIT_VALUE_TRUE = 1;
   public static final int VARBIT_VALUE_FALSE = 0;
 
@@ -124,5 +137,17 @@ public class VarbitsService {
     var canonItemId = itemManager.canonicalize(itemId);
     var price = itemManager.getItemPrice(canonItemId);
     return varbitValue(INT_MINIMUM_ITEM_VALUE_FOR_DROP_WARNING) < price * quantity;
+  }
+
+  /**
+   * @param slotIndex The index of the slot to check
+   * @return If this slot is unlocked or bank slot locks are disabled
+   */
+  public boolean isBankInventoryUnlocked(int slotIndex) {
+    if (isVarbitTrue(BOOLEAN_DISABLE_BANK_INVENTORY_LOCKS)) {
+      return true;
+    }
+    int slotMask = (1 << slotIndex); // Bit that should be set for the slot id
+    return (slotMask & varbitValue(INT_LOCKED_BANK_INVENTORY_SLOTS)) == 0;
   }
 }
