@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Item;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
 import org.junit.Before;
 import org.junit.Test;

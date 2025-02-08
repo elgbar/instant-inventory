@@ -25,9 +25,9 @@
  *
  */
 
-package no.elg.ii.inventory;
+package no.elg.ii.service;
 
-import static no.elg.ii.util.IndexedWidget.indexWidget;
+import static no.elg.ii.model.IndexedWidget.indexWidget;
 import static no.elg.ii.util.InventoryUtil.GROUP_ITEM_CONTAINER;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_ITEMS_CONTAINERS;
 
@@ -45,7 +45,7 @@ import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.widgets.Widget;
-import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.model.IndexedWidget;
 
 @Slf4j
 @Singleton

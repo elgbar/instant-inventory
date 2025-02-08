@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.util;
+package no.elg.ii.service;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

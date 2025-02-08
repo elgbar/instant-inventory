@@ -25,26 +25,22 @@
  *
  */
 
-package no.elg.ii.util;
+package no.elg.ii.feature.features;
 
-import com.google.common.collect.Streams.FunctionWithIndex;
-import lombok.NonNull;
-import lombok.Value;
-import net.runelite.api.widgets.Widget;
+import no.elg.ii.feature.featues.DepositFeature;
+import no.elg.ii.test.FeatureTestMother;
+import no.elg.ii.test.TestSetup;
+import org.junit.Test;
 
-@Value
-public class IndexedWidget implements Comparable<IndexedWidget> {
-
-  int index;
-  @NonNull
-  Widget widget;
+public class DepositFeatureTest extends FeatureTestMother<DepositFeature> {
 
   @Override
-  public int compareTo(IndexedWidget o) {
-    return Integer.compare(index, o.index);
+  public DepositFeature createNewInstance() {
+    return TestSetup.createNewDepositFeature();
   }
 
-  @SuppressWarnings("UnstableApiUsage")
-  public static final FunctionWithIndex<Widget, IndexedWidget> indexWidget =
-    (from, index) -> new IndexedWidget((int) index, from);
+  @Test
+  public void afterEnablingItWillBeShownOnSomeWidget() {
+    DepositFeature dropFeature = createNewInstance();
+  }
 }

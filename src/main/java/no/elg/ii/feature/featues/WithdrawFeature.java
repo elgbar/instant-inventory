@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.feature;
+package no.elg.ii.feature.featues;
 
 import static no.elg.ii.util.InventoryUtil.findFirst;
 import static no.elg.ii.util.WidgetUtils.ZERO_QUANTITY_BANK_ITEM_OPACITY;
@@ -46,11 +46,12 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
+import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.service.VarbitsService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.Util;
-import no.elg.ii.util.VarbitsService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j

@@ -52,8 +52,9 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
-import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.model.IndexedWidget;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in

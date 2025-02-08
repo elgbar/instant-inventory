@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,9 +25,9 @@
  *
  */
 
-package no.elg.ii.feature;
+package no.elg.ii.feature.features;
 
-import static no.elg.ii.feature.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.feature.featues.DropFeature.DROP_CONFIG_KEY;
 import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -41,8 +41,10 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.inventory.InventoryService;
+import no.elg.ii.feature.HideFeature;
+import no.elg.ii.feature.featues.DropFeature;
 import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;

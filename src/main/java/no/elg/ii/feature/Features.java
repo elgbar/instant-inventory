@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,19 +27,41 @@
 
 package no.elg.ii.feature;
 
-import no.elg.ii.test.FeatureTestMother;
-import no.elg.ii.test.TestSetup;
-import org.junit.Test;
+import com.google.common.annotations.VisibleForTesting;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import no.elg.ii.feature.featues.CleanHerbFeature;
+import no.elg.ii.feature.featues.DepositFeature;
+import no.elg.ii.feature.featues.DropFeature;
+import no.elg.ii.feature.featues.EquipFeature;
+import no.elg.ii.feature.featues.WithdrawFeature;
 
-public class DepositFeatureTest extends FeatureTestMother<DepositFeature> {
+@Singleton
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public final class Features {
 
-  @Override
-  public DepositFeature createNewInstance() {
-    return TestSetup.createNewDepositFeature();
-  }
+  @Inject
+  @VisibleForTesting
+  private DropFeature dropFeature;
 
-  @Test
-  public void afterEnablingItWillBeShownOnSomeWidget() {
-    DepositFeature dropFeature = createNewInstance();
-  }
+  @Inject
+  @VisibleForTesting
+  private CleanHerbFeature cleanHerbFeature;
+
+  @Inject
+  @VisibleForTesting
+  private DepositFeature depositFeature;
+
+  @Inject
+  @VisibleForTesting
+  private EquipFeature equipFeature;
+
+  @Inject
+  @VisibleForTesting
+  private WithdrawFeature withdrawFeature;
 }

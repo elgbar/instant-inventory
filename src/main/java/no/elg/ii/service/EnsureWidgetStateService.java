@@ -35,7 +35,6 @@ import lombok.NoArgsConstructor;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.inventory.InventoryService;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.util.WidgetUtils;

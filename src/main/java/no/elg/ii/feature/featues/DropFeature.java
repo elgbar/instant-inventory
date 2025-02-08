@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature;
+package no.elg.ii.feature.featues;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,7 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.util.VarbitsService;
+import no.elg.ii.feature.HideFeature;
+import no.elg.ii.service.VarbitsService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j

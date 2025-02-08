@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.feature;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

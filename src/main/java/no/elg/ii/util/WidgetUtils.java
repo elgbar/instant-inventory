@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 import net.runelite.api.Item;
 import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
+import no.elg.ii.model.IndexedWidget;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class WidgetUtils {

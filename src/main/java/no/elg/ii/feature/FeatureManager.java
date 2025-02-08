@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,25 +25,23 @@
  *
  */
 
-package no.elg.ii;
+package no.elg.ii.feature;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.InstantInventoryConfig;
 
 @Slf4j
-@Data
+@Singleton
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeatureManager {
@@ -53,8 +51,6 @@ public class FeatureManager {
    */
   @VisibleForTesting
   protected final Set<Feature> activeFeatures = ConcurrentHashMap.newKeySet();
-  private final Set<Feature> activeFeaturesView = Collections.unmodifiableSet(activeFeatures);
-
 
   @Inject
   @VisibleForTesting
@@ -73,8 +69,7 @@ public class FeatureManager {
   /**
    * Make sure all features are in its correct state
    */
-  @VisibleForTesting
-  protected void updateAllFeatureStatus() {
+  public void updateAllFeatureStatus() {
     updateFeatureStatus(featureInstances.getDropFeature(), config.instantDrop());
     updateFeatureStatus(featureInstances.getCleanHerbFeature(), config.instantClean());
     updateFeatureStatus(featureInstances.getDepositFeature(), config.instantDeposit());
@@ -83,8 +78,7 @@ public class FeatureManager {
   }
 
   public void disableAllFeatures() {
-    HashSet<Feature> copy = new HashSet<>(activeFeatures);
-    for (Feature feature : copy) {
+    for (Feature feature : getActiveFeatures()) {
       disableFeature(feature);
     }
   }
@@ -93,7 +87,7 @@ public class FeatureManager {
    * @return Thread safe view of the currently active features
    */
   public Set<Feature> getActiveFeatures() {
-    return activeFeaturesView;
+    return Set.copyOf(activeFeatures);
   }
 
   /**
@@ -122,7 +116,7 @@ public class FeatureManager {
   @VisibleForTesting
   void enableFeature(@Nonnull Feature feature) {
     clientThread.invoke(() -> {
-      log.debug("Enabling " + feature.getConfigKey());
+      log.debug("Enabling {}", feature.getConfigKey());
       eventBus.register(feature);
       activeFeatures.add(feature);
       feature.onEnable();
@@ -138,7 +132,7 @@ public class FeatureManager {
   @VisibleForTesting
   void disableFeature(@Nonnull Feature feature) {
     clientThread.invoke(() -> {
-      log.debug("Disabling " + feature.getConfigKey());
+      log.debug("Disabling {}", feature.getConfigKey());
       eventBus.unregister(feature);
       activeFeatures.remove(feature);
       feature.onDisable();

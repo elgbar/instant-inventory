@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature;
+package no.elg.ii.feature.featues;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,12 +38,13 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
-import no.elg.ii.inventory.InventoryService;
+import no.elg.ii.feature.HideFeature;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
-import no.elg.ii.util.IndexedWidget;
+import no.elg.ii.service.InventoryService;
+import no.elg.ii.service.VarbitsService;
+import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.util.Util;
-import no.elg.ii.util.VarbitsService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j

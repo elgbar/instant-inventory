@@ -49,9 +49,10 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
-import no.elg.ii.inventory.InventoryService;
+import no.elg.ii.feature.FeatureManager;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.EnsureWidgetStateService;
+import no.elg.ii.service.InventoryService;
 
 @Slf4j
 @AllArgsConstructor

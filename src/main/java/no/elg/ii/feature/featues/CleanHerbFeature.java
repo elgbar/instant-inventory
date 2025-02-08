@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,44 +24,64 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
-package no.elg.ii;
+package no.elg.ii.feature.featues;
 
 import com.google.common.annotations.VisibleForTesting;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import no.elg.ii.feature.CleanHerbFeature;
-import no.elg.ii.feature.DepositFeature;
-import no.elg.ii.feature.DropFeature;
-import no.elg.ii.feature.EquipFeature;
-import no.elg.ii.feature.WithdrawFeature;
+import lombok.NonNull;
+import net.runelite.api.Client;
+import net.runelite.api.Skill;
+import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.widgets.Widget;
+import net.runelite.client.eventbus.Subscribe;
+import no.elg.ii.feature.Feature;
+import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.service.WidgetService;
+import no.elg.ii.model.HerbInfo;
 
 @Singleton
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-public final class Features {
+public class CleanHerbFeature implements Feature {
+
+  public static final String CLEAN_OPTION = "Clean";
+  public static final String CLEAN_CONFIG_KEY = "instantClean";
 
   @Inject
   @VisibleForTesting
-  private DropFeature dropFeature;
+  public Client client;
 
   @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
+  @Getter
+  private InventoryState state;
 
   @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
+  private WidgetService widgetService;
 
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
+  @Subscribe
+  public void onMenuOptionClicked(final MenuOptionClicked event) {
+    Widget widget = event.getWidget();
+    if (widget != null) {
+      String menuOption = event.getMenuOption();
+      if (CLEAN_OPTION.equals(menuOption)) {
+        int itemId = event.getItemId();
+        HerbInfo herbInfo = HerbInfo.HERBS.get(itemId);
+        if (herbInfo == null) {
+          return;
+        }
+        int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
+        if (herbloreLevel >= herbInfo.getMinLevel()) {
+          state.setSlot(widget.getIndex(), herbInfo.getCleanItemId(), widget.getItemQuantity(), widgetService.getChangeOpacity());
+        }
+      }
+    }
+  }
 
-  @Inject
-  @VisibleForTesting
-  private WithdrawFeature withdrawFeature;
+  @Override
+  @NonNull
+  public String getConfigKey() {
+    return CLEAN_CONFIG_KEY;
+  }
 }

@@ -28,8 +28,10 @@
 package no.elg.ii.util;
 
 import java.util.Set;
+import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.annotations.Component;
@@ -39,25 +41,22 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
 
 @Slf4j
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class InventoryUtil {
   /**
    * Number of items in an inventory
    */
   public static final int INVENTORY_SIZE = 28;
 
-  public interface Filter<T> {
-    boolean filter(T t);
-  }
-
   @Nullable
-  public static Widget findFirst(@Nonnull Client client, @Component int componentId, @Nonnull Filter<Widget> filter) {
+  public static Widget findFirst(@Nonnull Client client, @Component int componentId, @Nonnull Predicate<Widget> filter) {
     Widget invWidget = client.getWidget(componentId);
     if (invWidget == null) {
       return null;
     }
     Widget[] inventoryWidgets = invWidget.getDynamicChildren();
     for (Widget widget : inventoryWidgets) {
-      if (filter.filter(widget)) {
+      if (filter.test(widget)) {
         return widget;
       }
     }
@@ -90,7 +89,4 @@ public final class InventoryUtil {
     DEPOSIT_BOX_ITEM_CONTAINER,
     RESIZABLE_VIEW_EQUIPMENT_STATUS_INVENTORY_ITEM_CONTAINER
   );
-
-  private InventoryUtil() {
-  }
 }
