@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,10 +28,11 @@ package no.elg.ii.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Data;
+import lombok.Value;
 import net.runelite.api.ItemID;
 
-@Data
+@Value
+@SuppressWarnings("MagicNumber")
 public class HerbInfo {
 
   /**
@@ -66,8 +67,7 @@ public class HerbInfo {
     HERBS.put(ItemID.GRIMY_NOXIFER, new HerbInfo(ItemID.NOXIFER, 60));
   }
 
-  private final int cleanItemId;
-  private final int minLevel;
-
+  int cleanItemId;
+  int minLevel;
 
 }

@@ -28,8 +28,10 @@ package no.elg.ii.feature;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.ComponentID;
@@ -45,6 +47,8 @@ import no.elg.ii.util.VarbitsService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
+@Singleton
+@NoArgsConstructor
 public class DepositFeature extends HideFeature {
 
   public static final String DEPOSIT_PREFIX_OPTION = "Deposit-";
@@ -62,7 +66,7 @@ public class DepositFeature extends HideFeature {
   private VarbitsService varbitsService;
 
   public boolean isSlotUnlocked(IndexedWidget indexedWidget) {
-    return varbitsService.isBankInventoryUnlocked(indexedWidget.getIndex());
+    return varbitsService.isBankInventorySlotUnlocked(indexedWidget.getIndex());
   }
 
   @Subscribe
@@ -122,9 +126,8 @@ public class DepositFeature extends HideFeature {
     }
   }
 
-  @Nonnull
   @Override
-  public String getConfigKey() {
+  public @NonNull String getConfigKey() {
     return DEPOSIT_CONFIG_KEY;
   }
 }

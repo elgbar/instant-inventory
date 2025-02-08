@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,15 +27,17 @@
 
 package no.elg.ii.util;
 
-import com.google.common.collect.Streams;
-import lombok.Data;
+import com.google.common.collect.Streams.FunctionWithIndex;
+import lombok.NonNull;
+import lombok.Value;
 import net.runelite.api.widgets.Widget;
 
-@Data
+@Value
 public class IndexedWidget implements Comparable<IndexedWidget> {
 
-  private final int index;
-  private final Widget widget;
+  int index;
+  @NonNull
+  Widget widget;
 
   @Override
   public int compareTo(IndexedWidget o) {
@@ -43,5 +45,6 @@ public class IndexedWidget implements Comparable<IndexedWidget> {
   }
 
   @SuppressWarnings("UnstableApiUsage")
-  public static final Streams.FunctionWithIndex<Widget, IndexedWidget> indexWidget = (from, index) -> new IndexedWidget((int) index, from);
+  public static final FunctionWithIndex<Widget, IndexedWidget> indexWidget =
+    (from, index) -> new IndexedWidget((int) index, from);
 }

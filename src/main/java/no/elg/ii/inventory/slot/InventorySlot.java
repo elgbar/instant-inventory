@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,9 +29,9 @@ package no.elg.ii.inventory.slot;
 
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class InventorySlot {
 
   /**
@@ -51,35 +51,35 @@ public class InventorySlot {
   /**
    * When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
    */
-  private final int changedTick;
+  int changedTick;
   /**
    * When this slot was modified in milliseconds. This is to remove flickering
    */
-  private final long changedMs = System.currentTimeMillis();
+  long changedMs = System.currentTimeMillis();
   /**
    * The item id of this slot, or {@link InventorySlot#INVALID_ITEM_ID} if this slot is not a real item
    */
-  private final int itemId;
+  int itemId;
   /**
    * How many of the item in this slot
    */
-  private final int quantity;
+  int quantity;
   /**
    * The opacity this slot should be rendered with
    */
-  private final int opacity;
+  int opacity;
 
   /**
    * @return Whether this slot is valid, i.e. has an item id
    */
   public boolean hasValidItemId() {
-    return getItemId() >= 0;
+    return itemId >= 0;
   }
 
   /**
    * @return Whether this slot has been modified, if so when it was will be reflected in {@link #getChangedTick()}
    */
   public boolean hasChangedTick() {
-    return getChangedTick() >= 0;
+    return changedTick >= 0;
   }
 }

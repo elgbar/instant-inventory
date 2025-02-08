@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,11 @@
 package no.elg.ii.util;
 
 import javax.annotation.Nonnull;
+import lombok.NoArgsConstructor;
 import net.runelite.api.widgets.Widget;
 
-public class Util {
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+public final class Util {
   public static final int NO_MENU_OPTION_NUMBER = -1;
   public static final int TICK_LENGTH_MS = 600;
 
@@ -54,8 +56,5 @@ public class Util {
 
   public static int coerceIn(int value, int min, int max) {
     return Math.max(min, Math.min(max, value));
-  }
-
-  private Util() {
   }
 }

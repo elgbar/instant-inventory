@@ -37,6 +37,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -59,8 +61,10 @@ import no.elg.ii.util.IndexedWidget;
 import no.elg.ii.util.WidgetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-@Singleton
+
 @Slf4j
+@Singleton
+@NoArgsConstructor
 public class EquipFeature implements Feature {
 
   public static final Set<String> EQUIP_OPTIONS = Set.of("Wear", "Wield", "Equip");
@@ -211,9 +215,8 @@ public class EquipFeature implements Feature {
     return index == EquipmentInventorySlot.WEAPON.getSlotIdx();
   }
 
-  @Nonnull
   @Override
-  public String getConfigKey() {
+  public @NonNull String getConfigKey() {
     return EQUIP_CONFIG_KEY;
   }
 }

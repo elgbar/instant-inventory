@@ -32,12 +32,14 @@ import static no.elg.ii.util.InventoryUtil.GROUP_ITEM_CONTAINER;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_ITEMS_CONTAINERS;
 
 import com.google.common.collect.Streams;
-import com.google.inject.Singleton;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
@@ -45,8 +47,9 @@ import net.runelite.api.ItemContainer;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.util.IndexedWidget;
 
-@Singleton
 @Slf4j
+@Singleton
+@NoArgsConstructor
 public class InventoryService {
 
   @Inject
@@ -65,8 +68,8 @@ public class InventoryService {
   }
 
   @Nonnull
-  private Stream<Widget> getOpenWidgetItemContainer() {
-    return INVENTORY_ITEMS_CONTAINERS.stream()
+  private Stream<Widget> getOpenWidget(Collection<Integer> componentIds) {
+    return componentIds.stream()
       .map(componentId -> client.getWidget(componentId))
       .filter(widget -> widget != null && !widget.isHidden());
   }
@@ -77,7 +80,7 @@ public class InventoryService {
   @Nonnull
   @SuppressWarnings("UnstableApiUsage")
   public final Stream<IndexedWidget> getAllOpenInventoryWidgets() {
-    return getOpenWidgetItemContainer()
+    return getOpenWidget(INVENTORY_ITEMS_CONTAINERS)
       .flatMap(container -> Streams.mapWithIndex(Arrays.stream(container.getDynamicChildren()), indexWidget));
   }
 }

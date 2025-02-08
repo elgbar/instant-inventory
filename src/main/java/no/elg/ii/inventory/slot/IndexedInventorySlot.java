@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,12 @@
 package no.elg.ii.inventory.slot;
 
 import javax.annotation.Nonnull;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class IndexedInventorySlot {
 
-  private final int index;
-  private final @Nonnull InventorySlot slot;
+  int index;
+  @Nonnull
+  InventorySlot slot;
 }

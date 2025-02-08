@@ -28,13 +28,13 @@
 package no.elg.ii.util;
 
 import javax.annotation.Nonnull;
+import lombok.NoArgsConstructor;
 import net.runelite.api.Item;
 import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 
+@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public final class WidgetUtils {
-  private WidgetUtils() {
-  }
 
   /**
    * Item is fully transparent, i.e., not visible

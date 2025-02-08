@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
@@ -40,6 +41,7 @@ import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.service.WidgetService;
 
 @Slf4j
+@NoArgsConstructor
 public abstract class HideFeature implements Feature {
 
   @Inject
@@ -63,6 +65,6 @@ public abstract class HideFeature implements Feature {
   public WidgetService widgetService;
 
   protected void hide(@Nonnull Widget widget) {
-    getState().setSlot(widget, widgetService.getHideOpacity());
+    state.setSlot(widget, widgetService.getHideOpacity());
   }
 }

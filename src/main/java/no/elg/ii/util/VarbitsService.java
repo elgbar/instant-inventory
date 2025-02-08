@@ -29,6 +29,7 @@ package no.elg.ii.util;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.NoArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.client.game.ItemManager;
 
@@ -41,6 +42,7 @@ import net.runelite.client.game.ItemManager;
  * @see net.runelite.api.Varbits
  */
 @Singleton
+@NoArgsConstructor
 public class VarbitsService {
 
   @Inject
@@ -100,7 +102,7 @@ public class VarbitsService {
    * <p>0 = Disposition will ignore locked slots
    * <p>1 = Disposition works as normal
    */
-  public static final int BOOLEAN_DISABLE_BANK_INVENTORY_LOCKS = 5450;
+  public static final int BOOLEAN_BANK_INVENTORY_LOCKS_DISABLED = 5450;
 
   /**
    * Bitmask of the bank inventory slots that are locked
@@ -135,7 +137,7 @@ public class VarbitsService {
       return false;
     }
     var canonItemId = itemManager.canonicalize(itemId);
-    var price = itemManager.getItemPrice(canonItemId);
+    var price = itemManager.getItemPriceWithSource(canonItemId, false);
     return varbitValue(INT_MINIMUM_ITEM_VALUE_FOR_DROP_WARNING) < price * quantity;
   }
 
@@ -143,11 +145,11 @@ public class VarbitsService {
    * @param slotIndex The index of the slot to check
    * @return If this slot is unlocked or bank slot locks are disabled
    */
-  public boolean isBankInventoryUnlocked(int slotIndex) {
-    if (isVarbitTrue(BOOLEAN_DISABLE_BANK_INVENTORY_LOCKS)) {
+  public boolean isBankInventorySlotUnlocked(int slotIndex) {
+    if (isVarbitTrue(BOOLEAN_BANK_INVENTORY_LOCKS_DISABLED)) {
       return true;
     }
-    int slotMask = (1 << slotIndex); // Bit that should be set for the slot id
+    int slotMask = (1 << slotIndex); // Bit that should be set for the slot
     return (slotMask & varbitValue(INT_LOCKED_BANK_INVENTORY_SLOTS)) == 0;
   }
 }

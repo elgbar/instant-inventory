@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,10 @@
  */
 package no.elg.ii.feature;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
@@ -36,6 +38,8 @@ import no.elg.ii.util.VarbitsService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
+@Singleton
+@NoArgsConstructor
 public class DropFeature extends HideFeature {
 
   public static final String DROP_OPTION = "Drop";
@@ -60,9 +64,8 @@ public class DropFeature extends HideFeature {
     }
   }
 
-  @Nonnull
   @Override
-  public String getConfigKey() {
+  public @NonNull String getConfigKey() {
     return DROP_CONFIG_KEY;
   }
 }

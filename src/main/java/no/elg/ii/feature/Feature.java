@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Elg
+ * Copyright (c) 2022-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 package no.elg.ii.feature;
 
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import no.elg.ii.inventory.InventoryState;
@@ -41,10 +41,10 @@ public interface Feature {
   /**
    * @return The state of the feature
    */
-  @Nonnull
+  @NonNull
   InventoryState getState();
 
-  @Nonnull
+  @NonNull
   String getConfigKey();
 
   /**

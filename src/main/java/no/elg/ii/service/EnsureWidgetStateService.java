@@ -30,6 +30,8 @@ package no.elg.ii.service;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.NoArgsConstructor;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -46,6 +48,8 @@ import no.elg.ii.util.WidgetUtils;
  * This only applies to the clicked item, but it is not known <b>when</b> the item was clicked.
  * So this is a brute-force method to ensure that the item is hidden.
  */
+@Singleton
+@NoArgsConstructor
 public class EnsureWidgetStateService {
   @Inject
   InventoryService inventoryService;

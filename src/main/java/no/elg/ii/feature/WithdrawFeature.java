@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,12 @@ import static no.elg.ii.util.WidgetUtils.ZERO_QUANTITY_BANK_ITEM_OPACITY;
 import static no.elg.ii.util.WidgetUtils.isEmpty;
 
 import com.google.common.annotations.VisibleForTesting;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
@@ -52,6 +54,8 @@ import no.elg.ii.util.VarbitsService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
+@Singleton
+@NoArgsConstructor
 public class WithdrawFeature implements Feature {
 
   public static final String WITHDRAW_PREFIX_OPTION = "Withdraw-";
@@ -153,7 +157,7 @@ public class WithdrawFeature implements Feature {
     return true;
   }
 
-  private void updateBankItem(@Nonnull Widget bankWidget, int quantityToWithdraw) {
+  private void updateBankItem(@NonNull Widget bankWidget, int quantityToWithdraw) {
     widgetService.updateQuantity(bankWidget, -quantityToWithdraw);
     log.debug("Removing {} from bank widget {}", quantityToWithdraw, WidgetUtils.debugInfo(bankWidget));
     if (bankWidget.getItemQuantity() == 0) {
@@ -179,9 +183,8 @@ public class WithdrawFeature implements Feature {
     return varbitsService.isVarbitFalse(VarbitsService.BOOLEAN_ALWAYS_SET_BANK_PLACEHOLDER);
   }
 
-  @Nonnull
   @Override
-  public String getConfigKey() {
+  public @NonNull String getConfigKey() {
     return WITHDRAW_CONFIG_KEY;
   }
 }
