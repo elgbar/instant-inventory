@@ -38,6 +38,7 @@ import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
 import no.elg.ii.feature.features.EquipFeature;
 import no.elg.ii.feature.features.PrayerFeature;
+import no.elg.ii.feature.features.SpecialAttackFeature;
 import no.elg.ii.feature.features.WithdrawFeature;
 
 @Singleton
@@ -69,4 +70,8 @@ public final class Features {
   @Inject
   @VisibleForTesting
   private PrayerFeature prayerFeature;
+
+  @Inject
+  @VisibleForTesting
+  private SpecialAttackFeature specFeature;
 }
