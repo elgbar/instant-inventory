@@ -99,6 +99,6 @@ public class IntegrationTestHelper {
     doReturn(inventoryState).when(cleanHerbFeature).getState();
     doReturn(inventoryState).when(depositFeature).getState();
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, inventoryService, ensureWidgetStateService));
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService));
   }
 }

@@ -48,7 +48,6 @@ import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.FeatureManager;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.EnsureWidgetStateService;
-import no.elg.ii.service.InventoryService;
 
 @Slf4j
 @AllArgsConstructor
@@ -76,9 +75,6 @@ public class InstantInventoryPlugin extends Plugin {
   protected InventoryState inventoryState;
   @Inject
   protected ClientThread clientThread;
-
-  @Inject
-  InventoryService inventoryService;
 
   //TODO If more services are added which only reacts to events, this should be redesigned to be more generic
   @Inject
