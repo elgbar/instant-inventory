@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,48 +24,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature;
 
+package no.elg.ii.feature.state;
 
-import lombok.NonNull;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.plugins.Plugin;
-import no.elg.ii.feature.state.FeatureState;
+import javax.inject.Singleton;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * A feature of the instant inventory plugin. Features have a {@link #getState()} which hold how the client know the difference between server and client.
+ * A no-op implementation of {@link FeatureState} that does nothing.
+ * This is used when no state management is required.
  */
-public interface Feature {
-
-  /**
-   * @return The state of the feature
-   */
-  @NonNull
-  FeatureState getState();
-
-  @NonNull
-  String getConfigKey();
-
-  /**
-   * Method run when this feature is loaded in, either on {@link Plugin#startUp()} or when
-   * {@link ConfigChanged} and this feature is enabled in the config and not already loaded.
-   */
-  default void onEnable() {
+@Slf4j
+@Singleton
+@NoArgsConstructor
+public class NoOpState implements FeatureState {
+  @Override
+  public void resetAll() {
   }
 
-  /**
-   * Method run when this feature is disabled, either on {@link Plugin#shutDown()} or when
-   * {@link ConfigChanged} and this feature is disabled in the config and is loaded.
-   */
-  default void onDisable() {
-  }
-
-  /**
-   * Reset the feature to its initial state.
-   * <p>
-   * In the default implementation {@link FeatureState#resetAll()} is called.
-   */
-  default void reset() {
-    getState().resetAll();
+  @Override
+  public void validateAll() {
   }
 }

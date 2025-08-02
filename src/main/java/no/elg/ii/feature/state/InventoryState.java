@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.inventory;
+package no.elg.ii.feature.state;
 
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
@@ -52,9 +52,9 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
-import no.elg.ii.model.IndexedWidget;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -71,7 +71,7 @@ import no.elg.ii.model.IndexedWidget;
 @AllArgsConstructor
 @NoArgsConstructor
 @Singleton
-public class InventoryState {
+public class InventoryState implements FeatureState {
 
   /**
    * Maximum number of ticks an item should be displayed as something else
@@ -156,9 +156,7 @@ public class InventoryState {
     return IntStream.range(0, slots.length).mapToObj(i -> new IndexedInventorySlot(i, getSlot(i))).filter((iis) -> iis.getSlot().hasValidItemId());
   }
 
-  /**
-   * Reset the state to its initial state
-   */
+  @Override
   public void resetAll() {
     for (int i = 0; i < INVENTORY_SIZE; i++) {
       resetState(i);
@@ -229,6 +227,17 @@ public class InventoryState {
    */
   public boolean isTooEarlyToReset(InventorySlot slot) {
     return msSinceChange(slot) < config.minChangedMs();
+  }
+
+  @Override
+  public void validateAll() {
+    ItemContainer itemContainer = inventoryService.getCurrentInventoryContainer();
+    if (itemContainer != null) {
+      for (int index = 0; index < INVENTORY_SIZE; index++) {
+        Item item = itemContainer.getItem(index);
+        validateState(index, item);
+      }
+    }
   }
 
   /**

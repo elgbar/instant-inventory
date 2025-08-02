@@ -40,7 +40,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import no.elg.ii.feature.HideFeature;
-import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;

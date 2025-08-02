@@ -55,10 +55,10 @@ import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStats;
 import no.elg.ii.feature.Feature;
-import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
-import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.util.WidgetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 

@@ -37,7 +37,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.WidgetService;
 
 @Slf4j

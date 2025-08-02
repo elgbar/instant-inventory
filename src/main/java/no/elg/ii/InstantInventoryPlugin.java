@@ -26,8 +26,6 @@
  */
 package no.elg.ii;
 
-import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
 import java.util.Set;
@@ -37,8 +35,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.Item;
-import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
@@ -50,7 +46,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.FeatureManager;
-import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
 
@@ -108,15 +104,7 @@ public class InstantInventoryPlugin extends Plugin {
    */
   @Subscribe(priority = Integer.MAX_VALUE)
   public void onGameTick(GameTick event) {
-    clientThread.invokeLater(() -> {
-      ItemContainer itemContainer = inventoryService.getCurrentInventoryContainer();
-      if (itemContainer != null) {
-        for (int index = 0; index < INVENTORY_SIZE; index++) {
-          Item item = itemContainer.getItem(index);
-          inventoryState.validateState(index, item);
-        }
-      }
-    });
+    clientThread.invokeLater(inventoryState::validateAll);
   }
 
   /* (non-javadoc)

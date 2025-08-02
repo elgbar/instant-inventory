@@ -28,7 +28,7 @@
 package no.elg.ii.feature.features;
 
 import static no.elg.ii.feature.featues.DropFeature.DROP_CONFIG_KEY;
-import static no.elg.ii.inventory.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
+import static no.elg.ii.feature.state.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,7 +43,7 @@ import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.HideFeature;
 import no.elg.ii.feature.featues.DropFeature;
-import no.elg.ii.inventory.InventoryState;
+import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.test.FeatureTestMother;

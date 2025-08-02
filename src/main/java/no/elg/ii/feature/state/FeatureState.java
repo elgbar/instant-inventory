@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,48 +24,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature;
 
-
-import lombok.NonNull;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.plugins.Plugin;
-import no.elg.ii.feature.state.FeatureState;
+package no.elg.ii.feature.state;
 
 /**
- * A feature of the instant inventory plugin. Features have a {@link #getState()} which hold how the client know the difference between server and client.
+ *
  */
-public interface Feature {
+public interface FeatureState {
 
   /**
-   * @return The state of the feature
+   * Reset the state to its initial state
    */
-  @NonNull
-  FeatureState getState();
-
-  @NonNull
-  String getConfigKey();
+  void resetAll();
 
   /**
-   * Method run when this feature is loaded in, either on {@link Plugin#startUp()} or when
-   * {@link ConfigChanged} and this feature is enabled in the config and not already loaded.
-   */
-  default void onEnable() {
-  }
-
-  /**
-   * Method run when this feature is disabled, either on {@link Plugin#shutDown()} or when
-   * {@link ConfigChanged} and this feature is disabled in the config and is loaded.
-   */
-  default void onDisable() {
-  }
-
-  /**
-   * Reset the feature to its initial state.
+   * Validate the state of the feature
    * <p>
-   * In the default implementation {@link FeatureState#resetAll()} is called.
+   * Must be called on the client thread
    */
-  default void reset() {
-    getState().resetAll();
-  }
+  void validateAll();
+
 }

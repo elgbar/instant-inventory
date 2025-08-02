@@ -38,9 +38,9 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
-import no.elg.ii.inventory.InventoryState;
-import no.elg.ii.service.WidgetService;
+import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.model.HerbInfo;
+import no.elg.ii.service.WidgetService;
 
 @Singleton
 @NoArgsConstructor
