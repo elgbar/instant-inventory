@@ -31,6 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import net.runelite.api.Client;
+import net.runelite.api.annotations.VarCInt;
+import net.runelite.api.annotations.VarCStr;
 import net.runelite.api.annotations.Varbit;
 import net.runelite.api.annotations.Varp;
 
@@ -47,6 +49,23 @@ public class VarService {
 
   public static final int VAR_VALUE_TRUE = 1;
   public static final int VAR_VALUE_FALSE = 0;
+
+
+  public int varbitValue(@Varbit int varbit) {
+    return client.getVarbitValue(varbit);
+  }
+
+  public int varpValue(@Varp int varp) {
+    return client.getVarpValue(varp);
+  }
+
+  public int varCIntValue(@VarCInt int varc) {
+    return client.getVarcIntValue(varc);
+  }
+
+  public String varCStrValue(@VarCStr int varc) {
+    return client.getVarcStrValue(varc);
+  }
 
   /**
    * @param varbit the varbit to test
@@ -80,11 +99,20 @@ public class VarService {
     return varpValue(varp) == VAR_VALUE_FALSE;
   }
 
-  public int varbitValue(@Varbit int varbit) {
-    return client.getVarbitValue(varbit);
+
+  /**
+   * @param varc the varc to test
+   * @return Whether the value of the varc is true, i.e., 1
+   */
+  public boolean isVarcTrue(@VarCInt int varc) {
+    return varCIntValue(varc) == VAR_VALUE_TRUE;
   }
 
-  public int varpValue(@Varp int varp) {
-    return client.getVarpValue(varp);
+  /**
+   * @param varc the varc to test
+   * @return Whether the value of the varc is false, i.e., 0
+   */
+  public boolean isVarcFalse(@VarCInt int varc) {
+    return varCIntValue(varc) == VAR_VALUE_FALSE;
   }
 }
