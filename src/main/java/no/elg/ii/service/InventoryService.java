@@ -28,7 +28,6 @@
 package no.elg.ii.service;
 
 import static no.elg.ii.model.IndexedWidget.indexWidget;
-import static no.elg.ii.util.InventoryUtil.GROUP_ITEM_CONTAINER;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_ITEMS_CONTAINERS;
 
 import com.google.common.collect.Streams;
@@ -43,6 +42,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.model.IndexedWidget;
@@ -57,9 +57,10 @@ public class InventoryService {
 
   @Nullable
   public ItemContainer getCurrentInventoryContainer() {
-    Widget widget = client.getWidget(GROUP_ITEM_CONTAINER);
+    Widget groupStorageWidget = client.getWidget(InterfaceID.SharedBankSide.ITEMS);
+    boolean isGroupStorageOpen = groupStorageWidget != null && !groupStorageWidget.isHidden();
     int itemContainer;
-    if (widget != null && !widget.isHidden()) {
+    if (isGroupStorageOpen) {
       itemContainer = InventoryID.INV_PLAYER_TEMP;
     } else {
       itemContainer = InventoryID.INV;

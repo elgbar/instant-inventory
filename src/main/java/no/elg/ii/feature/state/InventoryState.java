@@ -217,7 +217,7 @@ public class InventoryState implements FeatureState {
     }
   }
 
-  public long msSinceChange(InventorySlot slot) {
+  public static long msSinceChange(InventorySlot slot) {
     return System.currentTimeMillis() - slot.getChangedMs();
   }
 

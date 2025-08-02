@@ -35,10 +35,8 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.annotations.Component;
-import net.runelite.api.widgets.ComponentID;
-import net.runelite.api.widgets.InterfaceID;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetUtil;
 
 @Slf4j
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
@@ -63,30 +61,20 @@ public final class InventoryUtil {
     return null;
   }
 
-  public static final int BANK_WITHDRAW_AS_ITEM = WidgetUtil.packComponentId(InterfaceID.BANK, 22);
-  public static final int BANK_WITHDRAW_AS_NOTE = WidgetUtil.packComponentId(InterfaceID.BANK, 24);
-
-  public static final int GROUP_ITEM_CONTAINER = WidgetUtil.packComponentId(InterfaceID.GROUP_STORAGE_INVENTORY, 0);
-  public static final int DEPOSIT_BOX_ITEM_CONTAINER = WidgetUtil.packComponentId(268, 0);
-  public static final int RESIZABLE_GUIDE_PRICES_INVENTORY_ITEM_CONTAINER = WidgetUtil.packComponentId(238, 0);
-  public static final int RESIZABLE_VIEW_EQUIPMENT_STATUS_INVENTORY_ITEM_CONTAINER = WidgetUtil.packComponentId(85, 0);
-
   public static final Set<Integer> INVENTORY_ITEMS_CONTAINERS = Set.of(
-    ComponentID.INVENTORY_CONTAINER,
-    ComponentID.EQUIPMENT_INVENTORY_ITEM_CONTAINER,
-    ComponentID.BANK_INVENTORY_ITEM_CONTAINER,
-    ComponentID.GRAND_EXCHANGE_INVENTORY_INVENTORY_ITEM_CONTAINER,
-    ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER,
-    ComponentID.SHOP_INVENTORY_ITEM_CONTAINER,
-    ComponentID.SMITHING_INVENTORY_ITEM_CONTAINER,
-    ComponentID.GUIDE_PRICES_INVENTORY_ITEM_CONTAINER,
-    RESIZABLE_GUIDE_PRICES_INVENTORY_ITEM_CONTAINER,
-    ComponentID.SEED_VAULT_INVENTORY_ITEM_CONTAINER,
-    ComponentID.BANK_INVENTORY_EQUIPMENT_ITEM_CONTAINER,
-    ComponentID.FIXED_VIEWPORT_INVENTORY_CONTAINER,
-    ComponentID.FIXED_VIEWPORT_BANK_CONTAINER,
-    GROUP_ITEM_CONTAINER,
-    DEPOSIT_BOX_ITEM_CONTAINER,
-    RESIZABLE_VIEW_EQUIPMENT_STATUS_INVENTORY_ITEM_CONTAINER
+    InterfaceID.Inventory.ITEMS, // Normal inventory
+    InterfaceID.Bankside.ITEMS, // Normal inventory when the bank is open
+    InterfaceID.Bankside.WORNOPS, // Inventory when equipping items in the bank
+    InterfaceID.GeOffersSide.ITEMS, // Inventory when inside the Grand Exchange interface
+    InterfaceID.BankDepositbox.INVENTORY, // When using the deposit box
+    InterfaceID.GePricecheckerSide.ITEMS, // When price checking items ('View guide prices' in the 'Worn Equipment' tab)
+    InterfaceID.EquipmentSide.ITEMS, //When showing 'View equipment stats' in the 'Worn Equipment' tab
+    InterfaceID.SharedBankSide.ITEMS, // Inventory when in group storage
+    InterfaceID.InvoverlayNoops.ITEMS, // When the inventory is open, but it's not interactable (e.g. in the deposit box)
+    InterfaceID.InventoryNoops.ITEMS // TODO unknown, thought it was InvoverlayNoops.ITEMS
+
+    //Might be used in the future or broken:
+//    InterfaceID.SeedVaultDeposit.INV, // When using the seed vault in the Farming Guild (currently buggy, when trying to deposit non-seed items)
+//    InterfaceID.Shopside.ITEMS // When in a shop interface
   );
 }
