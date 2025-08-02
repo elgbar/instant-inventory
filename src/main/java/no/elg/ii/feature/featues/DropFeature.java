@@ -32,8 +32,10 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
 import no.elg.ii.feature.HideFeature;
 import no.elg.ii.service.VarService;
 import no.elg.ii.util.WidgetUtils;
@@ -47,6 +49,9 @@ public class DropFeature extends HideFeature {
   public static final String DROP_CONFIG_KEY = "instantDrop";
 
   @Inject
+  private ItemManager itemManager;
+
+  @Inject
   private VarService varService;
 
   @Subscribe
@@ -56,13 +61,22 @@ public class DropFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
         log.debug("Dropped item {}", WidgetUtils.debugInfo(widget));
-        if (varService.willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
+        if (willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
           log.debug("Drop warning will be shown, will not hide item");
         } else {
           hide(widget);
         }
       }
     }
+  }
+
+  public boolean willDropWarningBeShownForItem(int itemId, int quantity) {
+    if (varService.isVarbitFalse(VarbitID.OPTION_DROPWARNING_ON)) {
+      return false;
+    }
+    var canonItemId = itemManager.canonicalize(itemId);
+    var price = itemManager.getItemPriceWithSource(canonItemId, false);
+    return varService.varbitValue(VarbitID.OPTION_DROPWARNING_VALUE) < price * quantity;
   }
 
   @Override

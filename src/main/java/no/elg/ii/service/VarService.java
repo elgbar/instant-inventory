@@ -33,8 +33,6 @@ import lombok.NoArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.annotations.Varbit;
 import net.runelite.api.annotations.Varp;
-import net.runelite.api.gameval.VarbitID;
-import net.runelite.client.game.ItemManager;
 
 /**
  * @see net.runelite.api.gameval.VarbitID
@@ -46,8 +44,6 @@ public class VarService {
 
   @Inject
   private Client client;
-  @Inject
-  private ItemManager itemManager;
 
   public static final int VAR_VALUE_TRUE = 1;
   public static final int VAR_VALUE_FALSE = 0;
@@ -90,26 +86,5 @@ public class VarService {
 
   public int varpValue(@Varp int varp) {
     return client.getVarpValue(varp);
-  }
-
-  public boolean willDropWarningBeShownForItem(int itemId, int quantity) {
-    if (isVarbitFalse(VarbitID.OPTION_DROPWARNING_ON)) {
-      return false;
-    }
-    var canonItemId = itemManager.canonicalize(itemId);
-    var price = itemManager.getItemPriceWithSource(canonItemId, false);
-    return varbitValue(VarbitID.OPTION_DROPWARNING_VALUE) < price * quantity;
-  }
-
-  /**
-   * @param slotIndex The index of the slot to check
-   * @return If this slot is unlocked or bank slot locks are disabled
-   */
-  public boolean isBankInventorySlotUnlocked(int slotIndex) {
-    if (isVarbitTrue(VarbitID.BANK_SIDE_SLOT_IGNOREINVLOCKS)) {
-      return true;
-    }
-    int slotMask = (1 << slotIndex); // Bit that should be set for the slot
-    return (slotMask & varbitValue(VarbitID.BANK_SIDE_SLOT_OVERVIEW)) == 0;
   }
 }

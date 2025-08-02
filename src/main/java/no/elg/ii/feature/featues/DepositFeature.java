@@ -34,6 +34,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -66,8 +67,18 @@ public class DepositFeature extends HideFeature {
   @Inject
   private VarService varService;
 
+  /**
+   * @param indexedWidget The indexed widget to check
+   * @return If this slot is unlocked or bank slot locks are disabled
+   */
   public boolean isSlotUnlocked(IndexedWidget indexedWidget) {
-    return varService.isBankInventorySlotUnlocked(indexedWidget.getIndex());
+    int slotIndex = indexedWidget.getIndex();
+
+    if (varService.isVarbitTrue(VarbitID.BANK_SIDE_SLOT_IGNOREINVLOCKS)) {
+      return true;
+    }
+    int slotMask = (1 << slotIndex); // Bit that should be set for the slot
+    return (slotMask & varService.varbitValue(VarbitID.BANK_SIDE_SLOT_OVERVIEW)) == 0;
   }
 
   @Subscribe
