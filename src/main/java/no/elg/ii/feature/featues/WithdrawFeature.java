@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -49,7 +50,7 @@ import net.runelite.client.game.ItemManager;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
-import no.elg.ii.service.VarbitsService;
+import no.elg.ii.service.VarService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtils;
@@ -76,7 +77,7 @@ public class WithdrawFeature implements Feature {
   @Inject
   private WidgetService widgetService;
   @Inject
-  private VarbitsService varbitsService;
+  private VarService varService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -177,11 +178,11 @@ public class WithdrawFeature implements Feature {
    * @return Whether the bank is set to withdraw as a note
    */
   private boolean isWithdrawingAsNote() {
-    return varbitsService.isVarbitTrue(VarbitsService.BOOLEAN_WITHDRAW_AS_NOTE);
+    return varService.isVarbitTrue(VarbitID.BANK_WITHDRAWNOTES);
   }
 
   private boolean isPlaceholdersDisabled() {
-    return varbitsService.isVarbitFalse(VarbitsService.BOOLEAN_ALWAYS_SET_BANK_PLACEHOLDER);
+    return varService.isVarbitFalse(VarbitID.BANK_LEAVEPLACEHOLDERS);
   }
 
   @Override

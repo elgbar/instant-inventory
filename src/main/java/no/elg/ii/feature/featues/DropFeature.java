@@ -35,7 +35,7 @@ import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.HideFeature;
-import no.elg.ii.service.VarbitsService;
+import no.elg.ii.service.VarService;
 import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
@@ -47,7 +47,7 @@ public class DropFeature extends HideFeature {
   public static final String DROP_CONFIG_KEY = "instantDrop";
 
   @Inject
-  private VarbitsService varbitsService;
+  private VarService varService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -56,7 +56,7 @@ public class DropFeature extends HideFeature {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
         log.debug("Dropped item {}", WidgetUtils.debugInfo(widget));
-        if (varbitsService.willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
+        if (varService.willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
           log.debug("Drop warning will be shown, will not hide item");
         } else {
           hide(widget);

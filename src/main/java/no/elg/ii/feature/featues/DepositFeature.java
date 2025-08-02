@@ -41,9 +41,9 @@ import net.runelite.client.game.ItemManager;
 import no.elg.ii.feature.HideFeature;
 import no.elg.ii.inventory.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
-import no.elg.ii.service.InventoryService;
-import no.elg.ii.service.VarbitsService;
 import no.elg.ii.model.IndexedWidget;
+import no.elg.ii.service.InventoryService;
+import no.elg.ii.service.VarService;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtils;
 
@@ -64,10 +64,10 @@ public class DepositFeature extends HideFeature {
   @Inject
   private InventoryState inventoryState;
   @Inject
-  private VarbitsService varbitsService;
+  private VarService varService;
 
   public boolean isSlotUnlocked(IndexedWidget indexedWidget) {
-    return varbitsService.isBankInventorySlotUnlocked(indexedWidget.getIndex());
+    return varService.isBankInventorySlotUnlocked(indexedWidget.getIndex());
   }
 
   @Subscribe
