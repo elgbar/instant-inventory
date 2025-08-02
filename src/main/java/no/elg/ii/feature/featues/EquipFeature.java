@@ -43,11 +43,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
@@ -174,7 +174,7 @@ public class EquipFeature implements Feature {
 
     final ItemEquipmentStats clickedEquipment = itemStats.getEquipment();
 
-    ItemContainer equipmentContainer = client.getItemContainer(InventoryID.EQUIPMENT);
+    ItemContainer equipmentContainer = client.getItemContainer(InventoryID.WORN);
     if (clickedEquipment != null && equipmentContainer != null) {
       if (lastEquipped.getOrDefault(clickedEquipment.getSlot(), 0) == client.getTickCount()) {
         log.debug("We have already equipped an item in the same slot this tick, will not replace it");

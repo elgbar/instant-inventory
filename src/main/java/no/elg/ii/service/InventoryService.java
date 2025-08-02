@@ -42,8 +42,8 @@ import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.model.IndexedWidget;
 
@@ -58,11 +58,11 @@ public class InventoryService {
   @Nullable
   public ItemContainer getCurrentInventoryContainer() {
     Widget widget = client.getWidget(GROUP_ITEM_CONTAINER);
-    InventoryID itemContainer;
+    int itemContainer;
     if (widget != null && !widget.isHidden()) {
-      itemContainer = InventoryID.GROUP_STORAGE_INV;
+      itemContainer = InventoryID.INV_PLAYER_TEMP;
     } else {
-      itemContainer = InventoryID.INVENTORY;
+      itemContainer = InventoryID.INV;
     }
     return client.getItemContainer(itemContainer);
   }

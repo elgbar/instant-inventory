@@ -42,7 +42,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameTick;
@@ -197,7 +196,7 @@ public class InventoryState implements FeatureState {
     if (hasItem) {
       item = maybeItem;
     } else {
-      ItemContainer inventoryContainer = client.getItemContainer(InventoryID.INVENTORY);
+      ItemContainer inventoryContainer = inventoryService.getCurrentInventoryContainer();
       if (inventoryContainer == null) {
         return;
       }
