@@ -31,6 +31,7 @@ import static no.elg.ii.feature.featues.CleanHerbFeature.CLEAN_CONFIG_KEY;
 import static no.elg.ii.feature.featues.DepositFeature.DEPOSIT_CONFIG_KEY;
 import static no.elg.ii.feature.featues.DropFeature.DROP_CONFIG_KEY;
 import static no.elg.ii.feature.featues.EquipFeature.EQUIP_CONFIG_KEY;
+import static no.elg.ii.feature.featues.SpecialAttackFeature.SPEC_CONFIG_KEY;
 import static no.elg.ii.feature.featues.WithdrawFeature.WITHDRAW_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
@@ -127,6 +128,17 @@ public interface InstantInventoryConfig extends Config {
     position = 4
   )
   default boolean instantWithdraw() {
+    return true;
+  }
+
+  @ConfigItem(
+    keyName = SPEC_CONFIG_KEY,
+    section = FEATURE_SECTION,
+    name = "Spec Bar Instant Highlight",
+    description = "Highlight the special attack bar instantly",
+    position = 4
+  )
+  default boolean instantSpec() {
     return true;
   }
 

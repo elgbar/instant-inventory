@@ -38,6 +38,7 @@ import no.elg.ii.feature.featues.DepositFeature;
 import no.elg.ii.feature.featues.DropFeature;
 import no.elg.ii.feature.featues.EquipFeature;
 import no.elg.ii.feature.featues.WithdrawFeature;
+import no.elg.ii.feature.featues.SpecialAttackFeature;
 
 @Singleton
 @Data
@@ -64,4 +65,8 @@ public final class Features {
   @Inject
   @VisibleForTesting
   private WithdrawFeature withdrawFeature;
+
+  @Inject
+  @VisibleForTesting
+  private SpecialAttackFeature specFeature;
 }

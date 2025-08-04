@@ -41,6 +41,7 @@ import no.elg.ii.feature.featues.CleanHerbFeature;
 import no.elg.ii.feature.featues.DepositFeature;
 import no.elg.ii.feature.featues.DropFeature;
 import no.elg.ii.feature.featues.EquipFeature;
+import no.elg.ii.feature.featues.SpecialAttackFeature;
 import no.elg.ii.feature.featues.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.EnsureWidgetStateService;
@@ -74,6 +75,7 @@ public class IntegrationTestHelper {
   protected DepositFeature depositFeature;
   protected EquipFeature equipFeature;
   protected WithdrawFeature withdrawFeature;
+  protected SpecialAttackFeature specFeature;
   protected InventoryState inventoryState;
   protected ClientThread clientThread;
 
@@ -84,13 +86,15 @@ public class IntegrationTestHelper {
       TestSetup.createNewCleanHerbFeature(),
       TestSetup.createNewDepositFeature(),
       TestSetup.createNewEquipFeature(),
-      TestSetup.createNewWithdrawFeature()
+      TestSetup.createNewWithdrawFeature(),
+      TestSetup.createNewSpecFeature()
     );
     dropFeature = features.getDropFeature();
     cleanHerbFeature = features.getCleanHerbFeature();
     depositFeature = features.getDepositFeature();
     equipFeature = features.getEquipFeature();
     withdrawFeature = features.getWithdrawFeature();
+    specFeature = features.getSpecFeature();
 
     featureManager = spy(new FeatureManager(eventBus, instantInventoryConfig, features, clientThread));
 
