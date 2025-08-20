@@ -99,19 +99,15 @@ public class EquipFeature implements Feature {
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
     if (widget != null && !event.isConsumed()) {
-      final ItemStats itemStats = itemManager.getItemStats(widget.getItemId());
-      if (itemStats == null || !itemStats.isEquipable()) {
-        log.debug("Item has not status or is not equipable, will not equip it: {}", itemStats);
-        return;
-      }
-
       String menuOption = event.getMenuOption();
       if (EQUIP_OPTIONS.contains(menuOption)) {
         log.debug("'{}' item {}", menuOption, WidgetUtils.debugInfo(widget));
-        clientThread.invokeAtTickEnd(() -> equip(widget, itemStats));
+        clientThread.invokeAtTickEnd(() -> equip(widget));
       }
     }
   }
+
+  private static final String TOO_LOW_LEVEL_MESSAGE = "You are not a high enough level to use this item.";
 
   @Subscribe
   public void onChatMessage(ChatMessage event) {
@@ -121,13 +117,13 @@ public class EquipFeature implements Feature {
     }
   }
 
-  private void equip(@Nonnull Widget widget, @Nonnull ItemStats itemStats) {
+  protected void equip(@Nonnull Widget widget) {
     ItemContainer inventoryContainer = inventoryService.getCurrentInventoryContainer();
     if (inventoryContainer == null) {
       log.debug("Failed to find the inventory container");
       return;
     }
-    @Nullable Pair<Item, Item> itemIds = getEquipmentToReplace(itemStats);
+    @Nullable Pair<Item, Item> itemIds = getEquipmentToReplace(widget);
     if (itemIds == null) {
       return;
     }
@@ -162,11 +158,17 @@ public class EquipFeature implements Feature {
   }
 
   /**
-   * @param itemStats the stats of the item that was clicked
+   * @param widget the widget to equip
    * @return The item that was equipped (left) and potentially the off-hand item that was equipped (right) if it will be unequipped
    */
+  @VisibleForTesting
   @Nullable
-  private Pair<Item, Item> getEquipmentToReplace(@Nonnull ItemStats itemStats) {
+  public Pair<Item, Item> getEquipmentToReplace(Widget widget) {
+    final ItemStats itemStats = itemManager.getItemStats(widget.getItemId());
+    if (itemStats == null || !itemStats.isEquipable()) {
+      log.debug("Item has not status or is not equipable, will not equip it: {}", itemStats);
+      return null;
+    }
     Item toReplace = null;
     Item extra = null;
 
@@ -206,11 +208,6 @@ public class EquipFeature implements Feature {
     return Pair.of(toReplace, extra);
   }
 
-  @Override
-  public @NonNull String getConfigKey() {
-    return EQUIP_CONFIG_KEY;
-  }
-
   private static boolean isShieldSlot(int index) {
     return index == EquipmentInventorySlot.SHIELD.getSlotIdx();
   }
@@ -219,7 +216,8 @@ public class EquipFeature implements Feature {
     return index == EquipmentInventorySlot.WEAPON.getSlotIdx();
   }
 
-  private static final String TOO_LOW_LEVEL_MESSAGE = "You are not a high enough level to use this item.";
-  //          var event2 = new MenuOptionClicked(event.getMenuEntry());
-//          clientThread.invokeLater(() -> client.getCallbacks().post(event2));
+  @Override
+  public @NonNull String getConfigKey() {
+    return EQUIP_CONFIG_KEY;
+  }
 }
