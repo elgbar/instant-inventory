@@ -47,6 +47,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.FeatureManager;
 import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.service.DisallowedDroppingModifiedWidgetService;
 import no.elg.ii.service.EnsureWidgetStateService;
 
 @Slf4j
@@ -80,10 +81,14 @@ public class InstantInventoryPlugin extends Plugin {
   @Inject
   EnsureWidgetStateService ensureWidgetStateService;
 
+  @Inject
+  DisallowedDroppingModifiedWidgetService disallowedDroppingModifiedWidgetService;
+
   @Override
   protected void startUp() {
     featureManager.updateAllFeatureStatus();
     eventBus.register(ensureWidgetStateService);
+    eventBus.register(disallowedDroppingModifiedWidgetService);
   }
 
   @Override
@@ -91,6 +96,7 @@ public class InstantInventoryPlugin extends Plugin {
     // Disable all features when the plugin shuts down
     featureManager.disableAllFeatures();
     eventBus.unregister(ensureWidgetStateService);
+    eventBus.unregister(disallowedDroppingModifiedWidgetService);
   }
 
   /* (non-javadoc)
