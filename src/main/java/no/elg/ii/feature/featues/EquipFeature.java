@@ -27,6 +27,8 @@
 
 package no.elg.ii.feature.featues;
 
+import static no.elg.ii.feature.featues.DropFeature.DROP_OPTION;
+
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +97,7 @@ public class EquipFeature implements Feature {
    */
   private final Map</*slotIdx*/ Integer, /*last tick count changed*/ Integer> lastEquipped = new HashMap<>(EquipmentInventorySlot.values().length);
 
-  @Subscribe
+  @Subscribe(priority = Integer.MAX_VALUE)
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
     if (widget != null) {
@@ -109,6 +111,13 @@ public class EquipFeature implements Feature {
       if (EQUIP_OPTIONS.contains(menuOption)) {
         log.debug("'{}' item {}", menuOption, WidgetUtils.debugInfo(widget));
         clientThread.invokeAtTickEnd(() -> equip(widget, itemStats));
+      } else if (DROP_OPTION.equals(menuOption)) {
+        final ItemEquipmentStats clickedEquipment = itemStats.getEquipment();
+        ItemContainer equipmentContainer = client.getItemContainer(InventoryID.WORN);
+        if (clickedEquipment != null && equipmentContainer != null && lastEquipped.getOrDefault(clickedEquipment.getSlot(), 0) == client.getTickCount()) {
+          log.debug("Disallowing item {} to be dropped too early", WidgetUtils.debugInfo(widget));
+          event.consume();
+        }
       }
     }
   }
