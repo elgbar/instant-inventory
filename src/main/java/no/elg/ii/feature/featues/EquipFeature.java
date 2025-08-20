@@ -98,7 +98,7 @@ public class EquipFeature implements Feature {
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
-    if (widget != null) {
+    if (widget != null && !event.isConsumed()) {
       final ItemStats itemStats = itemManager.getItemStats(widget.getItemId());
       if (itemStats == null || !itemStats.isEquipable()) {
         log.debug("Item has not status or is not equipable, will not equip it: {}", itemStats);

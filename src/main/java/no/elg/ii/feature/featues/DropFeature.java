@@ -57,7 +57,7 @@ public class DropFeature extends HideFeature {
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
-    if (widget != null) {
+    if (widget != null && !event.isConsumed()) {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
         log.debug("Dropped item {}", WidgetUtils.debugInfo(widget));

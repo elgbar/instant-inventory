@@ -51,7 +51,7 @@ public class DisallowedDroppingModifiedWidgetService {
   @Subscribe(priority = Integer.MAX_VALUE)
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
-    if (widget != null) {
+    if (widget != null && !event.isConsumed()) {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
         ItemContainer currentInventoryContainer = inventoryService.getCurrentInventoryContainer();

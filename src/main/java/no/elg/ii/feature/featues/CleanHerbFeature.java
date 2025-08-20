@@ -63,7 +63,7 @@ public class CleanHerbFeature implements Feature {
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
-    if (widget != null) {
+    if (widget != null && !event.isConsumed()) {
       String menuOption = event.getMenuOption();
       if (CLEAN_OPTION.equals(menuOption)) {
         int itemId = event.getItemId();
