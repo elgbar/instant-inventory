@@ -98,7 +98,7 @@ public class EquipFeature implements Feature {
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
-    if (widget != null) {
+    if (widget != null && !event.isConsumed()) {
       String menuOption = event.getMenuOption();
       if (EQUIP_OPTIONS.contains(menuOption)) {
         log.debug("'{}' item {}", menuOption, WidgetUtils.debugInfo(widget));

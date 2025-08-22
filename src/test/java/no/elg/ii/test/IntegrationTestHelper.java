@@ -43,6 +43,7 @@ import no.elg.ii.feature.featues.DropFeature;
 import no.elg.ii.feature.featues.EquipFeature;
 import no.elg.ii.feature.featues.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.service.DisallowedDroppingModifiedWidgetService;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
@@ -63,6 +64,8 @@ public class IntegrationTestHelper {
   protected InventoryService inventoryService;
   @Mock
   protected EnsureWidgetStateService ensureWidgetStateService;
+  @Mock
+  protected DisallowedDroppingModifiedWidgetService disallowedDroppingModifiedWidgetService;
   @Mock
   protected WidgetService widgetService;
 
@@ -99,6 +102,6 @@ public class IntegrationTestHelper {
     doReturn(inventoryState).when(cleanHerbFeature).getState();
     doReturn(inventoryState).when(depositFeature).getState();
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService));
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowedDroppingModifiedWidgetService));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,63 +24,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.featues;
+
+package no.elg.ii.service;
+
+
+import static no.elg.ii.feature.featues.DropFeature.DROP_OPTION;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.game.ItemManager;
-import no.elg.ii.feature.HideFeature;
-import no.elg.ii.service.VarService;
-import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
 @Singleton
 @NoArgsConstructor
-public class DropFeature extends HideFeature {
-
-  public static final String DROP_OPTION = "Drop";
-  public static final String DROP_CONFIG_KEY = "instantDrop";
+public class DisallowedDroppingModifiedWidgetService {
 
   @Inject
-  private ItemManager itemManager;
+  private InventoryService inventoryService;
 
-  @Inject
-  private VarService varService;
-
-  @Subscribe
+  @Subscribe(priority = Integer.MAX_VALUE)
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
     if (widget != null && !event.isConsumed()) {
       String menuOption = event.getMenuOption();
       if (DROP_OPTION.equals(menuOption)) {
-        log.debug("Dropped item {}", WidgetUtils.debugInfo(widget));
-        if (willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
-          log.debug("Drop warning will be shown, will not hide item");
-        } else {
-          hide(widget);
+        ItemContainer currentInventoryContainer = inventoryService.getCurrentInventoryContainer();
+        if (currentInventoryContainer != null) {
+          Item item = currentInventoryContainer.getItem(widget.getIndex());
+          if (item != null && item.getId() != widget.getItemId()) {
+            log.debug("Widget item in slot {} is not the same as the item in the inventory. Disallowing dropping", widget.getIndex());
+            event.consume();
+          }
         }
       }
     }
-  }
-
-  public boolean willDropWarningBeShownForItem(int itemId, int quantity) {
-    if (varService.isVarbitFalse(VarbitID.OPTION_DROPWARNING_ON)) {
-      return false;
-    }
-    var canonItemId = itemManager.canonicalize(itemId);
-    var price = itemManager.getItemPriceWithSource(canonItemId, false);
-    return varService.varbitValue(VarbitID.OPTION_DROPWARNING_VALUE) < price * quantity;
-  }
-
-  @Override
-  public @NonNull String getConfigKey() {
-    return DROP_CONFIG_KEY;
   }
 }
