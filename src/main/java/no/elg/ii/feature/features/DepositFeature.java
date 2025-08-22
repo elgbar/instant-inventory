@@ -24,7 +24,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.featues;
+package no.elg.ii.feature.features;
 
 import java.util.Set;
 import java.util.stream.Collectors;

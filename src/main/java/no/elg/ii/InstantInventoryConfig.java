@@ -27,11 +27,11 @@
 package no.elg.ii;
 
 import static no.elg.ii.InstantInventoryConfig.GROUP;
-import static no.elg.ii.feature.featues.CleanHerbFeature.CLEAN_CONFIG_KEY;
-import static no.elg.ii.feature.featues.DepositFeature.DEPOSIT_CONFIG_KEY;
-import static no.elg.ii.feature.featues.DropFeature.DROP_CONFIG_KEY;
-import static no.elg.ii.feature.featues.EquipFeature.EQUIP_CONFIG_KEY;
-import static no.elg.ii.feature.featues.WithdrawFeature.WITHDRAW_CONFIG_KEY;
+import static no.elg.ii.feature.features.CleanHerbFeature.CLEAN_CONFIG_KEY;
+import static no.elg.ii.feature.features.DepositFeature.DEPOSIT_CONFIG_KEY;
+import static no.elg.ii.feature.features.DropFeature.DROP_CONFIG_KEY;
+import static no.elg.ii.feature.features.EquipFeature.EQUIP_CONFIG_KEY;
+import static no.elg.ii.feature.features.WithdrawFeature.WITHDRAW_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;

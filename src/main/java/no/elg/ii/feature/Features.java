@@ -33,11 +33,11 @@ import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.elg.ii.feature.featues.CleanHerbFeature;
-import no.elg.ii.feature.featues.DepositFeature;
-import no.elg.ii.feature.featues.DropFeature;
-import no.elg.ii.feature.featues.EquipFeature;
-import no.elg.ii.feature.featues.WithdrawFeature;
+import no.elg.ii.feature.features.CleanHerbFeature;
+import no.elg.ii.feature.features.DepositFeature;
+import no.elg.ii.feature.features.DropFeature;
+import no.elg.ii.feature.features.EquipFeature;
+import no.elg.ii.feature.features.WithdrawFeature;
 
 @Singleton
 @Data

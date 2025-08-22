@@ -24,63 +24,64 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package no.elg.ii.feature.featues;
+package no.elg.ii.feature.features;
 
+import com.google.common.annotations.VisibleForTesting;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+import net.runelite.api.Skill;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.game.ItemManager;
-import no.elg.ii.feature.HideFeature;
-import no.elg.ii.service.VarService;
-import no.elg.ii.util.WidgetUtils;
+import no.elg.ii.feature.Feature;
+import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.model.HerbInfo;
+import no.elg.ii.service.WidgetService;
 
-@Slf4j
 @Singleton
 @NoArgsConstructor
-public class DropFeature extends HideFeature {
+public class CleanHerbFeature implements Feature {
 
-  public static final String DROP_OPTION = "Drop";
-  public static final String DROP_CONFIG_KEY = "instantDrop";
-
-  @Inject
-  private ItemManager itemManager;
+  public static final String CLEAN_OPTION = "Clean";
+  public static final String CLEAN_CONFIG_KEY = "instantClean";
 
   @Inject
-  private VarService varService;
+  @VisibleForTesting
+  public Client client;
+
+  @Inject
+  @Getter
+  private InventoryState state;
+
+  @Inject
+  private WidgetService widgetService;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
     if (widget != null && !event.isConsumed()) {
       String menuOption = event.getMenuOption();
-      if (DROP_OPTION.equals(menuOption)) {
-        log.debug("Dropped item {}", WidgetUtils.debugInfo(widget));
-        if (willDropWarningBeShownForItem(widget.getItemId(), widget.getItemQuantity())) {
-          log.debug("Drop warning will be shown, will not hide item");
-        } else {
-          hide(widget);
+      if (CLEAN_OPTION.equals(menuOption)) {
+        int itemId = event.getItemId();
+        HerbInfo herbInfo = HerbInfo.HERBS.get(itemId);
+        if (herbInfo == null) {
+          return;
+        }
+        int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
+        if (herbloreLevel >= herbInfo.getMinLevel()) {
+          state.setSlot(widget.getIndex(), herbInfo.getCleanItemId(), widget.getItemQuantity(), widgetService.getChangeOpacity());
         }
       }
     }
   }
 
-  public boolean willDropWarningBeShownForItem(int itemId, int quantity) {
-    if (varService.isVarbitFalse(VarbitID.OPTION_DROPWARNING_ON)) {
-      return false;
-    }
-    var canonItemId = itemManager.canonicalize(itemId);
-    var price = itemManager.getItemPriceWithSource(canonItemId, false);
-    return varService.varbitValue(VarbitID.OPTION_DROPWARNING_VALUE) < price * quantity;
-  }
-
   @Override
-  public @NonNull String getConfigKey() {
-    return DROP_CONFIG_KEY;
+  @NonNull
+  public String getConfigKey() {
+    return CLEAN_CONFIG_KEY;
   }
 }

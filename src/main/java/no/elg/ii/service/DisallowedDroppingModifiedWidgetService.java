@@ -28,7 +28,7 @@
 package no.elg.ii.service;
 
 
-import static no.elg.ii.feature.featues.DropFeature.DROP_OPTION;
+import static no.elg.ii.feature.features.DropFeature.DROP_OPTION;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

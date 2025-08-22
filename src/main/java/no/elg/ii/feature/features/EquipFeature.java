@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.feature.featues;
+package no.elg.ii.feature.features;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;

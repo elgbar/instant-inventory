@@ -27,7 +27,6 @@
 
 package no.elg.ii.feature.features;
 
-import no.elg.ii.feature.featues.DepositFeature;
 import no.elg.ii.test.FeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;

@@ -25,7 +25,7 @@
  *
  */
 
-package no.elg.ii.feature.featues;
+package no.elg.ii.feature.features;
 
 import static no.elg.ii.util.InventoryUtil.findFirst;
 import static no.elg.ii.util.WidgetUtils.ZERO_QUANTITY_BANK_ITEM_OPACITY;
