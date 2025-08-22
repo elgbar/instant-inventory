@@ -13,11 +13,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Removed
+
+---
+
+## 1.2.3 - 2025-08-22
+
+### Changed
+
 * Cleanup internal varbit service
 
 ### Fixed
 
-### Removed
+* Fix allowing items to be unequipped and dropped in the same tick
 
 ---
 
