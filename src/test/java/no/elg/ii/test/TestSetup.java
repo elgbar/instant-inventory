@@ -38,12 +38,13 @@ import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.feature.Feature;
-import no.elg.ii.feature.HideFeature;
 import no.elg.ii.feature.featues.CleanHerbFeature;
 import no.elg.ii.feature.featues.DepositFeature;
 import no.elg.ii.feature.featues.DropFeature;
 import no.elg.ii.feature.featues.EquipFeature;
+import no.elg.ii.feature.Feature;
+import no.elg.ii.feature.HideFeature;
+import no.elg.ii.feature.featues.SpecialAttackFeature;
 import no.elg.ii.feature.featues.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.InventoryService;
@@ -79,6 +80,11 @@ public class TestSetup {
 
   public static WithdrawFeature createNewWithdrawFeature() {
     WithdrawFeature feature = spy(new WithdrawFeature());
+    return feature;
+  }
+
+  public static SpecialAttackFeature createNewSpecFeature() {
+    SpecialAttackFeature feature = spy(new SpecialAttackFeature());
     return feature;
   }
 
