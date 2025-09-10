@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fix allowing items to be unequipped and dropped in the same tick
+* [#22](https://github.com/elgbar/instant-inventory/issues/22) Fix allowing items to be unequipped and dropped in the
+  same tick
 
 ---
 
