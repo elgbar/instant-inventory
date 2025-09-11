@@ -32,7 +32,9 @@ import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.service.VarService;
 
 @Slf4j
@@ -46,11 +48,16 @@ public class PrayerState implements FeatureState {
   @Inject
   VarService varService;
 
-  public long prayerState;
+  public int prayerState;
+
+  @Subscribe(priority = Integer.MAX_VALUE)
+  public void onGameTick(final GameTick event) {
+    validateAll();
+  }
 
   @Override
   public void resetAll() {
-    prayerState = 0L;
+    prayerState = 0;
   }
 
   @Override

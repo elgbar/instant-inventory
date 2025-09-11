@@ -57,10 +57,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ScriptEvent;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
@@ -85,8 +82,6 @@ public class InstantPrayer implements Feature {
   @Inject
   Client client;
 
-  private int actualOldValue = 0;
-
   public int[] conflicting = {
     PrayerConflict.toConflictInt(THICK_SKIN, ROCK_SKIN, STEEL_SKIN),
     PrayerConflict.toConflictInt(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT),
@@ -94,12 +89,6 @@ public class InstantPrayer implements Feature {
     PrayerConflict.toConflictInt(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT),
     PrayerConflict.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE),
   };
-
-  @Subscribe(priority = Integer.MAX_VALUE)
-  public void onGameTick(final GameTick event) {
-    actualOldValue = varService.varbitValue(VarbitID.PRAYER_ALLACTIVE);
-  }
-
 
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
@@ -112,10 +101,10 @@ public class InstantPrayer implements Feature {
           int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
           if (prayerBit != 0) {
             //Toggle the prayer
-            int newValue = actualOldValue ^ prayerBit;
+            int newValue = state.prayerState ^ prayerBit;
             int updateValue = update(newValue);
             log.warn("[{}] Toggled prayer {}, old value {}, new value {}", client.getTickCount(), prayer, Integer.toBinaryString(updateValue), Integer.toBinaryString(newValue));
-            actualOldValue = updateValue;
+            state.prayerState = updateValue;
           }
         }
       }
@@ -123,17 +112,17 @@ public class InstantPrayer implements Feature {
   }
 
   //FIXMe still buggy when (on the same tick) switching between conflicting prayers
-  @Subscribe(priority = Integer.MAX_VALUE - 1)
-  public void onVarbitChanged(final VarbitChanged event) {
-    int varbitId = event.getVarbitId();
-    int newValue = event.getValue();
-    if (varbitId == VarbitID.PRAYER_ALLACTIVE && actualOldValue != newValue) {
-      update(newValue);
-    }
-  }
+//  @Subscribe(priority = Integer.MAX_VALUE - 1)
+//  public void onVarbitChanged(final VarbitChanged event) {
+//    int varbitId = event.getVarbitId();
+//    int newValue = event.getValue();
+//    if (varbitId == VarbitID.PRAYER_ALLACTIVE && state.prayerState != newValue) {
+//      update(newValue);
+//    }
+//  }
 
   int update(int newValue) {
-    int active = actualOldValue;
+    int active = state.prayerState;
     for (int conflictMask : conflicting) {
       int maskedNewValue = newValue & conflictMask;
       if (Integer.bitCount(maskedNewValue) > 1) {
