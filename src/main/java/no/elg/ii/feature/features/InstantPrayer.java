@@ -86,12 +86,12 @@ public class InstantPrayer implements Feature {
   @Inject
   Client client;
 
-  public int[] conflicting = {
-    PrayerConflict.toConflictInt(THICK_SKIN, ROCK_SKIN, STEEL_SKIN),
-    PrayerConflict.toConflictInt(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT),
-    PrayerConflict.toConflictInt(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT),
-    PrayerConflict.toConflictInt(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT),
-    PrayerConflict.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE),
+  public int[] conflicting = { //
+    PrayerConflict.toConflictInt(THICK_SKIN, ROCK_SKIN, STEEL_SKIN), //
+    PrayerConflict.toConflictInt(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
+    PrayerConflict.toConflictInt(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
+    PrayerConflict.toConflictInt(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
+    PrayerConflict.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE), //
   };
 
   @Subscribe(priority = Integer.MIN_VALUE)
@@ -112,12 +112,7 @@ public class InstantPrayer implements Feature {
             //Toggle the prayer
             int newValue = state.prayerState ^ prayerBit;
             int updateValue = update(newValue);
-            log.warn("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}",
-              client.getTickCount(),
-              prayer,
-              Integer.toBinaryString(state.prayerState),
-              Integer.toBinaryString(newValue),
-              Integer.toBinaryString(updateValue));
+            log.warn("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}", client.getTickCount(), prayer, Integer.toBinaryString(state.prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
             state.prayerState = updateValue;
           }
         }
@@ -152,12 +147,14 @@ public class InstantPrayer implements Feature {
     if (prayerContainer != null && !prayerContainer.isHidden()) {
       for (Map.Entry<Integer, Prayer> entry : INTERFACE_TO_PRAYER.entrySet()) {
         int prayerWidgetId = entry.getKey();
-        var prayerWidget = client.getWidget(prayerWidgetId);
-        if (prayerWidget != null) {
+        Prayer prayer = entry.getValue();
+        int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
+        Widget prayerWidget = client.getWidget(prayerWidgetId);
+
+        if (prayerWidget != null && prayerBit != 0) {
           var child = prayerWidget.getChild(0);
           if (child != null) {
-            var prayer = entry.getValue();
-            int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
+            // prayer is hidden when the bit is not set in the prayer state
             boolean hidden = (prayerBit & state.prayerState) == 0;
             child.setHidden(hidden);
           }
