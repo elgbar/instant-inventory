@@ -49,6 +49,7 @@ import static no.elg.ii.model.PrayerConflict.INTERFACE_TO_PRAYER;
 import static no.elg.ii.model.PrayerConflict.PRAYER_TO_BIT;
 import static no.elg.ii.model.PrayerConflict.PRAYER_TO_INTERFACE;
 
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
@@ -56,8 +57,11 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.Prayer;
 import net.runelite.api.ScriptEvent;
+import net.runelite.api.events.ClientTick;
 import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
@@ -90,6 +94,11 @@ public class InstantPrayer implements Feature {
     PrayerConflict.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE),
   };
 
+  @Subscribe(priority = Integer.MIN_VALUE)
+  public void onClientTick(ClientTick event) {
+    render();
+  }
+
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
     if (event.getScriptId() == 462) {
@@ -103,7 +112,12 @@ public class InstantPrayer implements Feature {
             //Toggle the prayer
             int newValue = state.prayerState ^ prayerBit;
             int updateValue = update(newValue);
-            log.warn("[{}] Toggled prayer {}, old value {}, new value {}", client.getTickCount(), prayer, Integer.toBinaryString(updateValue), Integer.toBinaryString(newValue));
+            log.warn("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}",
+              client.getTickCount(),
+              prayer,
+              Integer.toBinaryString(state.prayerState),
+              Integer.toBinaryString(newValue),
+              Integer.toBinaryString(updateValue));
             state.prayerState = updateValue;
           }
         }
@@ -111,17 +125,8 @@ public class InstantPrayer implements Feature {
     }
   }
 
-  //FIXMe still buggy when (on the same tick) switching between conflicting prayers
-//  @Subscribe(priority = Integer.MAX_VALUE - 1)
-//  public void onVarbitChanged(final VarbitChanged event) {
-//    int varbitId = event.getVarbitId();
-//    int newValue = event.getValue();
-//    if (varbitId == VarbitID.PRAYER_ALLACTIVE && state.prayerState != newValue) {
-//      update(newValue);
-//    }
-//  }
-
   int update(int newValue) {
+    assert client.isClientThread();
     int active = state.prayerState;
     for (int conflictMask : conflicting) {
       int maskedNewValue = newValue & conflictMask;
@@ -135,7 +140,30 @@ public class InstantPrayer implements Feature {
         active = (active & ~conflictMask) | correctedValue;
       }
     }
-    return active;
+    if (active != state.prayerState) {
+      return active;
+    } else {
+      return newValue;
+    }
+  }
+
+  void render() {
+    Widget prayerContainer = client.getWidget(InterfaceID.Prayerbook.CONTAINER);
+    if (prayerContainer != null && !prayerContainer.isHidden()) {
+      for (Map.Entry<Integer, Prayer> entry : INTERFACE_TO_PRAYER.entrySet()) {
+        int prayerWidgetId = entry.getKey();
+        var prayerWidget = client.getWidget(prayerWidgetId);
+        if (prayerWidget != null) {
+          var child = prayerWidget.getChild(0);
+          if (child != null) {
+            var prayer = entry.getValue();
+            int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
+            boolean hidden = (prayerBit & state.prayerState) == 0;
+            child.setHidden(hidden);
+          }
+        }
+      }
+    }
   }
 
   public void togglePrayerUI(int mask, boolean hidden) {

@@ -50,7 +50,7 @@ public class PrayerState implements FeatureState {
 
   public int prayerState;
 
-  @Subscribe(priority = Integer.MAX_VALUE)
+  @Subscribe
   public void onGameTick(final GameTick event) {
     validateAll();
   }
