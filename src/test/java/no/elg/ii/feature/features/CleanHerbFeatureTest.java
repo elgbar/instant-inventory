@@ -27,8 +27,8 @@
 
 package no.elg.ii.feature.features;
 
-import static net.runelite.api.ItemID.FIRE_CAPE;
-import static net.runelite.api.ItemID.GRIMY_GUAM_LEAF;
+import static net.runelite.api.gameval.ItemID.TZHAAR_CAPE_FIRE;
+import static net.runelite.api.gameval.ItemID.UNIDENTIFIED_GUAM;
 import static no.elg.ii.feature.features.CleanHerbFeature.CLEAN_CONFIG_KEY;
 import static no.elg.ii.feature.features.CleanHerbFeature.CLEAN_OPTION;
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
@@ -61,27 +61,27 @@ public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
 
   @Test
   public void onMenuOptionClicked_happy_path() {
-    onMenuOptionClicked_test(GRIMY_GUAM_LEAF, GRIMY_GUAM_LEAF, true, CLEAN_OPTION, 99);
+    onMenuOptionClicked_test(UNIDENTIFIED_GUAM, UNIDENTIFIED_GUAM, true, CLEAN_OPTION, 99);
   }
 
   @Test
   public void onMenuOptionClicked_no_widget() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, GRIMY_GUAM_LEAF, false, CLEAN_OPTION, 99);
+    onMenuOptionClicked_test(INVALID_ITEM_ID, UNIDENTIFIED_GUAM, false, CLEAN_OPTION, 99);
   }
 
   @Test
   public void onMenuOptionClicked_not_clean_option() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, GRIMY_GUAM_LEAF, true, "not clean", 99);
+    onMenuOptionClicked_test(INVALID_ITEM_ID, UNIDENTIFIED_GUAM, true, "not clean", 99);
   }
 
   @Test
   public void onMenuOptionClicked_not_a_herb() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, FIRE_CAPE, true, CLEAN_OPTION, 99);
+    onMenuOptionClicked_test(INVALID_ITEM_ID, TZHAAR_CAPE_FIRE, true, CLEAN_OPTION, 99);
   }
 
   @Test
   public void onMenuOptionClicked_too_low_level() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, GRIMY_GUAM_LEAF, true, CLEAN_OPTION, 1);
+    onMenuOptionClicked_test(INVALID_ITEM_ID, UNIDENTIFIED_GUAM, true, CLEAN_OPTION, 1);
   }
 
   private void onMenuOptionClicked_test(int stateItemId, int itemId, boolean hasWidget, String menuEntryOption, int level) {
