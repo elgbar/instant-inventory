@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,48 +25,36 @@
  *
  */
 
-package no.elg.ii.feature;
+package no.elg.ii.feature.state;
 
-import com.google.common.annotations.VisibleForTesting;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.elg.ii.feature.features.CleanHerbFeature;
-import no.elg.ii.feature.features.DepositFeature;
-import no.elg.ii.feature.features.DropFeature;
-import no.elg.ii.feature.features.EquipFeature;
-import no.elg.ii.feature.features.InstantPrayer;
-import no.elg.ii.feature.features.WithdrawFeature;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
+import net.runelite.api.gameval.VarbitID;
+import no.elg.ii.service.VarService;
 
+@Slf4j
 @Singleton
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-public final class Features {
+public class PrayerState implements FeatureState {
 
   @Inject
-  @VisibleForTesting
-  private DropFeature dropFeature;
+  Client client;
 
   @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
+  VarService varService;
 
-  @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
+  public long prayerState;
 
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
+  @Override
+  public void resetAll() {
+    prayerState = 0L;
+  }
 
-  @Inject
-  @VisibleForTesting
-  private WithdrawFeature withdrawFeature;
-
-  @Inject
-  @VisibleForTesting
-  private InstantPrayer instantPrayer;
+  @Override
+  public void validateAll() {
+    prayerState = varService.varbitValue(VarbitID.PRAYER_ALLACTIVE);
+  }
 }

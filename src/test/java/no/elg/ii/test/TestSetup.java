@@ -44,6 +44,7 @@ import no.elg.ii.feature.features.CleanHerbFeature;
 import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
 import no.elg.ii.feature.features.EquipFeature;
+import no.elg.ii.feature.features.InstantPrayer;
 import no.elg.ii.feature.features.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.InventoryService;
@@ -79,6 +80,11 @@ public class TestSetup {
 
   public static WithdrawFeature createNewWithdrawFeature() {
     WithdrawFeature feature = spy(new WithdrawFeature());
+    return feature;
+  }
+
+  public static InstantPrayer createNewInstantPrayer() {
+    InstantPrayer feature = spy(new InstantPrayer());
     return feature;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,48 +25,27 @@
  *
  */
 
-package no.elg.ii.feature;
+package no.elg.ii.model;
 
-import com.google.common.annotations.VisibleForTesting;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import no.elg.ii.feature.features.CleanHerbFeature;
-import no.elg.ii.feature.features.DepositFeature;
-import no.elg.ii.feature.features.DropFeature;
-import no.elg.ii.feature.features.EquipFeature;
-import no.elg.ii.feature.features.InstantPrayer;
-import no.elg.ii.feature.features.WithdrawFeature;
+import static no.elg.ii.model.PrayerConflict.PRAYER_TO_BIT;
+import static org.junit.Assert.assertEquals;
 
-@Singleton
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class Features {
+import java.util.Arrays;
+import net.runelite.api.Prayer;
+import org.junit.Test;
 
-  @Inject
-  @VisibleForTesting
-  private DropFeature dropFeature;
+public class PrayerConflictTest {
 
-  @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
+  @Test
+  public void toConflictLongTest() {
+    int conflictLong = PrayerConflict.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
+    assertEquals(PRAYER_TO_BIT.get(Prayer.THICK_SKIN) | PRAYER_TO_BIT.get(Prayer.ROCK_SKIN), conflictLong);
+  }
 
-  @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
-
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
-
-  @Inject
-  @VisibleForTesting
-  private WithdrawFeature withdrawFeature;
-
-  @Inject
-  @VisibleForTesting
-  private InstantPrayer instantPrayer;
+  @Test
+  public void prayerBitToPrayerTest() {
+    int conflictLong = PrayerConflict.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
+    var actual = PrayerConflict.prayerBitToPrayer(conflictLong);
+    assertEquals(Arrays.asList(Prayer.THICK_SKIN, Prayer.ROCK_SKIN), actual);
+  }
 }

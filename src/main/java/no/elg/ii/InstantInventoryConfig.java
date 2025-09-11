@@ -130,6 +130,17 @@ public interface InstantInventoryConfig extends Config {
     return true;
   }
 
+  @ConfigItem(
+    keyName = WITHDRAW_CONFIG_KEY,
+    section = FEATURE_SECTION,
+    name = "Prayer Switch Instantly",
+    description = "Switch prayers instantly",
+    position = 5
+  )
+  default boolean instantPrayer() {
+    return true;
+  }
+
 
   /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
