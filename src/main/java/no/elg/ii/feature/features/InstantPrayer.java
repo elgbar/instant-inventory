@@ -59,7 +59,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Prayer;
 import net.runelite.api.ScriptEvent;
-import net.runelite.api.events.ClientTick;
+import net.runelite.api.Skill;
+import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.gameval.InterfaceID;
@@ -95,8 +96,8 @@ public class InstantPrayer implements Feature {
     PrayerConflict.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE), //
   };
 
-  @Subscribe(priority = Integer.MIN_VALUE)
-  public void onClientTick(ClientTick event) {
+  @Subscribe
+  public void onBeforeRender(BeforeRender event) {
     render();
   }
 
