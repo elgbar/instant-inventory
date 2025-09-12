@@ -72,20 +72,14 @@ import net.runelite.api.gameval.InterfaceID;
 @NoArgsConstructor
 public final class PrayerConflict {
 
-  //  public static Map<Integer, Integer> PRAYER_VARBIT_TO_BIT = new HashMap<>(Prayer.values().length);
   public final static Map<Prayer, Integer> PRAYER_TO_BIT;
   public final static Map<Prayer, Integer> PRAYER_TO_INTERFACE;
 
   public final static Map<Integer, Prayer> BIT_TO_PRAYER;
   public final static Map<Integer, Prayer> INTERFACE_TO_PRAYER;
 
-//  public static Map<Integer, Integer> PRAYER_VARBIT_TO_CONFLICTS = new HashMap<>(Prayer.values().length);
-//  public static Map<Prayer, Integer> PRAYER_TO_CONFLICTS;
-
-
   static {
     PRAYER_TO_BIT = setupPrayerToBit();
-//    PRAYER_TO_CONFLICTS = setupPrayerToConflicts();
     PRAYER_TO_INTERFACE = setupPrayerToInterface();
 
     // Create reverse lookup map
@@ -130,38 +124,18 @@ public final class PrayerConflict {
 
     prayerToBit.put(MYSTIC_MIGHT, 1 << 23);
     prayerToBit.put(MYSTIC_VIGOUR, 1 << 23); // Intentional overlap with MYSTIC_MIGHT
-    //TODO fill in members only prayers
 
-//    prayerToBit.put(RETRIBUTION, 1L << );
-//    prayerToBit.put(REDEMPTION, 1L << );
-//    prayerToBit.put(SMITE, 1L << );
-//    prayerToBit.put(PRESERVE, 1L << );
-//
-//    prayerToBit.put(CHIVALRY, 1L << );
-//    prayerToBit.put(PIETY, 1L << );
-//    prayerToBit.put(RIGOUR, 1L << );
-//    prayerToBit.put(AUGURY, 1L << );
+    prayerToBit.put(RETRIBUTION, 1 << 15);
+    prayerToBit.put(REDEMPTION, 1 << 16);
+    prayerToBit.put(SMITE, 1 << 17);
+    prayerToBit.put(PRESERVE, 1 << 28);
+
+    prayerToBit.put(CHIVALRY, 1 << 25);
+    prayerToBit.put(PIETY, 1 << 26);
+    prayerToBit.put(RIGOUR, 1 << 24);
+    prayerToBit.put(AUGURY, 1 << 27);
     return prayerToBit;
   }
-
-//  private static Map<Prayer, Integer> setupPrayerToConflicts() {
-//    Map<Prayer, Integer> prayerToConflicts = new EnumMap<>(Prayer.class);
-//    prayerToConflicts.put(THICK_SKIN, toConflictLong(ROCK_SKIN, STEEL_SKIN));
-//    prayerToConflicts.put(ROCK_SKIN, toConflictLong(THICK_SKIN, STEEL_SKIN));
-//    prayerToConflicts.put(STEEL_SKIN, toConflictLong(ROCK_SKIN, THICK_SKIN));
-//
-//    prayerToConflicts.put(BURST_OF_STRENGTH, toConflictLong(SHARP_EYE, MYSTIC_WILL, SUPERHUMAN_STRENGTH, HAWK_EYE, MYSTIC_LORE, ULTIMATE_STRENGTH, EAGLE_EYE, MYSTIC_MIGHT));
-//    prayerToConflicts.put(SHARP_EYE, toConflictLong(BURST_OF_STRENGTH, MYSTIC_WILL, SUPERHUMAN_STRENGTH, HAWK_EYE, MYSTIC_LORE, ULTIMATE_STRENGTH, EAGLE_EYE, MYSTIC_MIGHT));
-//    prayerToConflicts.put(MYSTIC_WILL, toConflictLong(BURST_OF_STRENGTH, SHARP_EYE, SUPERHUMAN_STRENGTH, HAWK_EYE, MYSTIC_LORE, ULTIMATE_STRENGTH, EAGLE_EYE, MYSTIC_MIGHT));
-//    prayerToConflicts.put(SUPERHUMAN_STRENGTH, toConflictLong(BURST_OF_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, ULTIMATE_STRENGTH, EAGLE_EYE, MYSTIC_MIGHT));
-//    prayerToConflicts.put(HAWK_EYE, toConflictLong(BURST_OF_STRENGTH, SHARP_EYE, MYSTIC_WILL, SUPERHUMAN_STRENGTH, MYSTIC_LORE, ULTIMATE_STRENGTH, EAGLE_EYE, MYSTIC_MIGHT));
-//    prayerToConflicts.put(MYSTIC_LORE, toConflictLong(BURST_OF_STRENGTH, SHARP_EYE, MYSTIC_WILL, SUPERHUMAN_STRENGTH, HAWK_EYE, ULTIMATE_STRENGTH, EAGLE_EYE, MYSTIC_MIGHT));
-//    prayerToConflicts.put(ULTIMATE_STRENGTH, toConflictLong(BURST_OF_STRENGTH, SHARP_EYE, MYSTIC_WILL, SUPERHUMAN_STRENGTH, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT));
-//    prayerToConflicts.put(EAGLE_EYE, toConflictLong(BURST_OF_STRENGTH, SHARP_EYE, MYSTIC_WILL, SUPERHUMAN_STRENGTH, HAWK_EYE, MYSTIC_LORE, ULTIMATE_STRENGTH, MYSTIC_MIGHT));
-//    prayerToConflicts.put(MYSTIC_MIGHT, toConflictLong(BURST_OF_STRENGTH, SHARP_EYE, MYSTIC_WILL, SUPERHUMAN_STRENGTH, HAWK_EYE, MYSTIC_LORE, ULTIMATE_STRENGTH, EAGLE_EYE));
-//
-//    return prayerToConflicts;
-//  }
 
   private static Map<Prayer, Integer> setupPrayerToInterface() {
     Map<Prayer, Integer> prayerToInterface = new EnumMap<>(Prayer.class);
