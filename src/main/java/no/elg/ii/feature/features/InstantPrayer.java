@@ -111,7 +111,8 @@ public class InstantPrayer implements Feature {
     if (event.getScriptId() == 462) {
       ScriptEvent scriptEvent = event.getScriptEvent();
       Widget src = scriptEvent.getSource();
-      if (src != null) {
+      int prayerLeft = client.getBoostedSkillLevel(Skill.PRAYER);
+      if (src != null && prayerLeft > 0) {
         var prayer = INTERFACE_TO_PRAYER.get(src.getId());
         if (prayer != null) {
           int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
