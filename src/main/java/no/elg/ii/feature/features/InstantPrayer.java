@@ -27,10 +27,13 @@
 
 package no.elg.ii.feature.features;
 
+import static net.runelite.api.gameval.VarbitID.QUICKPRAYER_ACTIVE;
+import static net.runelite.api.gameval.VarbitID.QUICKPRAYER_SELECTED;
 import static no.elg.ii.model.PrayerInfo.INTERFACE_TO_PRAYER;
 import static no.elg.ii.model.PrayerInfo.PRAYER_TO_BIT;
 
 import java.util.Map;
+import java.util.function.IntBinaryOperator;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
@@ -44,12 +47,14 @@ import net.runelite.api.Skill;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.state.PrayerState;
 import no.elg.ii.model.PrayerInfo;
+import no.elg.ii.service.VarService;
 
 @Slf4j
 @Singleton
@@ -77,7 +82,10 @@ public class InstantPrayer implements Feature {
   private PrayerState state;
 
   @Inject
-  Client client;
+  private Client client;
+
+  @Inject
+  private VarService varService;
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
@@ -89,9 +97,12 @@ public class InstantPrayer implements Feature {
     state.validateAll();
   }
 
+  private static final IntBinaryOperator TOGGLE_OP = (prayerState, bit) -> prayerState ^ bit;
+  private static final IntBinaryOperator ENABLE_OP = (prayerState, bit) -> prayerState | bit;
+
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
-    if (event.getScriptId() == TOGGLE_PRAYER_SCRIPT_ID) {
+    if (event.getScriptId() == TOGGLE_PRAYER_SCRIPT_ID || event.getScriptId() == 455) { //TODO why does adding 455 help (but only a bit) with quick prayers?
       ScriptEvent scriptEvent = event.getScriptEvent();
       Widget src = scriptEvent.getSource();
       if (src != null && hasPrayer()) {
@@ -99,16 +110,56 @@ public class InstantPrayer implements Feature {
         if (prayer != null) {
           int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
           if (prayerBit != 0) {
-            int prayerState = state.getPrayerState();
-            //Toggle the prayer
-            int newValue = prayerState ^ prayerBit;
-            int updateValue = update(newValue);
-            log.debug("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}", client.getTickCount(), prayer, Integer.toBinaryString(prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
-            state.setPrayerState(updateValue);
+            updateBit(prayerBit, TOGGLE_OP);
           }
         }
       }
     }
+  }
+
+  @Subscribe
+  public void onVarbitChanged(final VarbitChanged event) {
+    if (event.getVarbitId() == QUICKPRAYER_ACTIVE && hasPrayer()) {
+      int quickPrayerBits = varService.varbitValue(QUICKPRAYER_SELECTED);
+      if (varService.isVarbitTrue(QUICKPRAYER_ACTIVE)) {
+        // turn on quick prayers, conflicting prayers will be automatically turned off by update
+        log.debug("[{}] Quick prayer toggled on: quick prayers {}", client.getTickCount(), Integer.toBinaryString(quickPrayerBits));
+        updateAllBits(quickPrayerBits, (prayerState, bit) -> prayerState | bit);
+      } else {
+        log.debug("[{}] Quick prayer toggled off. Will disable all prayers", client.getTickCount());
+        // turn off quick prayers and conflicting prayers
+        state.setPrayerState(0);
+      }
+    }
+  }
+
+  /**
+   * Update all bits by {@code op}, one at a time so that conflicts, and the ui updated are resolved correctly
+   */
+  private void updateAllBits(int prayerBits, @NonNull IntBinaryOperator op) {
+    var prayers = PrayerInfo.prayerBitsToPrayers(prayerBits);
+    for (Prayer prayer : prayers) {
+      int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
+      if (prayerBit != 0) {
+        updateBit(prayerBit, op);
+      }
+    }
+  }
+
+  /**
+   * Update a single prayer bit using the provided operator.
+   *
+   * @param prayerBit The prayer bit to update. Must only have one bit set.
+   * @param op        How to update {@code prayerBit}
+   * @see PrayerInfo#PRAYER_TO_BIT
+   */
+  private void updateBit(int prayerBit, @NonNull IntBinaryOperator op) {
+    assert Integer.bitCount(prayerBit) == 1;
+    int prayerState = state.getPrayerState();
+    int newValue = op.applyAsInt(prayerState, prayerBit);
+    int updateValue = update(newValue);
+    state.setPrayerState(updateValue);
+    log.debug("[{}] Toggled prayer: old state {}, new value {}, updated value {}", client.getTickCount(), Integer.toBinaryString(prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
   }
 
   private boolean hasPrayer() {
@@ -156,21 +207,21 @@ public class InstantPrayer implements Feature {
           // This &-ing will disable multiple prayers at once
           nextState &= resolvedStatus;
         }
-        log.debug("[{}] current state {}, diff state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(resolvedStatus));
+        log.debug("[{} | update] current state {}, diff state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(resolvedStatus));
       }
     }
     if (nextState == UNCHANGED_PRAYER_STATE) {
+      log.debug("[{} | update] no conflicts detected, final state will be input", client.getTickCount());
       // No conflicts found, assume the new state is correct
       // This is needed when turning on the first prayer in a conflict group
       nextState = tweakedState;
     }
-    log.debug("[{}] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
+    log.debug("[{} | update] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
     return nextState;
   }
 
   /**
    * Modify whether the prayer book is active based on the internal prayer state.
-   *
    */
   private void render() {
     assert client.isClientThread();

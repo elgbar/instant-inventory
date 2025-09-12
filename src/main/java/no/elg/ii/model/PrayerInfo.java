@@ -66,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import net.runelite.api.Client;
 import net.runelite.api.Prayer;
 import net.runelite.api.gameval.InterfaceID;
@@ -78,6 +79,7 @@ public final class PrayerInfo {
    * Mapping to find the bit for a prayer
    */
   public final static Map<Prayer, Integer> PRAYER_TO_BIT;
+  public final static Map<Prayer, Integer> PRAYER_TO_BIT_CONFLICTS;
 
   /**
    * Mapping to find the interface ID for a prayer
@@ -115,6 +117,27 @@ public final class PrayerInfo {
     for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_INTERFACE.entrySet()) {
       INTERFACE_TO_PRAYER.put(entry.getValue(), entry.getKey());
     }
+
+    PRAYER_TO_BIT_CONFLICTS = setupPrayerToBitConflicts();
+  }
+
+
+  /**
+   * Get all bits that conflict with the given prayer. Including the prayer itself.
+   */
+  private static Map<Prayer, Integer> setupPrayerToBitConflicts() {
+    Map<Prayer, Integer> prayerToBit = new EnumMap<>(Prayer.class);
+    for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_BIT.entrySet()) {
+      int conflictingBits = 0;
+      int prayerBit = entry.getValue();
+      for (int conflictingPrayer : CONFLICTING_PRAYERS) {
+        if ((prayerBit & conflictingPrayer) != 0) {
+          conflictingBits |= conflictingPrayer;
+        }
+      }
+      prayerToBit.put(entry.getKey(), conflictingBits);
+    }
+    return prayerToBit;
   }
 
   /**
@@ -208,7 +231,7 @@ public final class PrayerInfo {
   }
 
   public static List<Prayer> prayerBitsToPrayers(int prayerBits) {
-    List<Prayer> prayers = new ArrayList<>(Integer.bitCount(prayerBits));
+    List<Prayer> prayers = new ArrayList<>(Math.min(PRAYER_TO_BIT.size(), Integer.bitCount(prayerBits)));
 
     for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_BIT.entrySet()) {
       if ((prayerBits & entry.getValue()) != 0) {
@@ -224,7 +247,7 @@ public final class PrayerInfo {
    *
    * @return The bits of each prayer combined with bitwise OR
    */
-  public static int prayerToBits(Prayer... prayers) {
+  public static int prayerToBits(@NonNull Prayer... prayers) {
     return Stream.of(prayers).mapToInt(PRAYER_TO_BIT::get).reduce(0, (a, b) -> a | b);
   }
 }
