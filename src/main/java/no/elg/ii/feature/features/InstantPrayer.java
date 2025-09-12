@@ -45,8 +45,8 @@ import static net.runelite.api.Prayer.STEEL_SKIN;
 import static net.runelite.api.Prayer.SUPERHUMAN_STRENGTH;
 import static net.runelite.api.Prayer.THICK_SKIN;
 import static net.runelite.api.Prayer.ULTIMATE_STRENGTH;
-import static no.elg.ii.model.PrayerConflict.INTERFACE_TO_PRAYER;
-import static no.elg.ii.model.PrayerConflict.PRAYER_TO_BIT;
+import static no.elg.ii.model.PrayerInfo.INTERFACE_TO_PRAYER;
+import static no.elg.ii.model.PrayerInfo.PRAYER_TO_BIT;
 
 import java.util.Map;
 import javax.inject.Inject;
@@ -67,7 +67,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.state.PrayerState;
-import no.elg.ii.model.PrayerConflict;
+import no.elg.ii.model.PrayerInfo;
 
 @Slf4j
 @Singleton
@@ -98,16 +98,20 @@ public class InstantPrayer implements Feature {
   Client client;
 
   public int[] conflicting = { //
-    PrayerConflict.toConflictInt(THICK_SKIN, ROCK_SKIN, STEEL_SKIN), //
-    PrayerConflict.toConflictInt(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
-    PrayerConflict.toConflictInt(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
-    PrayerConflict.toConflictInt(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
-    PrayerConflict.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE), //
+    PrayerInfo.toConflictInt(THICK_SKIN, ROCK_SKIN, STEEL_SKIN), //
+    PrayerInfo.toConflictInt(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
+    PrayerInfo.toConflictInt(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
+    PrayerInfo.toConflictInt(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT), //
+    PrayerInfo.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE), //
   };
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
     render();
+  }
+
+  private boolean hasPrayer() {
+    return client.getBoostedSkillLevel(Skill.PRAYER) > 0;
   }
 
   @Subscribe
@@ -120,8 +124,7 @@ public class InstantPrayer implements Feature {
     if (event.getScriptId() == TOGGLE_PRAYER_SCRIPT_ID) {
       ScriptEvent scriptEvent = event.getScriptEvent();
       Widget src = scriptEvent.getSource();
-      int prayerLeft = client.getBoostedSkillLevel(Skill.PRAYER);
-      if (src != null && prayerLeft > 0) {
+      if (src != null && hasPrayer()) {
         var prayer = INTERFACE_TO_PRAYER.get(src.getId());
         if (prayer != null) {
           int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);

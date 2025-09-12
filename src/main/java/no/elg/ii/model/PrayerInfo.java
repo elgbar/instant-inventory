@@ -70,7 +70,7 @@ import net.runelite.api.Prayer;
 import net.runelite.api.gameval.InterfaceID;
 
 @NoArgsConstructor
-public final class PrayerConflict {
+public final class PrayerInfo {
 
   public final static Map<Prayer, Integer> PRAYER_TO_BIT;
   public final static Map<Prayer, Integer> PRAYER_TO_INTERFACE;
@@ -192,7 +192,7 @@ public final class PrayerConflict {
 
   /**
    *
-   * Note: must not be called before {@link PrayerConflict::PRAYER_TO_BIT} is populated
+   * Note: must not be called before {@link PrayerInfo ::PRAYER_TO_BIT} is populated
    *
    * @return The bits of each prayer combined with bitwise OR
    */

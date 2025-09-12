@@ -27,25 +27,25 @@
 
 package no.elg.ii.model;
 
-import static no.elg.ii.model.PrayerConflict.PRAYER_TO_BIT;
+import static no.elg.ii.model.PrayerInfo.PRAYER_TO_BIT;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import net.runelite.api.Prayer;
 import org.junit.Test;
 
-public class PrayerConflictTest {
+public class PrayerInfoTest {
 
   @Test
   public void toConflictLongTest() {
-    int conflictLong = PrayerConflict.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
+    int conflictLong = PrayerInfo.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
     assertEquals(PRAYER_TO_BIT.get(Prayer.THICK_SKIN) | PRAYER_TO_BIT.get(Prayer.ROCK_SKIN), conflictLong);
   }
 
   @Test
   public void prayerBitToPrayerTest() {
-    int conflictLong = PrayerConflict.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
-    var actual = PrayerConflict.prayerBitToPrayer(conflictLong);
+    int conflictLong = PrayerInfo.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
+    var actual = PrayerInfo.prayerBitToPrayer(conflictLong);
     assertEquals(Arrays.asList(Prayer.THICK_SKIN, Prayer.ROCK_SKIN), actual);
   }
 }
