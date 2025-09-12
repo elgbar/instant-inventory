@@ -60,6 +60,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Prayer;
 import net.runelite.api.ScriptEvent;
 import net.runelite.api.events.ClientTick;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
@@ -97,6 +98,11 @@ public class InstantPrayer implements Feature {
   @Subscribe(priority = Integer.MIN_VALUE)
   public void onClientTick(ClientTick event) {
     render();
+  }
+
+  @Subscribe
+  public void onGameTick(final GameTick event) {
+    state.validateAll();
   }
 
   @Subscribe

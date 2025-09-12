@@ -28,17 +28,13 @@
 package no.elg.ii.feature.state;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.service.VarService;
 
 @Slf4j
-@Singleton
 @NoArgsConstructor
 public class PrayerState implements FeatureState {
 
@@ -50,10 +46,6 @@ public class PrayerState implements FeatureState {
 
   public int prayerState;
 
-  @Subscribe
-  public void onGameTick(final GameTick event) {
-    validateAll();
-  }
 
   @Override
   public void resetAll() {
