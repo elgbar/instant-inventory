@@ -115,19 +115,16 @@ public class InstantPrayer implements Feature {
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
-    assert client.isClientThread();
     render();
   }
 
   @Subscribe
   public void onGameTick(final GameTick event) {
-    assert client.isClientThread();
     state.validateAll();
   }
 
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
-    assert client.isClientThread();
     if (event.getScriptId() == TOGGLE_PRAYER_SCRIPT_ID) {
       ScriptEvent scriptEvent = event.getScriptEvent();
       Widget src = scriptEvent.getSource();
