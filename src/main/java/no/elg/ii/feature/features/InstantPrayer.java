@@ -47,7 +47,6 @@ import static net.runelite.api.Prayer.THICK_SKIN;
 import static net.runelite.api.Prayer.ULTIMATE_STRENGTH;
 import static no.elg.ii.model.PrayerConflict.INTERFACE_TO_PRAYER;
 import static no.elg.ii.model.PrayerConflict.PRAYER_TO_BIT;
-import static no.elg.ii.model.PrayerConflict.PRAYER_TO_INTERFACE;
 
 import java.util.Map;
 import javax.inject.Inject;
@@ -69,7 +68,6 @@ import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.state.PrayerState;
 import no.elg.ii.model.PrayerConflict;
-import no.elg.ii.service.VarService;
 
 @Slf4j
 @Singleton
@@ -78,12 +76,23 @@ public class InstantPrayer implements Feature {
 
   public static final String PRAYER_CONFIG_KEY = "instantPrayer";
 
+  /**
+   * Index of the background/highlight widget for a prayer
+   */
+  private static final int BACKGROUND_PRAYER_INDEX = 0;
+
+  /**
+   * Indicates that no prayer change was made during an update.
+   * <p>
+   * Should be safe to use as there should never be a state where all bits are on.
+   */
+  private static final int UNCHANGED_PRAYER_STATE = Integer.MAX_VALUE;
+
+  private static final int TOGGLE_PRAYER_SCRIPT_ID = 462;
+
   @Inject
   @Getter
   private PrayerState state;
-
-  @Inject
-  VarService varService;
 
   @Inject
   Client client;
@@ -108,7 +117,7 @@ public class InstantPrayer implements Feature {
 
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
-    if (event.getScriptId() == 462) {
+    if (event.getScriptId() == TOGGLE_PRAYER_SCRIPT_ID) {
       ScriptEvent scriptEvent = event.getScriptEvent();
       Widget src = scriptEvent.getSource();
       int prayerLeft = client.getBoostedSkillLevel(Skill.PRAYER);
@@ -120,7 +129,7 @@ public class InstantPrayer implements Feature {
             //Toggle the prayer
             int newValue = state.prayerState ^ prayerBit;
             int updateValue = update(newValue);
-            log.warn("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}", client.getTickCount(), prayer, Integer.toBinaryString(state.prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
+            log.debug("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}", client.getTickCount(), prayer, Integer.toBinaryString(state.prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
             state.prayerState = updateValue;
           }
         }
@@ -128,59 +137,85 @@ public class InstantPrayer implements Feature {
     }
   }
 
-  int update(int newValue) {
+  /**
+   * Update the prayer state, making sure no conflicting prayers are active at the same time.
+   *
+   * @param tweakedState The new prayer state. Must be only bit different from the current state.
+   * @return The corrected prayer state
+   */
+  private int update(int tweakedState) {
     assert client.isClientThread();
-    int active = state.prayerState;
-    for (int conflictMask : conflicting) {
-      int maskedNewValue = newValue & conflictMask;
-      if (Integer.bitCount(maskedNewValue) > 1) {
-        //There are some conflicts
-        //remove the conflicting prayers by using the old value
-        int maskedOldValue = active & conflictMask;
-        togglePrayerUI(maskedOldValue, true);
-        int correctedValue = maskedNewValue & ~maskedOldValue;
-        togglePrayerUI(correctedValue, false);
-        active = (active & ~conflictMask) | correctedValue;
+    int initState = state.prayerState;
+    //Only one bit should be different
+    assert Math.abs(Integer.bitCount(tweakedState) - Integer.bitCount(initState)) <= 1;
+
+    int[] conflictResolvedStatus = new int[conflicting.length];
+    for (int i = 0, conflictingLength = conflicting.length; i < conflictingLength; i++) {
+      int conflictMask = conflicting[i];
+      int maskedTweakedValue = tweakedState & conflictMask;
+      if (Integer.bitCount(maskedTweakedValue) > 1) {
+        //There are at least two conflicts, remove the conflicting prayers by using the old value
+        // Keep only those active that are in the conflict mask
+        int maskedInitState = initState & conflictMask;
+        // Show only the one that was not active before
+        int correctedValue = maskedTweakedValue & ~maskedInitState;
+        // Disable all conflicting prayers in the group and enable the corrected value
+        conflictResolvedStatus[i] = (initState & ~conflictMask) | correctedValue;
       }
     }
-    if (active != state.prayerState) {
-      return active;
-    } else {
-      return newValue;
-    }
-  }
 
-  void render() {
-    Widget prayerContainer = client.getWidget(InterfaceID.Prayerbook.CONTAINER);
-    if (prayerContainer != null && !prayerContainer.isHidden()) {
-      for (Map.Entry<Integer, Prayer> entry : INTERFACE_TO_PRAYER.entrySet()) {
-        int prayerWidgetId = entry.getKey();
-        Prayer prayer = entry.getValue();
-        int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
-        Widget prayerWidget = client.getWidget(prayerWidgetId);
-
-        if (prayerWidget != null && prayerBit != 0) {
-          var child = prayerWidget.getChild(0);
-          if (child != null) {
-            // prayer is hidden when the bit is not set in the prayer state
-            boolean hidden = (prayerBit & state.prayerState) == 0;
-            child.setHidden(hidden);
-          }
+    int nextState = UNCHANGED_PRAYER_STATE;
+    for (int resolvedStatus : conflictResolvedStatus) {
+      // If no resolvedStatus is set it will be 0, so skip it
+      if (resolvedStatus != 0) {
+        if (nextState == UNCHANGED_PRAYER_STATE) {
+          // First conflicting group will be the initial status.
+          // This cannot be `initState` because a bit might be enabled and that would be removed by &-ing the `resolvedStatus` with `initState`
+          nextState = resolvedStatus;
+        } else {
+          // Handles multiple conflict groups, e.g. if you enable BURST_OF_STRENGTH + CLARITY_OF_THOUGHT are enabled, and you enable SHARP_EYE
+          // Both the BURST_OF_STRENGTH group and CLARITY_OF_THOUGHT should be disabled, while SHARP_EYE should be enabled
+          // This &-ing will disable multiple prayers at once
+          nextState &= resolvedStatus;
         }
+        log.debug("[{}] current state {}, diff state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(resolvedStatus));
       }
+    }
+    log.debug("[{}] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
+
+    if (nextState == UNCHANGED_PRAYER_STATE) {
+      // No conflicts found, assume the new state is correct
+      // This is needed when turning on the first prayer in a conflict group
+      return tweakedState;
+    } else {
+      // We modified the existing state, something was probably turned off
+      return nextState;
     }
   }
 
-  public void togglePrayerUI(int mask, boolean hidden) {
-    var prayers = PrayerConflict.prayerBitToPrayer(mask);
-    for (var prayer : prayers) {
-      int interfaceid = PRAYER_TO_INTERFACE.getOrDefault(prayer, 0);
-      if (interfaceid != 0) {
-        Widget widget = client.getWidget(interfaceid);
-        if (widget != null) {
-          Widget child = widget.getChild(0);
-          if (child != null) {
-            child.setHidden(hidden);
+  /**
+   * Modify whether the prayer book is active based on the internal prayer state.
+   *
+   */
+  void render() {
+    //Only update background widget when prayers was or is active
+    // The lastPrayerState is needed to make sure we disable the prayers when they are turned off
+    if ((state.prayerState != 0 || state.lastPrayerState != 0)) {
+      Widget prayerContainer = client.getWidget(InterfaceID.Prayerbook.CONTAINER);
+      if (prayerContainer != null && !prayerContainer.isHidden()) {
+        for (Map.Entry<Integer, Prayer> entry : INTERFACE_TO_PRAYER.entrySet()) {
+          int prayerBit = PRAYER_TO_BIT.getOrDefault(entry.getValue(), 0);
+          if (prayerBit != 0) {
+            int prayerWidgetId = entry.getKey();
+            Widget prayerWidget = client.getWidget(prayerWidgetId);
+            if (prayerWidget != null) {
+              Widget backgroundWidget = prayerWidget.getChild(BACKGROUND_PRAYER_INDEX);
+              if (backgroundWidget != null) {
+                // prayer is hidden when the bit is not set in the prayer state
+                boolean hidden = (prayerBit & state.prayerState) == 0;
+                backgroundWidget.setHidden(hidden);
+              }
+            }
           }
         }
       }

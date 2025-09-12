@@ -30,7 +30,6 @@ package no.elg.ii.feature.state;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
 import net.runelite.api.gameval.VarbitID;
 import no.elg.ii.service.VarService;
 
@@ -39,21 +38,28 @@ import no.elg.ii.service.VarService;
 public class PrayerState implements FeatureState {
 
   @Inject
-  Client client;
-
-  @Inject
   VarService varService;
 
-  public int prayerState;
+  /**
+   * Last tick server prayer state. Might be modified by client
+   */
+  public int lastPrayerState;
 
+  /**
+   * Current server prayer state.  Might be modified by client
+   */
+  public int prayerState;
 
   @Override
   public void resetAll() {
-    prayerState = 0;
+    validateAll();
+    // Keep to record of last state on reset
+    prayerState = lastPrayerState;
   }
 
   @Override
   public void validateAll() {
+    lastPrayerState = prayerState;
     prayerState = varService.varbitValue(VarbitID.PRAYER_ALLACTIVE);
   }
 }
