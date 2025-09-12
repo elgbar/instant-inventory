@@ -28,38 +28,67 @@
 package no.elg.ii.feature.state;
 
 import javax.inject.Inject;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.gameval.VarbitID;
-import no.elg.ii.service.VarService;
+import no.elg.ii.InstantInventoryConfig;
 
 @Slf4j
 @NoArgsConstructor
 public class PrayerState implements FeatureState {
 
   @Inject
-  VarService varService;
+  Client client;
+
+  @Inject
+  InstantInventoryConfig pluginConfig;
 
   /**
    * Last tick server prayer state. Might be modified by client
    */
-  public int lastPrayerState;
+  @Getter
+  private int lastPrayerState;
 
   /**
    * Current server prayer state.  Might be modified by client
    */
-  public int prayerState;
+  @Getter
+  private int prayerState;
+
+  private long lastManuallyModified;
+
+  public void setPrayerState(int state) {
+    this.prayerState = state;
+    lastManuallyModified = System.currentTimeMillis();
+  }
 
   @Override
   public void resetAll() {
-    validateAll();
+    prayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
     // Keep to record of last state on reset
-    prayerState = lastPrayerState;
+    lastPrayerState = prayerState;
   }
 
   @Override
   public void validateAll() {
-    lastPrayerState = prayerState;
-    prayerState = varService.varbitValue(VarbitID.PRAYER_ALLACTIVE);
+    if (shouldRevalidate()) {
+      lastPrayerState = prayerState;
+      prayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    } else {
+      // Skip reading server value as it likely does not reflect the clicked state.
+      // This will prevent flickering of prayer icons when clicking fast on multiple conflicting prayers
+      log.debug("Skipping prayer state revalidation, a manual modification was done ~ {} ms ago. Must wait at least {} ms", System.currentTimeMillis() - lastManuallyModified, pluginConfig.minChangedMs());
+    }
   }
+
+  /**
+   *
+   * @return Whether we should revalidate the state from server. This is to avoid overwriting manual changes too early
+   */
+  private boolean shouldRevalidate() {
+    return System.currentTimeMillis() - lastManuallyModified >= pluginConfig.minChangedMs();
+  }
+
 }

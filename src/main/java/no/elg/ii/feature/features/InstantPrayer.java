@@ -97,14 +97,7 @@ public class InstantPrayer implements Feature {
 
   private static final int TOGGLE_PRAYER_SCRIPT_ID = 462;
 
-  @Inject
-  @Getter
-  private PrayerState state;
-
-  @Inject
-  Client client;
-
-  public int[] conflicting = { //
+  public static final int[] conflicting = { //
     PrayerInfo.toConflictInt(THICK_SKIN, ROCK_SKIN, STEEL_SKIN, CHIVALRY, PIETY, RIGOUR, AUGURY), //
     PrayerInfo.toConflictInt(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
     PrayerInfo.toConflictInt(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
@@ -113,22 +106,28 @@ public class InstantPrayer implements Feature {
     PrayerInfo.toConflictInt(CHIVALRY, PIETY, RIGOUR, AUGURY), //
   };
 
+  @Inject
+  @Getter
+  private PrayerState state;
+
+  @Inject
+  Client client;
+
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
+    assert client.isClientThread();
     render();
-  }
-
-  private boolean hasPrayer() {
-    return client.getBoostedSkillLevel(Skill.PRAYER) > 0;
   }
 
   @Subscribe
   public void onGameTick(final GameTick event) {
+    assert client.isClientThread();
     state.validateAll();
   }
 
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
+    assert client.isClientThread();
     if (event.getScriptId() == TOGGLE_PRAYER_SCRIPT_ID) {
       ScriptEvent scriptEvent = event.getScriptEvent();
       Widget src = scriptEvent.getSource();
@@ -137,15 +136,20 @@ public class InstantPrayer implements Feature {
         if (prayer != null) {
           int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
           if (prayerBit != 0) {
+            int prayerState = state.getPrayerState();
             //Toggle the prayer
-            int newValue = state.prayerState ^ prayerBit;
+            int newValue = prayerState ^ prayerBit;
             int updateValue = update(newValue);
-            log.debug("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}", client.getTickCount(), prayer, Integer.toBinaryString(state.prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
-            state.prayerState = updateValue;
+            log.debug("[{}] Toggled prayer {}, old state {}, new value {}, updated value {}", client.getTickCount(), prayer, Integer.toBinaryString(prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
+            state.setPrayerState(updateValue);
           }
         }
       }
     }
+  }
+
+  private boolean hasPrayer() {
+    return client.getBoostedSkillLevel(Skill.PRAYER) > 0;
   }
 
   /**
@@ -156,7 +160,7 @@ public class InstantPrayer implements Feature {
    */
   private int update(int tweakedState) {
     assert client.isClientThread();
-    int initState = state.prayerState;
+    int initState = state.getPrayerState();
     //Only one bit should be different
     assert Math.abs(Integer.bitCount(tweakedState) - Integer.bitCount(initState)) <= 1;
 
@@ -192,26 +196,24 @@ public class InstantPrayer implements Feature {
         log.debug("[{}] current state {}, diff state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(resolvedStatus));
       }
     }
-    log.debug("[{}] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
-
     if (nextState == UNCHANGED_PRAYER_STATE) {
       // No conflicts found, assume the new state is correct
       // This is needed when turning on the first prayer in a conflict group
-      return tweakedState;
-    } else {
-      // We modified the existing state, something was probably turned off
-      return nextState;
+      nextState = tweakedState;
     }
+    log.debug("[{}] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
+    return nextState;
   }
 
   /**
    * Modify whether the prayer book is active based on the internal prayer state.
    *
    */
-  void render() {
+  private void render() {
+    assert client.isClientThread();
     //Only update background widget when prayers was or is active
     // The lastPrayerState is needed to make sure we disable the prayers when they are turned off
-    if ((state.prayerState != 0 || state.lastPrayerState != 0)) {
+    if ((state.getPrayerState() != 0 || state.getLastPrayerState() != 0)) {
       Widget prayerContainer = client.getWidget(InterfaceID.Prayerbook.CONTAINER);
       if (prayerContainer != null && !prayerContainer.isHidden()) {
         for (Map.Entry<Integer, Prayer> entry : INTERFACE_TO_PRAYER.entrySet()) {
@@ -223,7 +225,7 @@ public class InstantPrayer implements Feature {
               Widget backgroundWidget = prayerWidget.getChild(BACKGROUND_PRAYER_INDEX);
               if (backgroundWidget != null) {
                 // prayer is hidden when the bit is not set in the prayer state
-                boolean hidden = (prayerBit & state.prayerState) == 0;
+                boolean hidden = (prayerBit & state.getPrayerState()) == 0;
                 backgroundWidget.setHidden(hidden);
               }
             }

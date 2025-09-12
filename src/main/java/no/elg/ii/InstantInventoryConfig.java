@@ -201,11 +201,11 @@ public interface InstantInventoryConfig extends Config {
     keyName = "minChangedMs",
     name = "Min Changed Millis",
     description =
-      "How many milliseconds a clicked item should minimum stay hidden/changed before it can be reverted back to what it really is."
-        + "<p>"
+      "How many milliseconds an action should minimum stay changed before it can be reverted back to what the server says it is."
+        + "<p>The default value is half a game tick, i.e, 300ms."
         + "<p>This setting is affected by the ping and performance of the server. If you see items flicker back into existence, increase this value."
         + "<p>"
-        + "<p>This overwrites the \"Max Unmodified Ticks\" setting.",
+        + "<p>This overwrites the \"Max Unmodified Ticks\" setting for inventory actions.",
     position = 20
   )
   @Units(Units.MILLISECONDS)
