@@ -27,31 +27,6 @@
 
 package no.elg.ii.feature.features;
 
-import static net.runelite.api.Prayer.AUGURY;
-import static net.runelite.api.Prayer.BURST_OF_STRENGTH;
-import static net.runelite.api.Prayer.CHIVALRY;
-import static net.runelite.api.Prayer.CLARITY_OF_THOUGHT;
-import static net.runelite.api.Prayer.EAGLE_EYE;
-import static net.runelite.api.Prayer.HAWK_EYE;
-import static net.runelite.api.Prayer.IMPROVED_REFLEXES;
-import static net.runelite.api.Prayer.INCREDIBLE_REFLEXES;
-import static net.runelite.api.Prayer.MYSTIC_LORE;
-import static net.runelite.api.Prayer.MYSTIC_MIGHT;
-import static net.runelite.api.Prayer.MYSTIC_WILL;
-import static net.runelite.api.Prayer.PIETY;
-import static net.runelite.api.Prayer.PROTECT_FROM_MAGIC;
-import static net.runelite.api.Prayer.PROTECT_FROM_MELEE;
-import static net.runelite.api.Prayer.PROTECT_FROM_MISSILES;
-import static net.runelite.api.Prayer.REDEMPTION;
-import static net.runelite.api.Prayer.RETRIBUTION;
-import static net.runelite.api.Prayer.RIGOUR;
-import static net.runelite.api.Prayer.ROCK_SKIN;
-import static net.runelite.api.Prayer.SHARP_EYE;
-import static net.runelite.api.Prayer.SMITE;
-import static net.runelite.api.Prayer.STEEL_SKIN;
-import static net.runelite.api.Prayer.SUPERHUMAN_STRENGTH;
-import static net.runelite.api.Prayer.THICK_SKIN;
-import static net.runelite.api.Prayer.ULTIMATE_STRENGTH;
 import static no.elg.ii.model.PrayerInfo.INTERFACE_TO_PRAYER;
 import static no.elg.ii.model.PrayerInfo.PRAYER_TO_BIT;
 
@@ -96,15 +71,6 @@ public class InstantPrayer implements Feature {
   private static final int UNCHANGED_PRAYER_STATE = Integer.MAX_VALUE;
 
   private static final int TOGGLE_PRAYER_SCRIPT_ID = 462;
-
-  public static final int[] conflicting = { //
-    PrayerInfo.toConflictInt(THICK_SKIN, ROCK_SKIN, STEEL_SKIN, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-    PrayerInfo.toConflictInt(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-    PrayerInfo.toConflictInt(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-    PrayerInfo.toConflictInt(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-    PrayerInfo.toConflictInt(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE, RETRIBUTION, REDEMPTION, SMITE), //
-    PrayerInfo.toConflictInt(CHIVALRY, PIETY, RIGOUR, AUGURY), //
-  };
 
   @Inject
   @Getter
@@ -161,9 +127,9 @@ public class InstantPrayer implements Feature {
     //Only one bit should be different
     assert Math.abs(Integer.bitCount(tweakedState) - Integer.bitCount(initState)) <= 1;
 
-    int[] conflictResolvedStatus = new int[conflicting.length];
-    for (int i = 0, conflictingLength = conflicting.length; i < conflictingLength; i++) {
-      int conflictMask = conflicting[i];
+    int[] conflictResolvedStatus = new int[PrayerInfo.CONFLICTING_PRAYERS.length];
+    for (int i = 0, conflictingLength = PrayerInfo.CONFLICTING_PRAYERS.length; i < conflictingLength; i++) {
+      int conflictMask = PrayerInfo.CONFLICTING_PRAYERS[i];
       int maskedTweakedValue = tweakedState & conflictMask;
       if (Integer.bitCount(maskedTweakedValue) > 1) {
         //There are at least two conflicts, remove the conflicting prayers by using the old value

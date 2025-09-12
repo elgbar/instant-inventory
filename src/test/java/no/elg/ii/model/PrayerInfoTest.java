@@ -38,14 +38,14 @@ public class PrayerInfoTest {
 
   @Test
   public void toConflictLongTest() {
-    int conflictLong = PrayerInfo.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
+    int conflictLong = PrayerInfo.prayerToBits(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
     assertEquals(PRAYER_TO_BIT.get(Prayer.THICK_SKIN) | PRAYER_TO_BIT.get(Prayer.ROCK_SKIN), conflictLong);
   }
 
   @Test
-  public void prayerBitToPrayerTest() {
-    int conflictLong = PrayerInfo.toConflictInt(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
-    var actual = PrayerInfo.prayerBitToPrayer(conflictLong);
+  public void prayerBitsToPrayersTest() {
+    int conflictLong = PrayerInfo.prayerToBits(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
+    var actual = PrayerInfo.prayerBitsToPrayers(conflictLong);
     assertEquals(Arrays.asList(Prayer.THICK_SKIN, Prayer.ROCK_SKIN), actual);
   }
 }

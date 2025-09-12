@@ -66,21 +66,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
+import net.runelite.api.Client;
 import net.runelite.api.Prayer;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarbitID;
 
 @NoArgsConstructor
 public final class PrayerInfo {
 
+  /**
+   * Mapping to find the bit for a prayer
+   */
   public final static Map<Prayer, Integer> PRAYER_TO_BIT;
-  public final static Map<Prayer, Integer> PRAYER_TO_INTERFACE;
-
+  /**
+   * Mapping to find the prayer given a single bit
+   */
   public final static Map<Integer, Prayer> BIT_TO_PRAYER;
+
+  /**
+   * Mapping to find the interface ID for a prayer
+   *
+   * @see Client#getWidget(int)
+   * @see InterfaceID.Prayerbook
+   */
+  public final static Map<Prayer, Integer> PRAYER_TO_INTERFACE;
+  /**
+   * Mapping to find the prayer given an interface ID
+   *
+   * @see Client#getWidget(int)
+   * @see InterfaceID.Prayerbook
+   */
   public final static Map<Integer, Prayer> INTERFACE_TO_PRAYER;
+
+  /**
+   * Groups of conflicting prayers
+   */
+  public final static int[] CONFLICTING_PRAYERS;
 
   static {
     PRAYER_TO_BIT = setupPrayerToBit();
     PRAYER_TO_INTERFACE = setupPrayerToInterface();
+    CONFLICTING_PRAYERS = new int[]{ //
+      prayerToBits(THICK_SKIN, ROCK_SKIN, STEEL_SKIN, CHIVALRY, PIETY, RIGOUR, AUGURY), //
+      prayerToBits(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
+      prayerToBits(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
+      prayerToBits(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
+      prayerToBits(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE, RETRIBUTION, REDEMPTION, SMITE), //
+      prayerToBits(CHIVALRY, PIETY, RIGOUR, AUGURY), //
+    };
 
     // Create reverse lookup map
     BIT_TO_PRAYER = new HashMap<>(PRAYER_TO_BIT.size());
@@ -94,6 +127,11 @@ public final class PrayerInfo {
     }
   }
 
+  /**
+   * Manual setup of prayer to a bit. These bits reflect what bit the server sets in {@link VarbitID#PRAYER_ALLACTIVE}.
+   *
+   * @see VarbitID#PRAYER_ALLACTIVE
+   */
   @SuppressWarnings({"MagicNumber", "PointlessBitwiseExpression"})
   private static Map<Prayer, Integer> setupPrayerToBit() {
     Map<Prayer, Integer> prayerToBit = new EnumMap<>(Prayer.class);
@@ -179,7 +217,7 @@ public final class PrayerInfo {
     return prayerToInterface;
   }
 
-  public static List<Prayer> prayerBitToPrayer(int prayerBits) {
+  public static List<Prayer> prayerBitsToPrayers(int prayerBits) {
     List<Prayer> prayers = new ArrayList<>(Integer.bitCount(prayerBits));
 
     for (Map.Entry<Integer, Prayer> entry : BIT_TO_PRAYER.entrySet()) {
@@ -192,11 +230,11 @@ public final class PrayerInfo {
 
   /**
    *
-   * Note: must not be called before {@link PrayerInfo ::PRAYER_TO_BIT} is populated
+   * Note: must not be called before {@link PrayerInfo#PRAYER_TO_BIT} is populated
    *
    * @return The bits of each prayer combined with bitwise OR
    */
-  public static int toConflictInt(Prayer... prayers) {
+  public static int prayerToBits(Prayer... prayers) {
     return Stream.of(prayers).mapToInt(PRAYER_TO_BIT::get).reduce(0, (a, b) -> a | b);
   }
 }
