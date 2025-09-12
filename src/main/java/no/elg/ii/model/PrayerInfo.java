@@ -78,10 +78,6 @@ public final class PrayerInfo {
    * Mapping to find the bit for a prayer
    */
   public final static Map<Prayer, Integer> PRAYER_TO_BIT;
-  /**
-   * Mapping to find the prayer given a single bit
-   */
-  public final static Map<Integer, Prayer> BIT_TO_PRAYER;
 
   /**
    * Mapping to find the interface ID for a prayer
@@ -114,12 +110,6 @@ public final class PrayerInfo {
       prayerToBits(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE, RETRIBUTION, REDEMPTION, SMITE), //
       prayerToBits(CHIVALRY, PIETY, RIGOUR, AUGURY), //
     };
-
-    // Create reverse lookup map
-    BIT_TO_PRAYER = new HashMap<>(PRAYER_TO_BIT.size());
-    for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_BIT.entrySet()) {
-      BIT_TO_PRAYER.put(entry.getValue(), entry.getKey());
-    }
 
     INTERFACE_TO_PRAYER = new HashMap<>(PRAYER_TO_INTERFACE.size());
     for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_INTERFACE.entrySet()) {
@@ -220,9 +210,9 @@ public final class PrayerInfo {
   public static List<Prayer> prayerBitsToPrayers(int prayerBits) {
     List<Prayer> prayers = new ArrayList<>(Integer.bitCount(prayerBits));
 
-    for (Map.Entry<Integer, Prayer> entry : BIT_TO_PRAYER.entrySet()) {
-      if ((prayerBits & entry.getKey()) != 0) {
-        prayers.add(entry.getValue());
+    for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_BIT.entrySet()) {
+      if ((prayerBits & entry.getValue()) != 0) {
+        prayers.add(entry.getKey());
       }
     }
     return prayers;
