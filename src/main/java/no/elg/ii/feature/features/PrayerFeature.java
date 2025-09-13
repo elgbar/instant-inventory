@@ -59,7 +59,7 @@ import no.elg.ii.service.VarService;
 @Slf4j
 @Singleton
 @NoArgsConstructor
-public class InstantPrayer implements Feature {
+public class PrayerFeature implements Feature {
 
   public static final String PRAYER_CONFIG_KEY = "instantPrayer";
 
