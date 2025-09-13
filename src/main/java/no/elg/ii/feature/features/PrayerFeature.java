@@ -163,12 +163,11 @@ public class PrayerFeature implements Feature {
    * Enable all bits one at a time so that conflicts are resolved correctly
    */
   private void enableAllBits(int prayerBits) {
-    var prayers = PrayerInfo.prayerBitsToPrayers(prayerBits);
-    for (Prayer prayer : prayers) {
-      int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
-      if (prayerBit != 0) {
-        updateBit(prayerBit, ENABLE_OP);
-      }
+    int remaining = prayerBits;
+    while (remaining != 0) {
+      int bit = remaining & -remaining; // isolate lowest set bit
+      remaining &= (remaining - 1);     // clear that bit
+      updateBit(bit, ENABLE_OP);
     }
   }
 
