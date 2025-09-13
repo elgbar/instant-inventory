@@ -29,8 +29,7 @@ package no.elg.ii.feature.features;
 
 import static net.runelite.api.gameval.VarbitID.QUICKPRAYER_ACTIVE;
 import static net.runelite.api.gameval.VarbitID.QUICKPRAYER_SELECTED;
-import static no.elg.ii.model.PrayerInfo.INTERFACE_TO_PRAYER;
-import static no.elg.ii.model.PrayerInfo.PRAYER_TO_BIT;
+import static no.elg.ii.model.PrayerInfo.INTERFACE_TO_BIT;
 
 import java.util.Map;
 import java.util.function.IntBinaryOperator;
@@ -42,7 +41,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.Prayer;
 import net.runelite.api.ScriptEvent;
 import net.runelite.api.Skill;
 import net.runelite.api.events.BeforeRender;
@@ -118,12 +116,9 @@ public class PrayerFeature implements Feature {
       if (scriptEvent != null) {
         Widget src = scriptEvent.getSource();
         if (src != null) {
-          var prayer = INTERFACE_TO_PRAYER.get(src.getId());
-          if (prayer != null) {
-            int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
-            if (prayerBit != 0) {
-              updateBit(prayerBit, TOGGLE_OP);
-            }
+          var prayerBit = INTERFACE_TO_BIT.getOrDefault(src.getId(), 0);
+          if (prayerBit != 0) {
+            updateBit(prayerBit, TOGGLE_OP);
           }
         }
       }
@@ -180,7 +175,6 @@ public class PrayerFeature implements Feature {
    *
    * @param prayerBit The prayer bit to update. Must only have one bit set.
    * @param op        How to update {@code prayerBit}
-   * @see PrayerInfo#PRAYER_TO_BIT
    */
   private void updateBit(int prayerBit, @NonNull IntBinaryOperator op) {
     assert Integer.bitCount(prayerBit) == 1;
@@ -257,18 +251,16 @@ public class PrayerFeature implements Feature {
     if ((prayerState != 0 || state.getLastPrayerState() != 0)) {
       Widget prayerContainer = client.getWidget(InterfaceID.Prayerbook.CONTAINER);
       if (prayerContainer != null && !prayerContainer.isHidden()) {
-        for (Map.Entry<Integer, Prayer> entry : INTERFACE_TO_PRAYER.entrySet()) {
-          int prayerBit = PRAYER_TO_BIT.getOrDefault(entry.getValue(), 0);
-          if (prayerBit != 0) {
-            int prayerWidgetId = entry.getKey();
-            Widget prayerWidget = client.getWidget(prayerWidgetId);
-            if (prayerWidget != null) {
-              Widget backgroundWidget = prayerWidget.getChild(BACKGROUND_PRAYER_INDEX);
-              if (backgroundWidget != null) {
-                // prayer is hidden when the bit is not set in the prayer state
-                boolean hidden = (prayerBit & prayerState) == 0;
-                backgroundWidget.setHidden(hidden);
-              }
+        for (Map.Entry<Integer, Integer> entry : INTERFACE_TO_BIT.entrySet()) {
+          int prayerBit = entry.getValue();
+          int prayerWidgetId = entry.getKey();
+          Widget prayerWidget = client.getWidget(prayerWidgetId);
+          if (prayerWidget != null) {
+            Widget backgroundWidget = prayerWidget.getChild(BACKGROUND_PRAYER_INDEX);
+            if (backgroundWidget != null) {
+              // prayer is hidden when the bit is not set in the prayer state
+              boolean hidden = (prayerBit & prayerState) == 0;
+              backgroundWidget.setHidden(hidden);
             }
           }
         }

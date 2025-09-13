@@ -59,15 +59,12 @@ import static net.runelite.api.Prayer.SUPERHUMAN_STRENGTH;
 import static net.runelite.api.Prayer.THICK_SKIN;
 import static net.runelite.api.Prayer.ULTIMATE_STRENGTH;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import net.runelite.api.Client;
 import net.runelite.api.Prayer;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
@@ -78,22 +75,16 @@ public final class PrayerInfo {
   /**
    * Mapping to find the bit for a prayer
    */
-  public final static Map<Prayer, Integer> PRAYER_TO_BIT;
+  public final static EnumMap<Prayer, Integer> PRAYER_TO_BIT;
+
 
   /**
-   * Mapping to find the interface ID for a prayer
+   * Key is the interface id in the prayer book. value is the bit for the prayer.
    *
-   * @see Client#getWidget(int)
-   * @see InterfaceID.Prayerbook
-   */
-  public final static Map<Prayer, Integer> PRAYER_TO_INTERFACE;
-  /**
-   * Mapping to find the prayer given an interface ID
+   * @see #PRAYER_TO_BIT
    *
-   * @see Client#getWidget(int)
-   * @see InterfaceID.Prayerbook
    */
-  public final static Map<Integer, Prayer> INTERFACE_TO_PRAYER;
+  public static final Map<Integer, Integer> INTERFACE_TO_BIT;
 
   /**
    * Groups of conflicting prayers
@@ -102,7 +93,7 @@ public final class PrayerInfo {
 
   static {
     PRAYER_TO_BIT = setupPrayerToBit();
-    PRAYER_TO_INTERFACE = setupPrayerToInterface();
+    INTERFACE_TO_BIT = setupInterfaceToBit();
     CONFLICTING_PRAYERS = new int[]{ //
       prayerToBits(THICK_SKIN, ROCK_SKIN, STEEL_SKIN, CHIVALRY, PIETY, RIGOUR, AUGURY), //
       prayerToBits(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
@@ -111,11 +102,6 @@ public final class PrayerInfo {
       prayerToBits(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE, RETRIBUTION, REDEMPTION, SMITE), //
       prayerToBits(CHIVALRY, PIETY, RIGOUR, AUGURY), //
     };
-
-    INTERFACE_TO_PRAYER = new HashMap<>(PRAYER_TO_INTERFACE.size());
-    for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_INTERFACE.entrySet()) {
-      INTERFACE_TO_PRAYER.put(entry.getValue(), entry.getKey());
-    }
   }
 
   /**
@@ -124,8 +110,8 @@ public final class PrayerInfo {
    * @see VarbitID#PRAYER_ALLACTIVE
    */
   @SuppressWarnings({"MagicNumber", "PointlessBitwiseExpression"})
-  private static Map<Prayer, Integer> setupPrayerToBit() {
-    Map<Prayer, Integer> prayerToBit = new EnumMap<>(Prayer.class);
+  private static EnumMap<Prayer, Integer> setupPrayerToBit() {
+    EnumMap<Prayer, Integer> prayerToBit = new EnumMap<>(Prayer.class);
     prayerToBit.put(THICK_SKIN, 1 << 0);
     prayerToBit.put(BURST_OF_STRENGTH, 1 << 1);
     prayerToBit.put(CLARITY_OF_THOUGHT, 1 << 2);
@@ -166,57 +152,44 @@ public final class PrayerInfo {
     return prayerToBit;
   }
 
-  private static Map<Prayer, Integer> setupPrayerToInterface() {
-    Map<Prayer, Integer> prayerToInterface = new EnumMap<>(Prayer.class);
-    prayerToInterface.put(THICK_SKIN, InterfaceID.Prayerbook.PRAYER1);
-    prayerToInterface.put(BURST_OF_STRENGTH, InterfaceID.Prayerbook.PRAYER2);
-    prayerToInterface.put(CLARITY_OF_THOUGHT, InterfaceID.Prayerbook.PRAYER3);
-    prayerToInterface.put(SHARP_EYE, InterfaceID.Prayerbook.PRAYER19);
-    prayerToInterface.put(MYSTIC_WILL, InterfaceID.Prayerbook.PRAYER22);
+  private static Map<Integer, Integer> setupInterfaceToBit() {
+    Map<Integer, Integer> interfaceTobit = new HashMap<>(PRAYER_TO_BIT.size());
 
-    prayerToInterface.put(ROCK_SKIN, InterfaceID.Prayerbook.PRAYER4);
-    prayerToInterface.put(SUPERHUMAN_STRENGTH, InterfaceID.Prayerbook.PRAYER5);
-    prayerToInterface.put(IMPROVED_REFLEXES, InterfaceID.Prayerbook.PRAYER6);
-    prayerToInterface.put(RAPID_RESTORE, InterfaceID.Prayerbook.PRAYER7);
-    prayerToInterface.put(RAPID_HEAL, InterfaceID.Prayerbook.PRAYER8);
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER1, PRAYER_TO_BIT.get(THICK_SKIN));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER2, PRAYER_TO_BIT.get(BURST_OF_STRENGTH));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER3, PRAYER_TO_BIT.get(CLARITY_OF_THOUGHT));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER19, PRAYER_TO_BIT.get(SHARP_EYE));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER22, PRAYER_TO_BIT.get(MYSTIC_WILL));
 
-    prayerToInterface.put(PROTECT_ITEM, InterfaceID.Prayerbook.PRAYER9);
-    prayerToInterface.put(HAWK_EYE, InterfaceID.Prayerbook.PRAYER20);
-    prayerToInterface.put(MYSTIC_LORE, InterfaceID.Prayerbook.PRAYER23);
-    prayerToInterface.put(STEEL_SKIN, InterfaceID.Prayerbook.PRAYER10);
-    prayerToInterface.put(ULTIMATE_STRENGTH, InterfaceID.Prayerbook.PRAYER11);
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER4, PRAYER_TO_BIT.get(ROCK_SKIN));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER5, PRAYER_TO_BIT.get(SUPERHUMAN_STRENGTH));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER6, PRAYER_TO_BIT.get(IMPROVED_REFLEXES));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER7, PRAYER_TO_BIT.get(RAPID_RESTORE));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER8, PRAYER_TO_BIT.get(RAPID_HEAL));
 
-    prayerToInterface.put(INCREDIBLE_REFLEXES, InterfaceID.Prayerbook.PRAYER12);
-    prayerToInterface.put(PROTECT_FROM_MAGIC, InterfaceID.Prayerbook.PRAYER13);
-    prayerToInterface.put(PROTECT_FROM_MISSILES, InterfaceID.Prayerbook.PRAYER14);
-    prayerToInterface.put(PROTECT_FROM_MELEE, InterfaceID.Prayerbook.PRAYER15);
-    prayerToInterface.put(EAGLE_EYE, InterfaceID.Prayerbook.PRAYER21);
-    prayerToInterface.put(DEADEYE, InterfaceID.Prayerbook.PRAYER21); // Intentional overlap with EAGLE_EYE
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER9, PRAYER_TO_BIT.get(PROTECT_ITEM));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER20, PRAYER_TO_BIT.get(HAWK_EYE));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER23, PRAYER_TO_BIT.get(MYSTIC_LORE));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER10, PRAYER_TO_BIT.get(STEEL_SKIN));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER11, PRAYER_TO_BIT.get(ULTIMATE_STRENGTH));
 
-    prayerToInterface.put(MYSTIC_MIGHT, InterfaceID.Prayerbook.PRAYER24);
-    prayerToInterface.put(MYSTIC_VIGOUR, InterfaceID.Prayerbook.PRAYER24); // Intentional overlap with MYSTIC_MIGHT
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER12, PRAYER_TO_BIT.get(INCREDIBLE_REFLEXES));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER13, PRAYER_TO_BIT.get(PROTECT_FROM_MAGIC));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER14, PRAYER_TO_BIT.get(PROTECT_FROM_MISSILES));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER15, PRAYER_TO_BIT.get(PROTECT_FROM_MELEE));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER21, PRAYER_TO_BIT.get(EAGLE_EYE)); // Uses same slot as DEADEYE
 
-    prayerToInterface.put(RETRIBUTION, InterfaceID.Prayerbook.PRAYER16);
-    prayerToInterface.put(REDEMPTION, InterfaceID.Prayerbook.PRAYER17);
-    prayerToInterface.put(SMITE, InterfaceID.Prayerbook.PRAYER18);
-    prayerToInterface.put(PRESERVE, InterfaceID.Prayerbook.PRAYER29);
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER24, PRAYER_TO_BIT.get(MYSTIC_MIGHT)); // uses same slot as MYSTIC_VIGOUR
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER16, PRAYER_TO_BIT.get(RETRIBUTION));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER17, PRAYER_TO_BIT.get(REDEMPTION));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER18, PRAYER_TO_BIT.get(SMITE));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER29, PRAYER_TO_BIT.get(PRESERVE));
 
-    prayerToInterface.put(CHIVALRY, InterfaceID.Prayerbook.PRAYER26);
-    prayerToInterface.put(PIETY, InterfaceID.Prayerbook.PRAYER27);
-    prayerToInterface.put(RIGOUR, InterfaceID.Prayerbook.PRAYER25);
-    prayerToInterface.put(AUGURY, InterfaceID.Prayerbook.PRAYER28);
-    return prayerToInterface;
-  }
-
-  public static List<Prayer> prayerBitsToPrayers(int prayerBits) {
-    List<Prayer> prayers = new ArrayList<>(Math.min(PRAYER_TO_BIT.size(), Integer.bitCount(prayerBits)));
-
-    for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_BIT.entrySet()) {
-      if ((prayerBits & entry.getValue()) != 0) {
-        prayers.add(entry.getKey());
-      }
-    }
-    return prayers;
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER26, PRAYER_TO_BIT.get(CHIVALRY));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER27, PRAYER_TO_BIT.get(PIETY));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER25, PRAYER_TO_BIT.get(RIGOUR));
+    interfaceTobit.put(InterfaceID.Prayerbook.PRAYER28, PRAYER_TO_BIT.get(AUGURY));
+    return interfaceTobit;
   }
 
   /**
