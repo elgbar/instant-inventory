@@ -219,6 +219,23 @@ public class PrayerFeature implements Feature {
     assert (initState ^ tweakedState) == prayerBit
       : "Unexpected diff. expected=" + Integer.toBinaryString(prayerBit) + " actual=" + Integer.toBinaryString(initState ^ tweakedState);
 
+    if (initState == 0) {
+      if (log.isDebugEnabled()) {
+        log.debug("[{}] init state has no prayer, returning tweaked state", client.getTickCount());
+      }
+      return tweakedState;
+    }
+    if ((tweakedState & prayerBit) == 0) {
+      // A prayer was disabled, no need to check for conflicts
+      // we know here (by assertions) that it was on in the initState
+      if (log.isDebugEnabled()) {
+        log.debug("[{}] Prayer disabled. No need for conflict checking returning early", client.getTickCount());
+      }
+      return tweakedState;
+    }
+
+    // A prayer was enabled, check for conflicts
+
     int[] conflictResolvedStatus = new int[PrayerInfo.CONFLICTING_PRAYERS.length];
     for (int i = 0, conflictingLength = PrayerInfo.CONFLICTING_PRAYERS.length; i < conflictingLength; i++) {
       int conflictMask = PrayerInfo.CONFLICTING_PRAYERS[i];
