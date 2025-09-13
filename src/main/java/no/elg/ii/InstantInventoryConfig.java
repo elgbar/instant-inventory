@@ -31,6 +31,7 @@ import static no.elg.ii.feature.features.CleanHerbFeature.CLEAN_CONFIG_KEY;
 import static no.elg.ii.feature.features.DepositFeature.DEPOSIT_CONFIG_KEY;
 import static no.elg.ii.feature.features.DropFeature.DROP_CONFIG_KEY;
 import static no.elg.ii.feature.features.EquipFeature.EQUIP_CONFIG_KEY;
+import static no.elg.ii.feature.features.PrayerFeature.PRAYER_CONFIG_KEY;
 import static no.elg.ii.feature.features.WithdrawFeature.WITHDRAW_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
@@ -131,7 +132,7 @@ public interface InstantInventoryConfig extends Config {
   }
 
   @ConfigItem(
-    keyName = WITHDRAW_CONFIG_KEY,
+    keyName = PRAYER_CONFIG_KEY,
     section = FEATURE_SECTION,
     name = "Prayer Switch Instantly",
     description = "Switch prayers instantly",
