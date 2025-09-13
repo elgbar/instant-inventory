@@ -79,7 +79,6 @@ public final class PrayerInfo {
    * Mapping to find the bit for a prayer
    */
   public final static Map<Prayer, Integer> PRAYER_TO_BIT;
-  public final static Map<Prayer, Integer> PRAYER_TO_BIT_CONFLICTS;
 
   /**
    * Mapping to find the interface ID for a prayer
@@ -117,27 +116,6 @@ public final class PrayerInfo {
     for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_INTERFACE.entrySet()) {
       INTERFACE_TO_PRAYER.put(entry.getValue(), entry.getKey());
     }
-
-    PRAYER_TO_BIT_CONFLICTS = setupPrayerToBitConflicts();
-  }
-
-
-  /**
-   * Get all bits that conflict with the given prayer. Including the prayer itself.
-   */
-  private static Map<Prayer, Integer> setupPrayerToBitConflicts() {
-    Map<Prayer, Integer> prayerToBit = new EnumMap<>(Prayer.class);
-    for (Map.Entry<Prayer, Integer> entry : PRAYER_TO_BIT.entrySet()) {
-      int conflictingBits = 0;
-      int prayerBit = entry.getValue();
-      for (int conflictingPrayer : CONFLICTING_PRAYERS) {
-        if ((prayerBit & conflictingPrayer) != 0) {
-          conflictingBits |= conflictingPrayer;
-        }
-      }
-      prayerToBit.put(entry.getKey(), conflictingBits);
-    }
-    return prayerToBit;
   }
 
   /**
