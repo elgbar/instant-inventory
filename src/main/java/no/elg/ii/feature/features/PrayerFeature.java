@@ -46,8 +46,8 @@ import net.runelite.api.ScriptEvent;
 import net.runelite.api.Skill;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
-import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -76,6 +76,7 @@ public class PrayerFeature implements Feature {
   private static final int UNCHANGED_PRAYER_STATE = Integer.MAX_VALUE;
 
   private static final int TOGGLE_PRAYER_SCRIPT_ID = 462;
+  private static final int TOGGLE_QUICK_PRAYER_SCRIPT_ID = 455;
 
   @Inject
   @Getter
@@ -118,16 +119,16 @@ public class PrayerFeature implements Feature {
   }
 
   @Subscribe
-  public void onVarbitChanged(final VarbitChanged event) {
-    if (event.getVarbitId() == QUICKPRAYER_ACTIVE && hasPrayer()) {
-      int quickPrayerBits = varService.varbitValue(QUICKPRAYER_SELECTED);
+  public void onScriptPostFired(final ScriptPostFired event) {
+    if (event.getScriptId() == TOGGLE_QUICK_PRAYER_SCRIPT_ID && canUsePrayers()) {
       if (varService.isVarbitTrue(QUICKPRAYER_ACTIVE)) {
+        int quickPrayerBits = varService.varbitValue(QUICKPRAYER_SELECTED);
         // turn on quick prayers, conflicting prayers will be automatically turned off by update
         log.debug("[{}] Quick prayer toggled on: quick prayers {}", client.getTickCount(), Integer.toBinaryString(quickPrayerBits));
-        updateAllBits(quickPrayerBits, (prayerState, bit) -> prayerState | bit);
+        enableAllBits(quickPrayerBits);
       } else {
         log.debug("[{}] Quick prayer toggled off. Will disable all prayers", client.getTickCount());
-        // turn off quick prayers and conflicting prayers
+        // Quick prayer will turn off all prayers when toggled off, not just the configured prayers
         state.setPrayerState(0);
       }
     }
