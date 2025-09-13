@@ -34,6 +34,7 @@ import static no.elg.ii.model.PrayerInfo.PRAYER_TO_BIT;
 
 import java.util.Map;
 import java.util.function.IntBinaryOperator;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.Getter;
@@ -75,8 +76,20 @@ public class PrayerFeature implements Feature {
    */
   private static final int UNCHANGED_PRAYER_STATE = Integer.MAX_VALUE;
 
-  private static final int TOGGLE_PRAYER_SCRIPT_ID = 462;
+  /**
+   * Script called when clicking a prayer in the prayer book
+   */
+  private static final int TOGGLE_SINGLE_PRAYER_SCRIPT_ID = 462;
+
+  /**
+   * Script called when toggling quick prayer orb
+   */
   private static final int TOGGLE_QUICK_PRAYER_SCRIPT_ID = 455;
+
+  @Nonnull
+  private static final IntBinaryOperator TOGGLE_OP = (prayerState, bit) -> prayerState ^ bit;
+  @Nonnull
+  private static final IntBinaryOperator ENABLE_OP = (prayerState, bit) -> prayerState | bit;
 
   @Inject
   @Getter
@@ -98,36 +111,49 @@ public class PrayerFeature implements Feature {
     state.validateAll();
   }
 
-  private static final IntBinaryOperator TOGGLE_OP = (prayerState, bit) -> prayerState ^ bit;
-  private static final IntBinaryOperator ENABLE_OP = (prayerState, bit) -> prayerState | bit;
 
+  /* (non-javadoc)
+   * We cannot use ScriptPostFired, because it does not contain the source widget.
+   * And as the code suggest, we use the widget id to determine which prayer was toggled.
+   */
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
-    if (event.getScriptId() == TOGGLE_PRAYER_SCRIPT_ID || event.getScriptId() == 455) { //TODO why does adding 455 help (but only a bit) with quick prayers?
+    if (event.getScriptId() == TOGGLE_SINGLE_PRAYER_SCRIPT_ID && hasPrayerPoints()) {
       ScriptEvent scriptEvent = event.getScriptEvent();
-      Widget src = scriptEvent.getSource();
-      if (src != null && hasPrayer()) {
-        var prayer = INTERFACE_TO_PRAYER.get(src.getId());
-        if (prayer != null) {
-          int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
-          if (prayerBit != 0) {
-            updateBit(prayerBit, TOGGLE_OP);
+      if (scriptEvent != null) {
+        Widget src = scriptEvent.getSource();
+        if (src != null) {
+          var prayer = INTERFACE_TO_PRAYER.get(src.getId());
+          if (prayer != null) {
+            int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
+            if (prayerBit != 0) {
+              updateBit(prayerBit, TOGGLE_OP);
+            }
           }
         }
       }
     }
   }
 
+  /* (non-javadoc)
+   * Use the ScriptPostFired event because the QUICKPRAYER_ACTIVE varbit is updated by the TOGGLE_QUICK_PRAYER_SCRIPT_ID
+   * We cannot use VarbitChanged event because it does not toggle the prayers correctly off.
+   * Also, it is called from multiple places, and we are only interested in when the player toggles quick prayer.
+   */
   @Subscribe
   public void onScriptPostFired(final ScriptPostFired event) {
-    if (event.getScriptId() == TOGGLE_QUICK_PRAYER_SCRIPT_ID && canUsePrayers()) {
+    if (event.getScriptId() == TOGGLE_QUICK_PRAYER_SCRIPT_ID && hasPrayerPoints()) {
       if (varService.isVarbitTrue(QUICKPRAYER_ACTIVE)) {
         int quickPrayerBits = varService.varbitValue(QUICKPRAYER_SELECTED);
         // turn on quick prayers, conflicting prayers will be automatically turned off by update
-        log.debug("[{}] Quick prayer toggled on: quick prayers {}", client.getTickCount(), Integer.toBinaryString(quickPrayerBits));
+        if (log.isDebugEnabled()) {
+          log.debug("[{}] Quick prayer toggled on: quick prayers {}", client.getTickCount(), Integer.toBinaryString(quickPrayerBits));
+        }
         enableAllBits(quickPrayerBits);
       } else {
-        log.debug("[{}] Quick prayer toggled off. Will disable all prayers", client.getTickCount());
+        if (log.isDebugEnabled()) {
+          log.debug("[{}] Quick prayer toggled off. Will disable all prayers", client.getTickCount());
+        }
         // Quick prayer will turn off all prayers when toggled off, not just the configured prayers
         state.setPrayerState(0);
       }
@@ -135,14 +161,21 @@ public class PrayerFeature implements Feature {
   }
 
   /**
-   * Update all bits by {@code op}, one at a time so that conflicts, and the ui updated are resolved correctly
+   * @return Whether the player has any prayer points left to use prayers
    */
-  private void updateAllBits(int prayerBits, @NonNull IntBinaryOperator op) {
+  private boolean hasPrayerPoints() {
+    return client.getBoostedSkillLevel(Skill.PRAYER) > 0;
+  }
+
+  /**
+   * Enable all bits one at a time so that conflicts are resolved correctly
+   */
+  private void enableAllBits(int prayerBits) {
     var prayers = PrayerInfo.prayerBitsToPrayers(prayerBits);
     for (Prayer prayer : prayers) {
       int prayerBit = PRAYER_TO_BIT.getOrDefault(prayer, 0);
       if (prayerBit != 0) {
-        updateBit(prayerBit, op);
+        updateBit(prayerBit, ENABLE_OP);
       }
     }
   }
@@ -157,14 +190,12 @@ public class PrayerFeature implements Feature {
   private void updateBit(int prayerBit, @NonNull IntBinaryOperator op) {
     assert Integer.bitCount(prayerBit) == 1;
     int prayerState = state.getPrayerState();
-    int newValue = op.applyAsInt(prayerState, prayerBit);
-    int updateValue = update(newValue);
+    int tweakedPrayerState = op.applyAsInt(prayerState, prayerBit);
+    int updateValue = update(tweakedPrayerState);
     state.setPrayerState(updateValue);
-    log.debug("[{}] Toggled prayer: old state {}, new value {}, updated value {}", client.getTickCount(), Integer.toBinaryString(prayerState), Integer.toBinaryString(newValue), Integer.toBinaryString(updateValue));
-  }
-
-  private boolean hasPrayer() {
-    return client.getBoostedSkillLevel(Skill.PRAYER) > 0;
+    if (log.isDebugEnabled()) {
+      log.debug("[{}] Toggled prayer: old state {}, tweaked prayer state {}, updated value {}", client.getTickCount(), Integer.toBinaryString(prayerState), Integer.toBinaryString(tweakedPrayerState), Integer.toBinaryString(updateValue));
+    }
   }
 
   /**
@@ -208,16 +239,22 @@ public class PrayerFeature implements Feature {
           // This &-ing will disable multiple prayers at once
           nextState &= resolvedStatus;
         }
-        log.debug("[{} | update] current state {}, diff state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(resolvedStatus));
+        if (log.isDebugEnabled()) {
+          log.debug("[{}] current state {}, diff state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(resolvedStatus));
+        }
       }
     }
     if (nextState == UNCHANGED_PRAYER_STATE) {
-      log.debug("[{} | update] no conflicts detected, final state will be input", client.getTickCount());
+      if (log.isDebugEnabled()) {
+        log.debug("[{}] no conflicts detected, final state will be input", client.getTickCount());
+      }
       // No conflicts found, assume the new state is correct
       // This is needed when turning on the first prayer in a conflict group
       nextState = tweakedState;
     }
-    log.debug("[{} | update] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
+    if (log.isDebugEnabled()) {
+      log.debug("[{}] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
+    }
     return nextState;
   }
 
@@ -228,7 +265,8 @@ public class PrayerFeature implements Feature {
     assert client.isClientThread();
     //Only update background widget when prayers was or is active
     // The lastPrayerState is needed to make sure we disable the prayers when they are turned off
-    if ((state.getPrayerState() != 0 || state.getLastPrayerState() != 0)) {
+    int prayerState = state.getPrayerState();
+    if ((prayerState != 0 || state.getLastPrayerState() != 0)) {
       Widget prayerContainer = client.getWidget(InterfaceID.Prayerbook.CONTAINER);
       if (prayerContainer != null && !prayerContainer.isHidden()) {
         for (Map.Entry<Integer, Prayer> entry : INTERFACE_TO_PRAYER.entrySet()) {
@@ -240,7 +278,7 @@ public class PrayerFeature implements Feature {
               Widget backgroundWidget = prayerWidget.getChild(BACKGROUND_PRAYER_INDEX);
               if (backgroundWidget != null) {
                 // prayer is hidden when the bit is not set in the prayer state
-                boolean hidden = (prayerBit & state.getPrayerState()) == 0;
+                boolean hidden = (prayerBit & prayerState) == 0;
                 backgroundWidget.setHidden(hidden);
               }
             }
