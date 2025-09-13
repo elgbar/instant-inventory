@@ -164,8 +164,10 @@ public class PrayerFeature implements Feature {
   private void enableAllBits(int prayerBits) {
     int remaining = prayerBits;
     while (remaining != 0) {
-      int bit = remaining & -remaining; // isolate lowest set bit
-      remaining &= (remaining - 1);     // clear that bit
+      // find the next lowest bit that is on
+      int bit = Integer.lowestOneBit(remaining);
+      // clear the bit (we know it was on)
+      remaining ^= bit;
       updateBit(bit, ENABLE_OP);
     }
   }
