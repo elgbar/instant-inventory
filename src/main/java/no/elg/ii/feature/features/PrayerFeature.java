@@ -111,7 +111,6 @@ public class PrayerFeature implements Feature {
     state.validateAll();
   }
 
-
   /* (non-javadoc)
    * We cannot use ScriptPostFired, because it does not contain the source widget.
    * And as the code suggest, we use the widget id to determine which prayer was toggled.
@@ -191,7 +190,7 @@ public class PrayerFeature implements Feature {
     assert Integer.bitCount(prayerBit) == 1;
     int prayerState = state.getPrayerState();
     int tweakedPrayerState = op.applyAsInt(prayerState, prayerBit);
-    int updateValue = update(tweakedPrayerState);
+    int updateValue = update(tweakedPrayerState, prayerBit);
     state.setPrayerState(updateValue);
     if (log.isDebugEnabled()) {
       log.debug("[{}] Toggled prayer: old state {}, tweaked prayer state {}, updated value {}", client.getTickCount(), Integer.toBinaryString(prayerState), Integer.toBinaryString(tweakedPrayerState), Integer.toBinaryString(updateValue));
@@ -204,24 +203,29 @@ public class PrayerFeature implements Feature {
    * @param tweakedState The new prayer state. Must be only bit different from the current state.
    * @return The corrected prayer state
    */
-  private int update(int tweakedState) {
+  private int update(int tweakedState, int prayerBit) {
     assert client.isClientThread();
     int initState = state.getPrayerState();
-    //Only one bit should be different
-    assert Math.abs(Integer.bitCount(tweakedState) - Integer.bitCount(initState)) <= 1;
+    if (initState == tweakedState) {
+      if (log.isDebugEnabled()) {
+        log.debug("[{}] Skipping update, tweaked state did not differ from init state", client.getTickCount());
+      }
+      // We might get here when enabling quick prayers that were already manually enabled
+      return initState;
+    }
+    //Only one bit should be different, and that bit should be the prayerBit
+    assert Integer.bitCount(prayerBit) == 1
+      : "prayerBit must have exactly one bit set, prayerBit = " + Integer.toBinaryString(prayerBit);
+    assert (initState ^ tweakedState) == prayerBit
+      : "Unexpected diff. expected=" + Integer.toBinaryString(prayerBit) + " actual=" + Integer.toBinaryString(initState ^ tweakedState);
 
     int[] conflictResolvedStatus = new int[PrayerInfo.CONFLICTING_PRAYERS.length];
     for (int i = 0, conflictingLength = PrayerInfo.CONFLICTING_PRAYERS.length; i < conflictingLength; i++) {
       int conflictMask = PrayerInfo.CONFLICTING_PRAYERS[i];
       int maskedTweakedValue = tweakedState & conflictMask;
       if (Integer.bitCount(maskedTweakedValue) > 1) {
-        //There are at least two conflicts, remove the conflicting prayers by using the old value
-        // Keep only those active that are in the conflict mask
-        int maskedInitState = initState & conflictMask;
-        // Show only the one that was not active before
-        int correctedValue = maskedTweakedValue & ~maskedInitState;
-        // Disable all conflicting prayers in the group and enable the corrected value
-        conflictResolvedStatus[i] = (initState & ~conflictMask) | correctedValue;
+        // Disable all conflicting prayers in the group and enable the correct prayerBit
+        conflictResolvedStatus[i] = (initState & ~conflictMask) | prayerBit;
       }
     }
 
