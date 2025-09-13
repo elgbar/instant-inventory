@@ -66,6 +66,7 @@ public class PrayerState implements FeatureState {
 
   @Override
   public void resetAll() {
+    assert client.isClientThread();
     prayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
     // Keep to record of last state on reset
     lastPrayerState = prayerState;
@@ -73,6 +74,7 @@ public class PrayerState implements FeatureState {
 
   @Override
   public void validateAll() {
+    assert client.isClientThread();
     if (shouldRevalidate()) {
       lastPrayerState = prayerState;
       prayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);

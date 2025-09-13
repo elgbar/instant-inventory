@@ -96,11 +96,13 @@ public class PrayerFeature implements Feature {
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
+    assert client.isClientThread();
     render();
   }
 
   @Subscribe
   public void onGameTick(final GameTick event) {
+    assert client.isClientThread();
     state.validateAll();
   }
 
@@ -110,6 +112,7 @@ public class PrayerFeature implements Feature {
    */
   @Subscribe
   public void onScriptPreFired(final ScriptPreFired event) {
+    assert client.isClientThread();
     if (event.getScriptId() == TOGGLE_SINGLE_PRAYER_SCRIPT_ID && hasPrayerPoints()) {
       ScriptEvent scriptEvent = event.getScriptEvent();
       if (scriptEvent != null) {
@@ -134,17 +137,18 @@ public class PrayerFeature implements Feature {
    */
   @Subscribe
   public void onScriptPostFired(final ScriptPostFired event) {
+    assert client.isClientThread();
     if (event.getScriptId() == TOGGLE_QUICK_PRAYER_SCRIPT_ID && hasPrayerPoints()) {
       if (varService.isVarbitTrue(QUICKPRAYER_ACTIVE)) {
         int quickPrayerBits = varService.varbitValue(QUICKPRAYER_SELECTED);
         // turn on quick prayers, conflicting prayers will be automatically turned off by update
         if (log.isDebugEnabled()) {
-          log.debug("[{}] Quick prayer toggled on: quick prayers {}", client.getTickCount(), Integer.toBinaryString(quickPrayerBits));
+          log.debug("[{}] Quick prayers ON bits={}", client.getTickCount(), Integer.toBinaryString(quickPrayerBits));
         }
         enableAllBits(quickPrayerBits);
       } else {
         if (log.isDebugEnabled()) {
-          log.debug("[{}] Quick prayer toggled off. Will disable all prayers", client.getTickCount());
+          log.debug("[{}] Quick prayers OFF -> clearing all", client.getTickCount());
         }
         // Quick prayer will turn off all prayers when toggled off, not just the configured prayers
         state.setPrayerState(0);
@@ -196,7 +200,6 @@ public class PrayerFeature implements Feature {
    * @return The corrected prayer state
    */
   private int update(int tweakedState, int prayerBit) {
-    assert client.isClientThread();
     int initState = state.getPrayerState();
     if (initState == tweakedState) {
       if (log.isDebugEnabled()) {
@@ -248,7 +251,6 @@ public class PrayerFeature implements Feature {
    * Modify whether the prayer book is active based on the internal prayer state.
    */
   private void render() {
-    assert client.isClientThread();
     //Only update background widget when prayers was or is active
     // The lastPrayerState is needed to make sure we disable the prayers when they are turned off
     int prayerState = state.getPrayerState();
