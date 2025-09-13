@@ -94,13 +94,22 @@ public final class PrayerInfo {
   static {
     PRAYER_TO_BIT = setupPrayerToBit();
     INTERFACE_TO_BIT = setupInterfaceToBit();
-    CONFLICTING_PRAYERS = new int[]{ //
-      prayerToBits(THICK_SKIN, ROCK_SKIN, STEEL_SKIN, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-      prayerToBits(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-      prayerToBits(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES, SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-      prayerToBits(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT, CHIVALRY, PIETY, RIGOUR, AUGURY), //
-      prayerToBits(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE, RETRIBUTION, REDEMPTION, SMITE), //
-      prayerToBits(CHIVALRY, PIETY, RIGOUR, AUGURY), //
+    // Endgame prayers conflict with (almost) everything else
+    int endgame = prayerToBits(CHIVALRY, PIETY, RIGOUR, AUGURY);
+    // Ranged and magic prayers
+    int rangedAndMagic = prayerToBits(SHARP_EYE, MYSTIC_WILL, HAWK_EYE, MYSTIC_LORE, EAGLE_EYE, MYSTIC_MIGHT);
+    CONFLICTING_PRAYERS = new int[]{
+      // Protection / overheads
+      prayerToBits(PROTECT_FROM_MAGIC, PROTECT_FROM_MISSILES, PROTECT_FROM_MELEE, RETRIBUTION, REDEMPTION, SMITE),
+      // Defence prayers (can be used with ranged/magic prayers!)
+      prayerToBits(THICK_SKIN, ROCK_SKIN, STEEL_SKIN) | endgame,
+      // Strength prayers
+      prayerToBits(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH) | rangedAndMagic | endgame,
+      // Attack prayers
+      prayerToBits(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES) | rangedAndMagic | endgame,
+      // Ranged and magic prayers
+      rangedAndMagic | endgame, //
+      endgame,//
     };
   }
 
