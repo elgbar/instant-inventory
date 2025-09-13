@@ -70,13 +70,6 @@ public class PrayerFeature implements Feature {
   private static final int BACKGROUND_PRAYER_INDEX = 0;
 
   /**
-   * Indicates that no prayer change was made during an update.
-   * <p>
-   * Should be safe to use as there should never be a state where all bits are on.
-   */
-  private static final int UNCHANGED_PRAYER_STATE = Integer.MAX_VALUE;
-
-  /**
    * Script called when clicking a prayer in the prayer book
    */
   private static final int TOGGLE_SINGLE_PRAYER_SCRIPT_ID = 462;
@@ -236,45 +229,18 @@ public class PrayerFeature implements Feature {
 
     // A prayer was enabled, check for conflicts
 
-    int[] conflictResolvedStatus = new int[PrayerInfo.CONFLICTING_PRAYERS.length];
-    for (int i = 0, conflictingLength = PrayerInfo.CONFLICTING_PRAYERS.length; i < conflictingLength; i++) {
-      int conflictMask = PrayerInfo.CONFLICTING_PRAYERS[i];
-      int maskedTweakedValue = tweakedState & conflictMask;
-      if (Integer.bitCount(maskedTweakedValue) > 1) {
-        // Disable all conflicting prayers in the group and enable the correct prayerBit
-        conflictResolvedStatus[i] = (initState & ~conflictMask) | prayerBit;
+    int nextState = tweakedState;
+    for (int prayerConflictMask : PrayerInfo.CONFLICTING_PRAYERS) {
+      int activeInGroup = nextState & prayerConflictMask;
+      assert Integer.bitCount((initState & prayerConflictMask)) <= 1
+        : "Unexpected conflict in initState with a conflict mask. initState & prayerConflictMask= " + Integer.toBinaryString((initState & prayerConflictMask)) + " initState=" + Integer.toBinaryString(initState) + " prayerConflictMask=" + Integer.toBinaryString(prayerConflictMask);
+      if (Integer.bitCount(activeInGroup) > 1) {
+        // Keep only the just-enabled prayerBit in this conflict group
+        nextState = (nextState & ~prayerConflictMask) | prayerBit;
       }
-    }
-
-    int nextState = UNCHANGED_PRAYER_STATE;
-    for (int resolvedStatus : conflictResolvedStatus) {
-      // If no resolvedStatus is set it will be 0, so skip it
-      if (resolvedStatus != 0) {
-        if (nextState == UNCHANGED_PRAYER_STATE) {
-          // First conflicting group will be the initial status.
-          // This cannot be `initState` because a bit might be enabled and that would be removed by &-ing the `resolvedStatus` with `initState`
-          nextState = resolvedStatus;
-        } else {
-          // Handles multiple conflict groups, e.g. if you enable BURST_OF_STRENGTH + CLARITY_OF_THOUGHT are enabled, and you enable SHARP_EYE
-          // Both the BURST_OF_STRENGTH group and CLARITY_OF_THOUGHT should be disabled, while SHARP_EYE should be enabled
-          // This &-ing will disable multiple prayers at once
-          nextState &= resolvedStatus;
-        }
-        if (log.isDebugEnabled()) {
-          log.debug("[{}] current state {}, diff state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(resolvedStatus));
-        }
-      }
-    }
-    if (nextState == UNCHANGED_PRAYER_STATE) {
-      if (log.isDebugEnabled()) {
-        log.debug("[{}] no conflicts detected, final state will be input", client.getTickCount());
-      }
-      // No conflicts found, assume the new state is correct
-      // This is needed when turning on the first prayer in a conflict group
-      nextState = tweakedState;
     }
     if (log.isDebugEnabled()) {
-      log.debug("[{}] init state {}, final state {}", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState));
+      log.debug("[{}] init state {}, final state {} (diff {})", client.getTickCount(), Integer.toBinaryString(initState), Integer.toBinaryString(nextState), Integer.toBinaryString(initState ^ nextState));
     }
     return nextState;
   }
