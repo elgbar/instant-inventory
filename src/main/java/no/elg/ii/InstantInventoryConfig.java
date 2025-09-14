@@ -174,6 +174,43 @@ public interface InstantInventoryConfig extends Config {
     return 75; //% transparent
   }
 
+  @ConfigItem(
+    section = APPEARANCE_SECTION,
+    keyName = "prayerDisableOpacityPercent",
+    name = "Disabled prayer opacity",
+    description =
+      "Temporary background opacity shown <i>after you click to disable</i> a prayer but <i>before the server confirms it is off</i>."
+        + "<p>"
+        + "<p>Applies only during this short prediction window."
+        + "<p>Set to 0 to make it indistinguishable from normal inactive prayers."
+        + "<p>"
+        + "<p>Lower value makes background more transparent.",
+    position = 30
+  )
+  @Range(max = 100)
+  @Units(Units.PERCENT)
+  default int prayerDisableOpacityPercent() {
+    return 15; //% transparent
+  }
+
+  @ConfigItem(
+    section = APPEARANCE_SECTION,
+    keyName = "prayerEnableOpacityPercent",
+    name = "Enabled prayer opacity",
+    description =
+      "Temporary background opacity shown <i>after you click to enable</i> a prayer but <i>before the server confirms it is active</i>."
+        + "<p>"
+        + "<p>Applies only during this short prediction window."
+        + "<p>Set to 100 to make it indistinguishable from normal active prayers."
+        + "<p>"
+        + "<p>Lower value makes background more transparent.",
+    position = 40
+  )
+  @Range(max = 100)
+  @Units(Units.PERCENT)
+  default int prayerEnableOpacityPercent() {
+    return 80; //% transparent
+  }
 
   /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -189,7 +226,9 @@ public interface InstantInventoryConfig extends Config {
         + "<p>when this is 1 items will occasionally flicker back into view when the servers are unstable,"
         + "<p>and when this is 2+ flickering rarely happens (i.e., only when the server lags)."
         + "<p>"
-        + "<p>When in PvP or Bossing it is recommended to set this to 1.",
+        + "<p>When in PvP or Bossing it is recommended to set this to 1."
+        + "<p>"
+        + "<p>This setting applies only items and not generally.",
     position = 10
   )
   @Units(Units.TICKS)
@@ -204,7 +243,7 @@ public interface InstantInventoryConfig extends Config {
     description =
       "How many milliseconds an action should minimum stay changed before it can be reverted back to what the server says it is."
         + "<p>The default value is half a game tick, i.e, 300ms."
-        + "<p>This setting is affected by the ping and performance of the server. If you see items flicker back into existence, increase this value."
+        + "<p>This setting is affected by the ping and performance of the server. If you see widgets flicker back into existence, increase this value."
         + "<p>"
         + "<p>This overwrites the \"Max Unmodified Ticks\" setting for inventory actions.",
     position = 20

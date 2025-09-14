@@ -49,11 +49,14 @@ import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.state.PrayerState;
 import no.elg.ii.model.PrayerInfo;
 import no.elg.ii.service.VarService;
+import no.elg.ii.service.WidgetService;
+import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
 @Singleton
@@ -91,6 +94,12 @@ public class PrayerFeature implements Feature {
 
   @Inject
   private VarService varService;
+
+  @Inject
+  private ClientThread clientThread;
+
+  @Inject
+  private WidgetService widgetService;
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
@@ -253,6 +262,7 @@ public class PrayerFeature implements Feature {
     if ((prayerState != 0 || state.getLastPrayerState() != 0)) {
       Widget prayerContainer = client.getWidget(InterfaceID.Prayerbook.CONTAINER);
       if (prayerContainer != null && !prayerContainer.isHidden()) {
+        int serverState = state.getServerPrayerState();
         for (Map.Entry<Integer, Integer> entry : INTERFACE_TO_BIT.entrySet()) {
           int prayerBit = entry.getValue();
           int prayerWidgetId = entry.getKey();
@@ -262,11 +272,33 @@ public class PrayerFeature implements Feature {
             if (backgroundWidget != null) {
               // prayer is hidden when the bit is not set in the prayer state
               boolean hidden = (prayerBit & prayerState) == 0;
-              backgroundWidget.setHidden(hidden);
+              boolean serverHidden = (prayerBit & serverState) == 0;
+              customizeWidget(backgroundWidget, hidden, serverHidden);
+              if (prayerState == 0) {
+                // this render will not run next tick so make sure we are resetting everything
+                clientThread.invokeLater(() -> {
+                  backgroundWidget.setHidden(hidden);
+                  backgroundWidget.setOpacity(WidgetUtils.FULLY_OPAQUE);
+                });
+              }
             }
           }
         }
       }
+    }
+  }
+
+  private void customizeWidget(@Nonnull Widget backgroundWidget, boolean hidden, boolean serverHidden) {
+    if (hidden != serverHidden) {
+      backgroundWidget.setHidden(false);
+      if (hidden) {
+        backgroundWidget.setOpacity(widgetService.getPrayerDisableOpacity());
+      } else {
+        backgroundWidget.setOpacity(widgetService.getPrayerEnableOpacity());
+      }
+    } else {
+      backgroundWidget.setHidden(serverHidden);
+      backgroundWidget.setOpacity(WidgetUtils.FULLY_OPAQUE);
     }
   }
 

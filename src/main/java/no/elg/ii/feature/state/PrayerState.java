@@ -52,10 +52,16 @@ public class PrayerState implements FeatureState {
   private int lastPrayerState;
 
   /**
-   * Current server prayer state.  Might be modified by client
+   * Current server prayer state. Might be modified by client
    */
   @Getter
   private int prayerState;
+
+  /**
+   * Current server prayer state. Never modified by client
+   */
+  @Getter
+  private int serverPrayerState;
 
   private long lastManuallyModified;
 
@@ -67,17 +73,19 @@ public class PrayerState implements FeatureState {
   @Override
   public void resetAll() {
     assert client.isClientThread();
-    prayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    serverPrayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    prayerState = serverPrayerState;
     // Keep to record of last state on reset
-    lastPrayerState = prayerState;
+    lastPrayerState = serverPrayerState;
   }
 
   @Override
   public void validateAll() {
     assert client.isClientThread();
+    serverPrayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
     if (shouldRevalidate()) {
       lastPrayerState = prayerState;
-      prayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+      prayerState = serverPrayerState;
     } else {
       // Skip reading server value as it likely does not reflect the clicked state.
       // This will prevent flickering of prayer icons when clicking fast on multiple conflicting prayers
