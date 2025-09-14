@@ -37,3 +37,5 @@ See [the changelog file](./CHANGELOG.md)
 [equipment_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/5e5bf832-e335-4a6a-b8a7-2e2aa4a6c785)
 
 [bank_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/ffb93f2d-f57c-445a-b47d-1de9eab34f74)
+
+[prayer-feature.webm](https://github.com/user-attachments/assets/2b936926-5bd8-4184-86c7-e8ecb2720e9c)
