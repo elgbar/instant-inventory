@@ -71,6 +71,14 @@ public class WidgetService {
     return intPercentToOpacityValue(config.hideOpacityPercent());
   }
 
+  public int getPrayerEnableOpacity() {
+    return intPercentToOpacityValue(config.prayerEnableOpacityPercent());
+  }
+
+  public int getPrayerDisableOpacity() {
+    return intPercentToOpacityValue(config.prayerDisableOpacityPercent());
+  }
+
   /**
    * Set the opacity of the widget to the user specified change opacity
    *

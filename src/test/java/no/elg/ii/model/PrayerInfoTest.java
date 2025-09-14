@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2025 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,48 +25,19 @@
  *
  */
 
-package no.elg.ii.feature;
+package no.elg.ii.model;
 
-import com.google.common.annotations.VisibleForTesting;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import no.elg.ii.feature.features.CleanHerbFeature;
-import no.elg.ii.feature.features.DepositFeature;
-import no.elg.ii.feature.features.DropFeature;
-import no.elg.ii.feature.features.EquipFeature;
-import no.elg.ii.feature.features.PrayerFeature;
-import no.elg.ii.feature.features.WithdrawFeature;
+import static no.elg.ii.model.PrayerInfo.PRAYER_TO_BIT;
+import static org.junit.Assert.assertEquals;
 
-@Singleton
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class Features {
+import net.runelite.api.Prayer;
+import org.junit.Test;
 
-  @Inject
-  @VisibleForTesting
-  private DropFeature dropFeature;
+public class PrayerInfoTest {
 
-  @Inject
-  @VisibleForTesting
-  private CleanHerbFeature cleanHerbFeature;
-
-  @Inject
-  @VisibleForTesting
-  private DepositFeature depositFeature;
-
-  @Inject
-  @VisibleForTesting
-  private EquipFeature equipFeature;
-
-  @Inject
-  @VisibleForTesting
-  private WithdrawFeature withdrawFeature;
-
-  @Inject
-  @VisibleForTesting
-  private PrayerFeature prayerFeature;
+  @Test
+  public void toConflictLongTest() {
+    int conflictLong = PrayerInfo.prayerToBits(Prayer.THICK_SKIN, Prayer.ROCK_SKIN);
+    assertEquals(PRAYER_TO_BIT.get(Prayer.THICK_SKIN) | PRAYER_TO_BIT.get(Prayer.ROCK_SKIN), conflictLong);
+  }
 }

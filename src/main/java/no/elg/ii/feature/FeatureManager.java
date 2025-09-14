@@ -75,6 +75,7 @@ public class FeatureManager {
     updateFeatureStatus(featureInstances.getDepositFeature(), config.instantDeposit());
     updateFeatureStatus(featureInstances.getEquipFeature(), config.instantEquip());
     updateFeatureStatus(featureInstances.getWithdrawFeature(), config.instantWithdraw());
+    updateFeatureStatus(featureInstances.getPrayerFeature(), config.instantPrayer());
   }
 
   public void disableAllFeatures() {
