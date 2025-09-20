@@ -28,14 +28,16 @@
 package no.elg.ii.service;
 
 
-import static no.elg.ii.feature.features.DropFeature.DROP_OPTION;
-
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -43,26 +45,39 @@ import net.runelite.client.eventbus.Subscribe;
 @Slf4j
 @Singleton
 @NoArgsConstructor
-public class DisallowedDroppingModifiedWidgetService {
+public class DisallowModifiedWidgetInteractionService {
 
   @Inject
   private InventoryService inventoryService;
 
+  @Inject
+  private Client client;
+
   @Subscribe(priority = Integer.MAX_VALUE)
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
-    if (widget != null && !event.isConsumed()) {
-      String menuOption = event.getMenuOption();
-      if (DROP_OPTION.equals(menuOption)) {
-        ItemContainer currentInventoryContainer = inventoryService.getCurrentInventoryContainer();
-        if (currentInventoryContainer != null) {
-          Item item = currentInventoryContainer.getItem(widget.getIndex());
-          if (item != null && item.getId() != widget.getItemId()) {
-            log.debug("Widget item in slot {} is not the same as the item in the inventory. Disallowing dropping", widget.getIndex());
-            event.consume();
-          }
+    if (widget != null && !event.isConsumed() && (event.isItemOp() || isUseItemAction(event.getMenuEntry()))) {
+      ItemContainer currentInventoryContainer = inventoryService.getCurrentInventoryContainer();
+      if (currentInventoryContainer != null) {
+        Item item = currentInventoryContainer.getItem(widget.getIndex());
+        if (item != null && item.getId() != widget.getItemId()) {
+          log.debug("Widget item in slot {} is not the same as the item in the inventory. Disallowing interaction", widget.getIndex());
+          event.consume();
         }
       }
+    }
+  }
+
+  private boolean isUseItemAction(@Nullable MenuEntry menuEntry) {
+    if (menuEntry != null && "Use".equals(menuEntry.getOption())) {
+      MenuAction type = menuEntry.getType();
+      if (client.isWidgetSelected()) {
+        return type == MenuAction.WIDGET_TARGET_ON_WIDGET;
+      } else {
+        return type == MenuAction.WIDGET_TARGET;
+      }
+    } else {
+      return false;
     }
   }
 }
