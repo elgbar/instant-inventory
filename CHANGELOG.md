@@ -19,11 +19,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 1.3.1 - 2025-09-20
+
+### Fixed
+
+* [#33](https://github.com/elgbar/instant-inventory/issues/33) Disallow all interaction with modified inventory widgets
+
+---
+
 ## 1.3.0 - 2025-09-14
 
 ### Added
 
-* #31 Add instant prayers
+* [#31](https://github.com/elgbar/instant-inventory/issues/31) Add instant prayers
 
 ---
 
