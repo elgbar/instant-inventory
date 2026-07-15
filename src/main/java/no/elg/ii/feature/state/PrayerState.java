@@ -32,6 +32,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.gameval.VarbitID;
 import no.elg.ii.InstantInventoryConfig;
 
@@ -73,6 +74,11 @@ public class PrayerState implements FeatureState {
   @Override
   public void resetAll() {
     assert client.isClientThread();
+    if (client.getGameState() != GameState.LOGGED_IN) {
+      // Server varbits do not exist before login, reading them would throw a NPE.
+      // Features are reset again on the LOGGED_IN game state change, so this is safe to skip.
+      return;
+    }
     serverPrayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
     prayerState = serverPrayerState;
     // Keep to record of last state on reset
