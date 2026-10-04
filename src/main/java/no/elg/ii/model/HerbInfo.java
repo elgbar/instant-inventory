@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,10 @@
  */
 package no.elg.ii.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.NonNull;
 import lombok.Value;
 import net.runelite.api.gameval.ItemID;
 
@@ -38,33 +40,38 @@ public class HerbInfo {
   /**
    * Map of {@link ItemID} from grimy herbs to cleaned herbs
    */
-  public static Map<Integer, HerbInfo> HERBS = new HashMap<>();
+  @NonNull
+  public static Map<Integer, HerbInfo> HERBS;
 
   static {
-    HERBS.put(ItemID.UNIDENTIFIED_ROGUES_PURSE, new HerbInfo(ItemID.ROGUES_PURSE, 3));
-    HERBS.put(ItemID.UNIDENTIFIED_SNAKE_WEED, new HerbInfo(ItemID.SNAKE_WEED, 3));
-    HERBS.put(ItemID.UNIDENTIFIED_ARDRIGAL, new HerbInfo(ItemID.ARDRIGAL, 3));
-    HERBS.put(ItemID.UNIDENTIFIED_SITO_FOIL, new HerbInfo(ItemID.SITO_FOIL, 3));
-    HERBS.put(ItemID.UNIDENTIFIED_VOLENCIA_MOSS, new HerbInfo(ItemID.VOLENCIA_MOSS, 3));
-    HERBS.put(ItemID.UNIDENTIFIED_GUAM, new HerbInfo(ItemID.GUAM_LEAF, 3));
-    HERBS.put(ItemID.UNIDENTIFIED_MARENTILL, new HerbInfo(ItemID.MARENTILL, 5));
-    HERBS.put(ItemID.UNIDENTIFIED_TARROMIN, new HerbInfo(ItemID.TARROMIN, 11));
-    HERBS.put(ItemID.UNIDENTIFIED_HARRALANDER, new HerbInfo(ItemID.HARRALANDER, 20));
-    HERBS.put(ItemID.UNIDENTIFIED_RANARR, new HerbInfo(ItemID.RANARR_WEED, 25));
-    HERBS.put(ItemID.UNIDENTIFIED_IRIT, new HerbInfo(ItemID.IRIT_LEAF, 40));
-    HERBS.put(ItemID.UNIDENTIFIED_AVANTOE, new HerbInfo(ItemID.AVANTOE, 48));
-    HERBS.put(ItemID.UNIDENTIFIED_KWUARM, new HerbInfo(ItemID.KWUARM, 54));
-    HERBS.put(ItemID.UNIDENTIFIED_SNAPDRAGON, new HerbInfo(ItemID.SNAPDRAGON, 59));
-    HERBS.put(ItemID.UNIDENTIFIED_CADANTINE, new HerbInfo(ItemID.CADANTINE, 65));
-    HERBS.put(ItemID.UNIDENTIFIED_DWARF_WEED, new HerbInfo(ItemID.DWARF_WEED, 70));
-    HERBS.put(ItemID.UNIDENTIFIED_TORSTOL, new HerbInfo(ItemID.TORSTOL, 75));
-    HERBS.put(ItemID.UNIDENTIFIED_LANTADYME, new HerbInfo(ItemID.LANTADYME, 67));
-    HERBS.put(ItemID.UNIDENTIFIED_TOADFLAX, new HerbInfo(ItemID.TOADFLAX, 30));
+    var herbs = new HashMap<Integer, HerbInfo>();
+
+    herbs.put(ItemID.UNIDENTIFIED_ROGUES_PURSE, new HerbInfo(ItemID.ROGUES_PURSE, 3));
+    herbs.put(ItemID.UNIDENTIFIED_SNAKE_WEED, new HerbInfo(ItemID.SNAKE_WEED, 3));
+    herbs.put(ItemID.UNIDENTIFIED_ARDRIGAL, new HerbInfo(ItemID.ARDRIGAL, 3));
+    herbs.put(ItemID.UNIDENTIFIED_SITO_FOIL, new HerbInfo(ItemID.SITO_FOIL, 3));
+    herbs.put(ItemID.UNIDENTIFIED_VOLENCIA_MOSS, new HerbInfo(ItemID.VOLENCIA_MOSS, 3));
+    herbs.put(ItemID.UNIDENTIFIED_GUAM, new HerbInfo(ItemID.GUAM_LEAF, 3));
+    herbs.put(ItemID.UNIDENTIFIED_MARENTILL, new HerbInfo(ItemID.MARENTILL, 5));
+    herbs.put(ItemID.UNIDENTIFIED_TARROMIN, new HerbInfo(ItemID.TARROMIN, 11));
+    herbs.put(ItemID.UNIDENTIFIED_HARRALANDER, new HerbInfo(ItemID.HARRALANDER, 20));
+    herbs.put(ItemID.UNIDENTIFIED_RANARR, new HerbInfo(ItemID.RANARR_WEED, 25));
+    herbs.put(ItemID.UNIDENTIFIED_TOADFLAX, new HerbInfo(ItemID.TOADFLAX, 30));
+    herbs.put(ItemID.UNIDENTIFIED_IRIT, new HerbInfo(ItemID.IRIT_LEAF, 40));
+    herbs.put(ItemID.UNIDENTIFIED_AVANTOE, new HerbInfo(ItemID.AVANTOE, 48));
+    herbs.put(ItemID.UNIDENTIFIED_KWUARM, new HerbInfo(ItemID.KWUARM, 54));
+    herbs.put(ItemID.UNIDENTIFIED_SNAPDRAGON, new HerbInfo(ItemID.SNAPDRAGON, 59));
+    herbs.put(ItemID.UNIDENTIFIED_CADANTINE, new HerbInfo(ItemID.CADANTINE, 65));
+    herbs.put(ItemID.UNIDENTIFIED_DWARF_WEED, new HerbInfo(ItemID.DWARF_WEED, 70));
+    herbs.put(ItemID.UNIDENTIFIED_TORSTOL, new HerbInfo(ItemID.TORSTOL, 75));
+    herbs.put(ItemID.UNIDENTIFIED_LANTADYME, new HerbInfo(ItemID.LANTADYME, 67));
 
     // Chambers of Xeric herbs
-    HERBS.put(ItemID.RAIDS_GRIMY_GOLPAR, new HerbInfo(ItemID.RAIDS_GOLPAR, 47));
-    HERBS.put(ItemID.RAIDS_GRIMY_BUCHULEAF, new HerbInfo(ItemID.RAIDS_BUCHULEAF, 52));
-    HERBS.put(ItemID.RAIDS_GRIMY_NOXIFER, new HerbInfo(ItemID.RAIDS_NOXIFER, 60));
+    herbs.put(ItemID.RAIDS_GRIMY_GOLPAR, new HerbInfo(ItemID.RAIDS_GOLPAR, 47));
+    herbs.put(ItemID.RAIDS_GRIMY_BUCHULEAF, new HerbInfo(ItemID.RAIDS_BUCHULEAF, 52));
+    herbs.put(ItemID.RAIDS_GRIMY_NOXIFER, new HerbInfo(ItemID.RAIDS_NOXIFER, 60));
+
+    HERBS = Collections.unmodifiableMap(herbs);
   }
 
   int cleanItemId;
