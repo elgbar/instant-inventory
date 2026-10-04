@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,16 +25,18 @@
  *
  */
 
-package no.elg.ii.feature.featues;
+package no.elg.ii.feature.features;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.awt.Color;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.Client;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.widgets.Widget;
@@ -43,9 +45,6 @@ import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.VarService;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.awt.Color;
 
 
 @Slf4j
