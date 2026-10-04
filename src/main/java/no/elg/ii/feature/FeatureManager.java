@@ -70,13 +70,7 @@ public class FeatureManager {
    * Make sure all features are in its correct state
    */
   public void updateAllFeatureStatus() {
-    updateFeatureStatus(featureInstances.getDropFeature(), config.instantDrop());
-    updateFeatureStatus(featureInstances.getCleanHerbFeature(), config.instantClean());
-    updateFeatureStatus(featureInstances.getDepositFeature(), config.instantDeposit());
-    updateFeatureStatus(featureInstances.getEquipFeature(), config.instantEquip());
-    updateFeatureStatus(featureInstances.getWithdrawFeature(), config.instantWithdraw());
-    updateFeatureStatus(featureInstances.getPrayerFeature(), config.instantPrayer());
-    updateFeatureStatus(featureInstances.getSpecFeature(), config.instantSpec());
+    featureInstances.forEach(this::updateFeatureStatus);
   }
 
   public void disableAllFeatures() {
@@ -99,7 +93,8 @@ public class FeatureManager {
    * @param feature The feature to check
    */
   @VisibleForTesting
-  void updateFeatureStatus(@Nonnull Feature feature, boolean isEnabledInConfig) {
+  void updateFeatureStatus(@Nonnull StatelessFeature feature) {
+    boolean isEnabledInConfig = feature.isEnabledInConfig();
     boolean wasEnabled = activeFeatures.contains(feature);
 
     if (!wasEnabled && isEnabledInConfig) {

@@ -143,4 +143,9 @@ public class DepositFeature extends HideFeature {
   public String getConfigKey() {
     return DEPOSIT_CONFIG_KEY;
   }
+
+  @Override
+  public boolean isEnabledInConfig() {
+    return config.instantDeposit();
+  }
 }

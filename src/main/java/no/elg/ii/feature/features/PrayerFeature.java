@@ -310,4 +310,9 @@ public class PrayerFeature implements StatefulFeature {
   public String getConfigKey() {
     return PRAYER_CONFIG_KEY;
   }
+
+  @Override
+  public boolean isEnabledInConfig() {
+    return config.instantPrayer();
+  }
 }

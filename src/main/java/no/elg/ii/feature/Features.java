@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,13 @@
 package no.elg.ii.feature;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import no.elg.ii.feature.features.CleanHerbFeature;
 import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
@@ -74,4 +76,14 @@ public final class Features {
   @Inject
   @VisibleForTesting
   private SpecialAttackFeature specFeature;
+
+  public void forEach(@NonNull Consumer<StatelessFeature> action) {
+    action.accept(dropFeature);
+    action.accept(cleanHerbFeature);
+    action.accept(depositFeature);
+    action.accept(equipFeature);
+    action.accept(withdrawFeature);
+    action.accept(prayerFeature);
+    action.accept(specFeature);
+  }
 }

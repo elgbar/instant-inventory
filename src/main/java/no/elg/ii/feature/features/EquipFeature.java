@@ -224,4 +224,9 @@ public class EquipFeature implements StatefulFeature {
   public String getConfigKey() {
     return EQUIP_CONFIG_KEY;
   }
+
+  @Override
+  public boolean isEnabledInConfig() {
+    return config.instantEquip();
+  }
 }

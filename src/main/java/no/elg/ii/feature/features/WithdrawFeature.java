@@ -191,4 +191,9 @@ public class WithdrawFeature implements StatefulFeature {
   public String getConfigKey() {
     return WITHDRAW_CONFIG_KEY;
   }
+
+  @Override
+  public boolean isEnabledInConfig() {
+    return config.instantWithdraw();
+  }
 }

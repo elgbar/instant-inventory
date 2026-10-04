@@ -132,4 +132,9 @@ public class SpecialAttackFeature implements StatelessFeature {
   public @NonNull String getConfigKey() {
     return SPEC_CONFIG_KEY;
   }
+
+  @Override
+  public boolean isEnabledInConfig() {
+    return config.instantSpec();
+  }
 }

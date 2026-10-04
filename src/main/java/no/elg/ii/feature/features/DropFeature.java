@@ -84,4 +84,9 @@ public class DropFeature extends HideFeature {
   public String getConfigKey() {
     return DROP_CONFIG_KEY;
   }
+
+  @Override
+  public boolean isEnabledInConfig() {
+    return config.instantDrop();
+  }
 }

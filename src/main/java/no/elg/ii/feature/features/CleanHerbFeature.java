@@ -88,4 +88,9 @@ public class CleanHerbFeature implements StatefulFeature {
   public String getConfigKey() {
     return CLEAN_CONFIG_KEY;
   }
+
+  @Override
+  public boolean isEnabledInConfig() {
+    return config.instantClean();
+  }
 }
