@@ -11,15 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* [#29](https://github.com/elgbar/instant-inventory/pull/29) New feature, instant special attack, Thanks @BenChaimberg
-
 ### Changed
 
 ### Fixed
 
-* [#37](https://github.com/elgbar/instant-inventory/pull/37) Fix NPE on startup
-
 ### Removed
+
+---
+
+## 1.4.0 - 2026-10-04
+
+### Added
+
+* [#29](https://github.com/elgbar/instant-inventory/pull/29) New feature, instant special attack, Thanks @BenChaimberg
+
+### Fixed
+
+* [#37](https://github.com/elgbar/instant-inventory/pull/37) Fix NPE on startup
+* [#35](https://github.com/elgbar/instant-inventory/issues/35) Fix withdrawing noted items
+  * The item was internally set to the unnoted itemID, so the feature and rendering got confused
+* Fix using deprecated API
+* Fix herb cleaning not working on the Huasca herb
 
 ---
 
@@ -28,10 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * [#33](https://github.com/elgbar/instant-inventory/issues/33) Disallow all interaction with modified inventory widgets
-* [#35](https://github.com/elgbar/instant-inventory/issues/35) Fix withdrawing noted items
-  * The item was internally set to the unnoted itemID, so the feature and rendering got confused
-* Fix using deprecated API
-* Fix herb cleaning not working on the Huasca herb
 
 ---
 
