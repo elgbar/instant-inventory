@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,9 @@
 package no.elg.ii.feature;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,23 +40,58 @@ import org.junit.Test;
 
 public class FeatureManagerTest extends IntegrationTestHelper {
 
-
   @Test
   public void updateFeatureStatus() {
-    featureManager.updateFeatureStatus(dropFeature, false);
+    // Disabled in config and not active: nothing happens
+    doReturn(false).when(dropFeature).isEnabledInConfig();
+    featureManager.updateFeatureStatus(dropFeature);
     verify(dropFeature, never()).onEnable();
-    featureManager.updateFeatureStatus(dropFeature, false);
+    featureManager.updateFeatureStatus(dropFeature);
     verify(dropFeature, never()).onEnable();
-    featureManager.updateFeatureStatus(dropFeature, true);
-    verify(dropFeature).onEnable();
-    featureManager.updateFeatureStatus(dropFeature, true);
-    verify(dropFeature).onEnable();
+    assertFalse(featureManager.getActiveFeatures().contains(dropFeature));
 
+    // Enabled in config: enabled exactly once, even when updated again
+    doReturn(true).when(dropFeature).isEnabledInConfig();
+    featureManager.updateFeatureStatus(dropFeature);
+    verify(dropFeature).onEnable();
+    featureManager.updateFeatureStatus(dropFeature);
+    verify(dropFeature).onEnable();
+    assertTrue(featureManager.getActiveFeatures().contains(dropFeature));
+
+    // Disabled in config again: disabled exactly once, even when updated again
     verify(dropFeature, never()).onDisable();
-    featureManager.updateFeatureStatus(dropFeature, false);
+    doReturn(false).when(dropFeature).isEnabledInConfig();
+    featureManager.updateFeatureStatus(dropFeature);
     verify(dropFeature).onDisable();
-    featureManager.updateFeatureStatus(dropFeature, false);
+    featureManager.updateFeatureStatus(dropFeature);
     verify(dropFeature).onDisable();
+    assertFalse(featureManager.getActiveFeatures().contains(dropFeature));
+  }
+
+  @Test
+  public void updateAllFeatureStatus_checksEveryFeature() {
+    features.forEach(feature -> doReturn(false).when(feature).isEnabledInConfig());
+
+    featureManager.updateAllFeatureStatus();
+
+    features.forEach(feature -> verify(featureManager).updateFeatureStatus(feature));
+  }
+
+  @Test
+  public void enableFeature_offTheClientThread_failsTheClientThreadAssertion() throws Exception {
+    Throwable[] thrown = new Throwable[1];
+    Thread otherThread = new Thread(() -> {
+      try {
+        featureManager.enableFeature(dropFeature);
+      } catch (Throwable t) {
+        thrown[0] = t;
+      }
+    });
+    otherThread.start();
+    otherThread.join();
+
+    assertTrue("Expected the client thread assertion to fail, got " + thrown[0], thrown[0] instanceof AssertionError);
+    assertTrue(featureManager.getActiveFeatures().isEmpty());
   }
 
   @Test

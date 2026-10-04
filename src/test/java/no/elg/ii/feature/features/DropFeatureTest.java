@@ -32,11 +32,13 @@ import static no.elg.ii.feature.state.InventoryState.DEFAULT_MAX_UNMODIFIED_TICK
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import net.runelite.api.Client;
+import net.runelite.api.Item;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
@@ -59,12 +61,9 @@ public class DropFeatureTest extends StatefulFeatureTestMother<DropFeature> {
   @Test
   public void onMenuOptionClicked_doNothingWhenWidgetIsNull() {
     int index = 1;
-    int itemId = 2;
     DropFeature dropFeature = createNewInstance();
 
     MenuEntry menuEntry = mock(MenuEntry.class);
-    doReturn(DropFeature.DROP_OPTION).when(menuEntry).getOption();
-    doReturn(itemId).when(menuEntry).getItemId();
     doReturn(null).when(menuEntry).getWidget();
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
@@ -77,15 +76,12 @@ public class DropFeatureTest extends StatefulFeatureTestMother<DropFeature> {
   @Test
   public void onMenuOptionClicked_different_menuEntry_clicked_does_not_update_state() {
     int index = 1;
-    int itemId = 2;
     DropFeature dropFeature = createNewInstance();
 
     Widget widget = mock(Widget.class);
-    doReturn(index).when(widget).getIndex();
 
     MenuEntry menuEntry = mock(MenuEntry.class);
     doReturn("not drop").when(menuEntry).getOption();
-    doReturn(itemId).when(menuEntry).getItemId();
     doReturn(widget).when(menuEntry).getWidget();
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
@@ -107,16 +103,17 @@ public class DropFeatureTest extends StatefulFeatureTestMother<DropFeature> {
 
     MenuEntry menuEntry = mock(MenuEntry.class);
     doReturn(DropFeature.DROP_OPTION).when(menuEntry).getOption();
-    doReturn(itemId).when(menuEntry).getItemId();
     doReturn(widget).when(menuEntry).getWidget();
 
     InstantInventoryConfig config = spy(new InstantInventoryConfig() {
     });
-    Client client = mock(Client.class);
+    doReturn(0).when(config).minChangedMs();
+    Client client = TestSetup.mockClient();
     var inventoryService = mock(InventoryService.class);
     var widgetService = mock(WidgetService.class);
     InventoryState inventoryState = new InventoryState(config, client, inventoryService, widgetService);
-    doReturn(inventoryState).when(feature).getState();
+    feature.state = inventoryState;
+    doReturn(false).when(feature).willDropWarningBeShownForItem(anyInt(), anyInt());
 
     MenuOptionClicked event = new MenuOptionClicked(menuEntry);
 
@@ -125,11 +122,13 @@ public class DropFeatureTest extends StatefulFeatureTestMother<DropFeature> {
     assertTrue(feature.getState().getSlot(index).hasValidItemId());
     assertEquals(itemId, feature.getState().getSlot(index).getItemId());
 
-    feature.getState().validateState(index, null);
+    // The same item is still in the inventory, so the hidden slot must survive until it times out
+    Item itemStillInInventory = new Item(itemId, 0);
+    feature.getState().validateState(index, itemStillInInventory);
     assertTrue("State was reset when it should not have been", feature.getState().getSlot(index).hasValidItemId());
 
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS).when(client).getTickCount();
-    feature.getState().validateState(index, null);
+    feature.getState().validateState(index, itemStillInInventory);
     assertFalse("State was NOT reset when it should have been", feature.getState().getSlot(index).hasValidItemId());
   }
 

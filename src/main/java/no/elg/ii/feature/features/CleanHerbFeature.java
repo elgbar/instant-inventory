@@ -56,10 +56,12 @@ public class CleanHerbFeature implements StatefulFeature {
 
   @Inject
   @Getter
-  private InventoryState state;
+  @VisibleForTesting
+  public InventoryState state;
 
   @Inject
-  private WidgetService widgetService;
+  @VisibleForTesting
+  public WidgetService widgetService;
 
   @Inject
   private InstantInventoryConfig config;
@@ -77,7 +79,7 @@ public class CleanHerbFeature implements StatefulFeature {
         }
         int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
         if (herbloreLevel >= herbInfo.getMinLevel()) {
-          state.setSlot(widget.getIndex(), herbInfo.getCleanItemId(), widget.getItemQuantity(), widgetService.getChangeOpacity());
+          getState().setSlot(widget.getIndex(), herbInfo.getCleanItemId(), widget.getItemQuantity(), widgetService.getChangeOpacity());
         }
       }
     }

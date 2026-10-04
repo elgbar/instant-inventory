@@ -27,11 +27,9 @@
 
 package no.elg.ii.test;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.withSettings;
 
 import java.util.function.BooleanSupplier;
 import net.runelite.api.Client;
@@ -39,7 +37,6 @@ import net.runelite.client.callback.ClientThread;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.HideFeature;
-import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.features.CleanHerbFeature;
 import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
@@ -50,15 +47,16 @@ import no.elg.ii.feature.features.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
+import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 public class TestSetup {
 
   public static CleanHerbFeature createNewCleanHerbFeature() {
     CleanHerbFeature feature = spy(new CleanHerbFeature());
-    feature.client = mock(Client.class);
-
-    setupCommonFeature(feature, feature.client);
+    feature.client = mockClient();
+    feature.widgetService = mock(WidgetService.class);
+    feature.state = newInventoryState(feature.client);
     return feature;
   }
 
@@ -75,57 +73,86 @@ public class TestSetup {
   }
 
   public static EquipFeature createNewEquipFeature() {
-    EquipFeature feature = spy(new EquipFeature());
-    return feature;
+    return spy(new EquipFeature());
   }
 
   public static WithdrawFeature createNewWithdrawFeature() {
-    WithdrawFeature feature = spy(new WithdrawFeature());
-    return feature;
+    return spy(new WithdrawFeature());
   }
 
   public static PrayerFeature createNewInstantPrayer() {
-    PrayerFeature feature = spy(new PrayerFeature());
-    return feature;
+    return spy(new PrayerFeature());
   }
 
   public static SpecialAttackFeature createNewSpecFeature() {
-    SpecialAttackFeature feature = spy(new SpecialAttackFeature());
-    return feature;
+    return spy(new SpecialAttackFeature());
   }
 
-  private static void setupCommonFeature(StatefulFeature feature, Client client) {
-    var inventoryService = mock(InventoryService.class);
-    var widgetService = mock(WidgetService.class);
+  /**
+   * A mocked {@link Client} for which the thread calling this method, normally the JUnit thread, is
+   * the client thread. {@link Client#isClientThread()} is false on every other thread, so
+   * {@code assert client.isClientThread()} keeps catching mistakes in tests.
+   * <p>
+   * This is part of how the mock is defined rather than a stubbing, so strict stubs do not complain
+   * in tests that never reach such an assert.
+   */
+  public static Client mockClient() {
+    Thread clientThread = Thread.currentThread();
+    Answer<Object> clientThreadAware = invocation -> {
+      if ("isClientThread".equals(invocation.getMethod().getName())) {
+        return Thread.currentThread() == clientThread;
+      }
+      return Mockito.RETURNS_DEFAULTS.answer(invocation);
+    };
+    return mock(Client.class, withSettings().defaultAnswer(clientThreadAware));
+  }
 
-    InventoryState inventoryState = new InventoryState(spy(new InstantInventoryConfig() {
-    }), client, inventoryService, widgetService);
-    doReturn(inventoryState).when(feature).getState();
+  /**
+   * A {@link ClientThread} that runs everything immediately. Tests are single threaded and the
+   * JUnit thread is the client thread, so later collapses to now.
+   */
+  public static ClientThread inlineClientThread() {
+    return new JunitClientThread();
+  }
+
+  public static InventoryState newInventoryState(Client client) {
+    InstantInventoryConfig config = spy(new InstantInventoryConfig() {
+    });
+    return new InventoryState(config, client, mock(InventoryService.class), mock(WidgetService.class));
   }
 
   private static void setupHideFeature(HideFeature feature) {
-    setupCommonFeature(feature, mock(Client.class));
-    feature.clientThread = TestSetup.mockedClientThread();
-    InstantInventoryPlugin plugin = feature.plugin = mock(InstantInventoryPlugin.class);
-//    doReturn(EMPTY_WIDGET).when(plugin).inventoryItems(any());
+    feature.client = mockClient();
+    feature.state = newInventoryState(feature.client);
+    feature.clientThread = inlineClientThread();
+    feature.widgetService = mock(WidgetService.class);
+    feature.plugin = mock(InstantInventoryPlugin.class);
   }
 
-  public static ClientThread mockedClientThread() {
-    ClientThread clientThread = mock(ClientThread.class);
+  private static class JunitClientThread extends ClientThread {
+    @Override
+    public void invoke(Runnable r) {
+      r.run();
+    }
 
-    Answer<Void> runnableAnswer = invocation -> {
-      invocation.getArgument(0, Runnable.class).run();
-      return null;
-    };
-    doAnswer(runnableAnswer).when(clientThread).invoke(any(Runnable.class));
-    doAnswer(runnableAnswer).when(clientThread).invokeLater(any(Runnable.class));
+    @Override
+    public void invoke(BooleanSupplier r) {
+      r.getAsBoolean();
+    }
 
-    doAnswer(it -> it.getArgument(0, BooleanSupplier.class).getAsBoolean()).when(clientThread)
-      .invoke(any(BooleanSupplier.class));
-    doAnswer(it -> it.getArgument(0, BooleanSupplier.class).getAsBoolean()).when(clientThread)
-      .invokeLater(any(BooleanSupplier.class));
+    @Override
+    public void invokeLater(Runnable r) {
+      r.run();
+    }
 
-    return clientThread;
+    @Override
+    public void invokeLater(BooleanSupplier r) {
+      r.getAsBoolean();
+    }
+
+    @Override
+    public void invokeAtTickEnd(Runnable r) {
+      r.run();
+    }
   }
-
 }

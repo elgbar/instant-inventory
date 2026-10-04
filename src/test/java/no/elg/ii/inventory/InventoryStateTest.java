@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,9 +49,13 @@ import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
+import no.elg.ii.test.TestSetup;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class InventoryStateTest {
 
   private InventoryState inventoryState;
@@ -65,8 +69,14 @@ public class InventoryStateTest {
 
   @Before
   public void setUp() {
-    config = spy(InstantInventoryConfig.class);
-    client = mock(Client.class);
+    // These tests drive time through the tick count, so the wall clock guard is off
+    config = spy(new InstantInventoryConfig() {
+      @Override
+      public int minChangedMs() {
+        return 0;
+      }
+    });
+    client = TestSetup.mockClient();
     var inventoryService = mock(InventoryService.class);
     var widgetService = mock(WidgetService.class);
 
@@ -158,7 +168,7 @@ public class InventoryStateTest {
   public void validateState_timeout_resets_customizable_time() {
     int maxUnmodifiedTicks = DEFAULT_MAX_UNMODIFIED_TICKS + 1;
     doReturn(maxUnmodifiedTicks).when(config).maxUnmodifiedTicks();
-    inventoryState.setSlot(index, itemId, 0, FULLY_OPAQUE);
+    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());

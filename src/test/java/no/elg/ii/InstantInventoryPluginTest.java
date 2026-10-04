@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,12 @@
 
 package no.elg.ii;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.events.ConfigChanged;
 import no.elg.ii.test.IntegrationTestHelper;
@@ -39,9 +41,22 @@ import org.junit.Test;
 public class InstantInventoryPluginTest extends IntegrationTestHelper {
 
   @Test
-  public void startUp_calls_updateAllFeatures() {
+  public void startUp_calls_updateAllFeatures_when_logged_in() {
+    doNothing().when(featureManager).updateAllFeatureStatus();
+    doReturn(GameState.LOGGED_IN).when(client).getGameState();
+
     plugin.startUp();
+
     verify(featureManager).updateAllFeatureStatus();
+  }
+
+  @Test
+  public void startUp_does_not_update_features_when_not_logged_in() {
+    doReturn(GameState.STARTING).when(client).getGameState();
+
+    plugin.startUp();
+
+    verify(featureManager, never()).updateAllFeatureStatus();
   }
 
   @Test
@@ -51,19 +66,34 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   }
 
   @Test
-  public void onGameStateChanged_calls_nothing_on_incorrect_group() {
-    plugin.startUp();
-    plugin.onGameStateChanged(new GameStateChanged());
+  public void onGameStateChanged_calls_updateAllFeatureStatus_when_logged_in() {
+    doNothing().when(featureManager).updateAllFeatureStatus();
+    GameStateChanged gameStateChanged = new GameStateChanged();
+    gameStateChanged.setGameState(GameState.LOGGED_IN);
 
-    verify(dropFeature, times(2)).reset();
-    verify(cleanHerbFeature, times(2)).reset();
+    plugin.onGameStateChanged(gameStateChanged);
+
+    verify(featureManager).updateAllFeatureStatus();
+  }
+
+  @Test
+  public void onGameStateChanged_calls_nothing_on_other_states() {
+    GameStateChanged gameStateChanged = new GameStateChanged();
+    gameStateChanged.setGameState(GameState.LOGIN_SCREEN);
+
+    plugin.onGameStateChanged(gameStateChanged);
+
+    verify(featureManager, never()).updateAllFeatureStatus();
   }
 
   @Test
   public void onConfigChanged_calls_updateAllFeatureStatus_on_correct_group() {
+    doNothing().when(featureManager).updateAllFeatureStatus();
     ConfigChanged configChanged = new ConfigChanged();
     configChanged.setGroup(InstantInventoryConfig.GROUP);
+
     plugin.onConfigChanged(configChanged);
+
     verify(featureManager).updateAllFeatureStatus();
   }
 
@@ -71,7 +101,9 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   public void onConfigChanged_calls_nothing_on_incorrect_group() {
     ConfigChanged configChanged = new ConfigChanged();
     configChanged.setGroup("");
+
     plugin.onConfigChanged(configChanged);
+
     verify(featureManager, never()).updateAllFeatureStatus();
   }
 }

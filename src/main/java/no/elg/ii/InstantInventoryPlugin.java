@@ -93,7 +93,7 @@ public class InstantInventoryPlugin extends Plugin {
     GameState gameState = client.getGameState();
     if (gameState == GameState.LOGGED_IN) {
       log.debug("Starting up instant inventory. During the game state {}, will update all feature statues", gameState);
-      featureManager.updateAllFeatureStatus();
+      clientThread.invoke(featureManager::updateAllFeatureStatus);
     } else {
       log.debug("Starting up instant inventory. During the game state {}, no reset is done", gameState);
     }
@@ -103,7 +103,7 @@ public class InstantInventoryPlugin extends Plugin {
   protected void shutDown() {
     log.debug("Shutting down instant inventory plugin");
     // Disable all features when the plugin shuts down
-    featureManager.disableAllFeatures();
+    clientThread.invoke(featureManager::disableAllFeatures);
     eventBus.unregister(ensureWidgetStateService);
     eventBus.unregister(disallowModifiedWidgetInteractionService);
   }
@@ -132,12 +132,12 @@ public class InstantInventoryPlugin extends Plugin {
   @Subscribe
   public void onConfigChanged(ConfigChanged configChanged) {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
-      featureManager.updateAllFeatureStatus();
+      clientThread.invoke(featureManager::updateAllFeatureStatus);
     }
   }
 
   @Provides
-  InstantInventoryConfig provideConfig(ConfigManager configManager) {
+  public InstantInventoryConfig provideConfig(ConfigManager configManager) {
     return configManager.getConfig(InstantInventoryConfig.class);
   }
 }

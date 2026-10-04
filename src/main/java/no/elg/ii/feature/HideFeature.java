@@ -26,6 +26,7 @@
  */
 package no.elg.ii.feature;
 
+import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -54,7 +55,8 @@ public abstract class HideFeature implements StatefulFeature {
 
   @Inject
   @Getter
-  private InventoryState state;
+  @VisibleForTesting
+  public InventoryState state;
 
   @Inject
   public Client client;
@@ -63,6 +65,6 @@ public abstract class HideFeature implements StatefulFeature {
   public WidgetService widgetService;
 
   protected void hide(@Nonnull Widget widget) {
-    state.setSlot(widget, widgetService.getHideOpacity());
+    getState().setSlot(widget, widgetService.getHideOpacity());
   }
 }

@@ -34,19 +34,22 @@ import static no.elg.ii.feature.features.CleanHerbFeature.CLEAN_OPTION;
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
+import net.runelite.api.Skill;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
+import no.elg.ii.model.HerbInfo;
 import no.elg.ii.test.StatefulFeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
 
 public class CleanHerbFeatureTest extends StatefulFeatureTestMother<CleanHerbFeature> {
+
+  private static final int INDEX = 1;
+  private static final int MAX_LEVEL = 99;
 
   @Override
   public CleanHerbFeature createNewInstance() {
@@ -61,47 +64,83 @@ public class CleanHerbFeatureTest extends StatefulFeatureTestMother<CleanHerbFea
 
   @Test
   public void onMenuOptionClicked_happy_path() {
-    onMenuOptionClicked_test(UNIDENTIFIED_GUAM, UNIDENTIFIED_GUAM, true, CLEAN_OPTION, 99);
+    CleanHerbFeature feature = createNewInstance();
+    Widget widget = mock(Widget.class);
+    doReturn(INDEX).when(widget).getIndex();
+    MenuEntry menuEntry = menuEntry(CLEAN_OPTION, widget);
+    doReturn(UNIDENTIFIED_GUAM).when(menuEntry).getItemId();
+    doReturn(MAX_LEVEL).when(feature.client).getBoostedSkillLevel(Skill.HERBLORE);
+
+    click(feature, menuEntry);
+
+    // The slot holds what the widget should show, which is the cleaned herb
+    assertEquals(HerbInfo.HERBS.get(UNIDENTIFIED_GUAM).getCleanItemId(), feature.getState().getSlot(INDEX).getItemId());
   }
 
   @Test
   public void onMenuOptionClicked_no_widget() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, UNIDENTIFIED_GUAM, false, CLEAN_OPTION, 99);
+    CleanHerbFeature feature = createNewInstance();
+    MenuEntry menuEntry = menuEntry(CLEAN_OPTION, null);
+
+    click(feature, menuEntry);
+
+    assertSlotUntouched(feature);
   }
 
   @Test
   public void onMenuOptionClicked_not_clean_option() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, UNIDENTIFIED_GUAM, true, "not clean", 99);
+    CleanHerbFeature feature = createNewInstance();
+    MenuEntry menuEntry = menuEntry("not clean", mock(Widget.class));
+
+    click(feature, menuEntry);
+
+    assertSlotUntouched(feature);
   }
 
   @Test
   public void onMenuOptionClicked_not_a_herb() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, TZHAAR_CAPE_FIRE, true, CLEAN_OPTION, 99);
+    CleanHerbFeature feature = createNewInstance();
+    MenuEntry menuEntry = menuEntry(CLEAN_OPTION, mock(Widget.class));
+    doReturn(TZHAAR_CAPE_FIRE).when(menuEntry).getItemId();
+
+    click(feature, menuEntry);
+
+    assertSlotUntouched(feature);
   }
 
   @Test
   public void onMenuOptionClicked_too_low_level() {
-    onMenuOptionClicked_test(INVALID_ITEM_ID, UNIDENTIFIED_GUAM, true, CLEAN_OPTION, 1);
+    CleanHerbFeature feature = createNewInstance();
+    MenuEntry menuEntry = menuEntry(CLEAN_OPTION, mock(Widget.class));
+    doReturn(UNIDENTIFIED_GUAM).when(menuEntry).getItemId();
+    doReturn(1).when(feature.client).getBoostedSkillLevel(Skill.HERBLORE);
+
+    click(feature, menuEntry);
+
+    assertSlotUntouched(feature);
   }
 
-  private void onMenuOptionClicked_test(int stateItemId, int itemId, boolean hasWidget, String menuEntryOption, int level) {
-    int index = 1;
-    CleanHerbFeature feature = createNewInstance();
-
-    Widget widget = mock(Widget.class);
-    doReturn(index).when(widget).getIndex();
-
+  /**
+   * Each test stubs only what its code path reads, as the strict runner requires.
+   *
+   * @param widget The widget the entry was clicked on, {@code null} when there is none. A mock
+   *               returns {@code null} by default, and without a widget the option is never read.
+   */
+  private static MenuEntry menuEntry(String option, Widget widget) {
     MenuEntry menuEntry = mock(MenuEntry.class);
-    doReturn(menuEntryOption).when(menuEntry).getOption();
-    doReturn(itemId).when(menuEntry).getItemId();
-    doReturn(hasWidget ? widget : null).when(menuEntry).getWidget();
-    Client client = feature.client;
-    doReturn(level).when(client).getBoostedSkillLevel(any());
+    if (widget != null) {
+      doReturn(widget).when(menuEntry).getWidget();
+      doReturn(option).when(menuEntry).getOption();
+    }
+    return menuEntry;
+  }
 
-    MenuOptionClicked event = new MenuOptionClicked(menuEntry);
+  private static void click(CleanHerbFeature feature, MenuEntry menuEntry) {
+    assertFalse(feature.getState().getSlot(INDEX).hasValidItemId());
+    feature.onMenuOptionClicked(new MenuOptionClicked(menuEntry));
+  }
 
-    assertFalse(feature.getState().getSlot(index).hasValidItemId());
-    feature.onMenuOptionClicked(event);
-    assertEquals(stateItemId, feature.getState().getSlot(index).getItemId());
+  private static void assertSlotUntouched(CleanHerbFeature feature) {
+    assertEquals(INVALID_ITEM_ID, feature.getState().getSlot(INDEX).getItemId());
   }
 }

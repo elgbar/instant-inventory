@@ -36,10 +36,15 @@ import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.callback.ClientThread;
+import net.runelite.api.Client;
 import net.runelite.client.eventbus.EventBus;
-import no.elg.ii.InstantInventoryConfig;
 
+/**
+ * Keeps every feature enabled or disabled according to the config.
+ * <p>
+ * All methods that change feature state must be called on the client thread. Callers are
+ * responsible for getting there, see {@link net.runelite.client.callback.ClientThread}.
+ */
 @Slf4j
 @Singleton
 @NoArgsConstructor
@@ -57,14 +62,11 @@ public class FeatureManager {
   protected EventBus eventBus;
 
   @Inject
-  @VisibleForTesting
-  protected InstantInventoryConfig config;
-
-  @Inject
   protected Features featureInstances;
 
   @Inject
-  protected ClientThread clientThread;
+  @VisibleForTesting
+  protected Client client;
 
   /**
    * Make sure all features are in its correct state
@@ -74,6 +76,7 @@ public class FeatureManager {
   }
 
   public void disableAllFeatures() {
+    assert client.isClientThread();
     for (StatelessFeature feature : getActiveFeatures()) {
       disableFeature(feature);
     }
@@ -94,6 +97,7 @@ public class FeatureManager {
    */
   @VisibleForTesting
   void updateFeatureStatus(@Nonnull StatelessFeature feature) {
+    assert client.isClientThread();
     boolean isEnabledInConfig = feature.isEnabledInConfig();
     boolean wasEnabled = activeFeatures.contains(feature);
 
@@ -111,15 +115,14 @@ public class FeatureManager {
    */
   @VisibleForTesting
   void enableFeature(@Nonnull StatelessFeature feature) {
-    clientThread.invoke(() -> {
-      log.debug("Enabling {}", feature.getConfigKey());
-      eventBus.register(feature);
-      activeFeatures.add(feature);
-      feature.onEnable();
-      if (feature instanceof StatefulFeature) {
-        ((StatefulFeature) feature).reset();
-      }
-    });
+    assert client.isClientThread();
+    log.debug("Enabling {}", feature.getConfigKey());
+    eventBus.register(feature);
+    activeFeatures.add(feature);
+    feature.onEnable();
+    if (feature instanceof StatefulFeature) {
+      ((StatefulFeature) feature).reset();
+    }
   }
 
   /**
@@ -129,14 +132,13 @@ public class FeatureManager {
    */
   @VisibleForTesting
   void disableFeature(@Nonnull StatelessFeature feature) {
-    clientThread.invoke(() -> {
-      log.debug("Disabling {}", feature.getConfigKey());
-      eventBus.unregister(feature);
-      activeFeatures.remove(feature);
-      feature.onDisable();
-      if (feature instanceof StatefulFeature) {
-        ((StatefulFeature) feature).reset();
-      }
-    });
+    assert client.isClientThread();
+    log.debug("Disabling {}", feature.getConfigKey());
+    eventBus.unregister(feature);
+    activeFeatures.remove(feature);
+    feature.onDisable();
+    if (feature instanceof StatefulFeature) {
+      ((StatefulFeature) feature).reset();
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 
 package no.elg.ii.test;
 
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import net.runelite.api.Client;
@@ -49,18 +48,19 @@ import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-public class IntegrationTestHelper {
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
+public abstract class IntegrationTestHelper {
 
   protected InstantInventoryPlugin plugin;
   @Mock(answer = Answers.CALLS_REAL_METHODS)
   protected InstantInventoryConfig instantInventoryConfig;
   @Mock
   protected EventBus eventBus;
-  @Mock
-  protected Client client;
   @Mock
   protected InventoryService inventoryService;
   @Mock
@@ -69,6 +69,13 @@ public class IntegrationTestHelper {
   protected DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
   @Mock
   protected WidgetService widgetService;
+
+  /**
+   * Created in {@link #setUp()} rather than with {@link Mock} so the JUnit thread counts as the
+   * client thread, see {@link TestSetup#mockClient()}
+   */
+  protected Client client;
+  protected ClientThread clientThread;
 
   protected FeatureManager featureManager;
   protected Features features;
@@ -80,10 +87,12 @@ public class IntegrationTestHelper {
   protected WithdrawFeature withdrawFeature;
   protected SpecialAttackFeature specFeature;
   protected InventoryState inventoryState;
-  protected ClientThread clientThread;
 
   @Before
   public void setUp() {
+    client = TestSetup.mockClient();
+    clientThread = TestSetup.inlineClientThread();
+
     features = new Features(
       TestSetup.createNewDropFeature(),
       TestSetup.createNewCleanHerbFeature(),
@@ -100,12 +109,12 @@ public class IntegrationTestHelper {
     withdrawFeature = features.getWithdrawFeature();
     specFeature = features.getSpecFeature();
 
-    featureManager = spy(new FeatureManager(eventBus, instantInventoryConfig, features, clientThread));
+    featureManager = spy(new FeatureManager(eventBus, features, client));
 
     inventoryState = new InventoryState(instantInventoryConfig, client, inventoryService, widgetService);
-    doReturn(inventoryState).when(dropFeature).getState();
-    doReturn(inventoryState).when(cleanHerbFeature).getState();
-    doReturn(inventoryState).when(depositFeature).getState();
+    dropFeature.state = inventoryState;
+    cleanHerbFeature.state = inventoryState;
+    depositFeature.state = inventoryState;
 
     plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService));
   }
