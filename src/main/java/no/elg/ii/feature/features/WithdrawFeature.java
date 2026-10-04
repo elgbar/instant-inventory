@@ -42,8 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -115,7 +115,7 @@ public class WithdrawFeature implements StatefulFeature {
     int quantityToWithdraw = Math.min(bankWidget.getItemQuantity(), amount);
 
     if (bankWidgetComposition.isStackable()) {
-      Widget inventoryWidget = findFirst(client, ComponentID.BANK_INVENTORY_ITEM_CONTAINER, w -> w.getItemId() == bankWidgetItemId);
+      Widget inventoryWidget = findFirst(client, InterfaceID.Bankside.ITEMS, w -> w.getItemId() == bankWidgetItemId);
       if (inventoryWidget != null) {
         //There is a matching widget, so we can just update the quantity
         updateBankItem(bankWidget, quantityToWithdraw);
@@ -138,7 +138,7 @@ public class WithdrawFeature implements StatefulFeature {
   /**
    * @return Whether the item can be noted
    */
-  private boolean isItemNotable(ItemComposition itemComposition) {
+  private static boolean isItemNotable(ItemComposition itemComposition) {
     return itemComposition.getLinkedNoteId() > 0;
   }
 
@@ -146,7 +146,7 @@ public class WithdrawFeature implements StatefulFeature {
    * @return {@code false} if there is no more space in the inventory, {@code true} otherwise
    */
   private boolean fillFirstEmpty(Widget bankWidget, int actualItemId, int quantityToWithdraw) {
-    var emptyWidget = findFirst(client, ComponentID.BANK_INVENTORY_ITEM_CONTAINER, widget -> {
+    var emptyWidget = findFirst(client, InterfaceID.Bankside.ITEMS, widget -> {
       @Nullable
       InventorySlot slot = getState().getSlot(widget.getIndex());
       return isEmpty(widget) && slot != null && !slot.hasValidItemId();
