@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ import java.util.function.BiPredicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
@@ -47,6 +48,7 @@ import no.elg.ii.util.WidgetUtils;
  * This only applies to the clicked item, but it is not known <b>when</b> the item was clicked.
  * So this is a brute-force method to ensure that the item is hidden.
  */
+@Slf4j
 @Singleton
 @NoArgsConstructor
 public class EnsureWidgetStateService {
@@ -78,6 +80,7 @@ public class EnsureWidgetStateService {
   }
 
   private void setWidgetFromSlot(Widget widget, InventorySlot slot) {
+    log.debug("Widget inconsistent with internal inventory state! Displayed widget {} should have item id {}, quantity {}, opacity {}", WidgetUtils.debugInfo(widget), slot.getItemId(), slot.getQuantity(), slot.getOpacity());
     widgetService.updateVisibleWidget(widget, slot.getItemId(), slot.getQuantity());
     widgetService.setOpacity(widget, slot.getOpacity(), true);
   }
