@@ -60,6 +60,7 @@ public class HerbInfo {
     herbs.put(ItemID.UNIDENTIFIED_IRIT, new HerbInfo(ItemID.IRIT_LEAF, 40));
     herbs.put(ItemID.UNIDENTIFIED_AVANTOE, new HerbInfo(ItemID.AVANTOE, 48));
     herbs.put(ItemID.UNIDENTIFIED_KWUARM, new HerbInfo(ItemID.KWUARM, 54));
+    herbs.put(ItemID.UNIDENTIFIED_HUASCA, new HerbInfo(ItemID.HUASCA, 58));
     herbs.put(ItemID.UNIDENTIFIED_SNAPDRAGON, new HerbInfo(ItemID.SNAPDRAGON, 59));
     herbs.put(ItemID.UNIDENTIFIED_CADANTINE, new HerbInfo(ItemID.CADANTINE, 65));
     herbs.put(ItemID.UNIDENTIFIED_DWARF_WEED, new HerbInfo(ItemID.DWARF_WEED, 70));
