@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,11 +27,11 @@
 
 package no.elg.ii.feature.features;
 
-import no.elg.ii.test.FeatureTestMother;
+import no.elg.ii.test.StatefulFeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
 
-public class DepositFeatureTest extends FeatureTestMother<DepositFeature> {
+public class DepositFeatureTest extends StatefulFeatureTestMother<DepositFeature> {
 
   @Override
   public DepositFeature createNewInstance() {

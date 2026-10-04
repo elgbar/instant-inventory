@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Elg
+ * Copyright (c) 2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,26 +24,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+package no.elg.ii.feature;
 
-package no.elg.ii.feature.state;
 
-import javax.inject.Singleton;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.NonNull;
+import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.plugins.Plugin;
+import no.elg.ii.InstantInventoryConfig;
 
 /**
- * A no-op implementation of {@link FeatureState} that does nothing.
- * This is used when no state management is required.
+ * A feature of the instant inventory plugin.
+ * Usually each feature implements {@link StatefulFeature} when they need a state.
  */
-@Slf4j
-@Singleton
-@NoArgsConstructor
-public class NoOpState implements FeatureState {
-  @Override
-  public void resetAll() {
+public interface StatelessFeature {
+
+  /**
+   * @return Config key in {@link InstantInventoryConfig} for this feature
+   */
+  @NonNull
+  String getConfigKey();
+
+  /**
+   * @return If the relevant {@link InstantInventoryConfig} toggle is enabled
+   */
+  boolean isEnabledInConfig();
+
+  /**
+   * Method run when this feature is loaded in, either on {@link Plugin#startUp()} or when
+   * {@link ConfigChanged} and this feature is enabled in the config and not already loaded.
+   */
+  default void onEnable() {
   }
 
-  @Override
-  public void validateAll() {
+  /**
+   * Method run when this feature is disabled, either on {@link Plugin#shutDown()} or when
+   * {@link ConfigChanged} and this feature is disabled in the config and is loaded.
+   */
+  default void onDisable() {
   }
 }

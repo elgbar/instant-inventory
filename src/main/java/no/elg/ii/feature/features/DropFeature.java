@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -79,8 +79,9 @@ public class DropFeature extends HideFeature {
     return varService.varbitValue(VarbitID.OPTION_DROPWARNING_VALUE) < price * quantity;
   }
 
+  @NonNull
   @Override
-  public @NonNull String getConfigKey() {
+  public String getConfigKey() {
     return DROP_CONFIG_KEY;
   }
 }

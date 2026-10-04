@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,11 +45,11 @@ import no.elg.ii.feature.HideFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
-import no.elg.ii.test.FeatureTestMother;
+import no.elg.ii.test.StatefulFeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
 
-public class DropFeatureTest extends FeatureTestMother<DropFeature> {
+public class DropFeatureTest extends StatefulFeatureTestMother<DropFeature> {
 
   @Override
   public DropFeature createNewInstance() {

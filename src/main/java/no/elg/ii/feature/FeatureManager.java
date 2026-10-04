@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ public class FeatureManager {
    * The currently loaded features
    */
   @VisibleForTesting
-  protected final Set<Feature> activeFeatures = ConcurrentHashMap.newKeySet();
+  protected final Set<StatelessFeature> activeFeatures = ConcurrentHashMap.newKeySet();
 
   @Inject
   @VisibleForTesting
@@ -80,7 +80,7 @@ public class FeatureManager {
   }
 
   public void disableAllFeatures() {
-    for (Feature feature : getActiveFeatures()) {
+    for (StatelessFeature feature : getActiveFeatures()) {
       disableFeature(feature);
     }
   }
@@ -88,7 +88,7 @@ public class FeatureManager {
   /**
    * @return Thread safe view of the currently active features
    */
-  public Set<Feature> getActiveFeatures() {
+  public Set<StatelessFeature> getActiveFeatures() {
     return Set.copyOf(activeFeatures);
   }
 
@@ -96,8 +96,7 @@ public class FeatureManager {
    * Make sure a feature is in its correct state, that is disabled when disabled in the config and
    * vice versa
    *
-   * @param feature           The feature to check
-   * @param isEnabledInConfig Whether the feature is currently enable in the config
+   * @param feature The feature to check
    */
   @VisibleForTesting
   void updateFeatureStatus(@Nonnull Feature feature, boolean isEnabledInConfig) {
@@ -116,13 +115,15 @@ public class FeatureManager {
    * @param feature The feature to enable
    */
   @VisibleForTesting
-  void enableFeature(@Nonnull Feature feature) {
+  void enableFeature(@Nonnull StatelessFeature feature) {
     clientThread.invoke(() -> {
       log.debug("Enabling {}", feature.getConfigKey());
       eventBus.register(feature);
       activeFeatures.add(feature);
       feature.onEnable();
-      feature.reset();
+      if (feature instanceof StatefulFeature) {
+        ((StatefulFeature) feature).reset();
+      }
     });
   }
 
@@ -132,13 +133,15 @@ public class FeatureManager {
    * @param feature The feature to disable
    */
   @VisibleForTesting
-  void disableFeature(@Nonnull Feature feature) {
+  void disableFeature(@Nonnull StatelessFeature feature) {
     clientThread.invoke(() -> {
       log.debug("Disabling {}", feature.getConfigKey());
       eventBus.unregister(feature);
       activeFeatures.remove(feature);
       feature.onDisable();
-      feature.reset();
+      if (feature instanceof StatefulFeature) {
+        ((StatefulFeature) feature).reset();
+      }
     });
   }
 }

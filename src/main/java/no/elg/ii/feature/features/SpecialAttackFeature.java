@@ -31,7 +31,6 @@ import com.google.common.annotations.VisibleForTesting;
 import java.awt.Color;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -43,15 +42,15 @@ import net.runelite.api.gameval.SpriteID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.feature.Feature;
-import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.feature.StatelessFeature;
 import no.elg.ii.service.VarService;
 
 
 @Slf4j
 @Singleton
 @NoArgsConstructor
-public class SpecialAttackFeature implements Feature {
+public class SpecialAttackFeature implements StatelessFeature {
 
   public static final String SPEC_CONFIG_KEY = "instantSpec";
   private static final int SPEC_ACTIVE_COLOR = Color.YELLOW.getRGB();
@@ -69,15 +68,12 @@ public class SpecialAttackFeature implements Feature {
 
   @Inject
   @VisibleForTesting
-  Client client;
+  private Client client;
 
   @Inject
   private VarService varService;
-
   @Inject
-  @Getter
-  private InventoryState state;
-
+  private InstantInventoryConfig config;
 
   /* (non-javadoc)
    * Uses the ScriptPreFired event because the SA_ATTACK varbit is updated by the TOGGLE_QUICK_PRAYER_SCRIPT_ID

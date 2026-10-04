@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.model.IndexedWidget;
@@ -59,7 +59,7 @@ import no.elg.ii.service.WidgetService;
  * Hold the state of the players inventory. The state is checked every server tick in
  * {@link InstantInventoryPlugin#onGameTick(GameTick)}
  * <p>
- * A {@link Feature} uses this class to handle how to render the changes on the client. Typically, a
+ * A {@link StatefulFeature} uses this class to handle how to render the changes on the client. Typically, a
  * feature will modify the rendering of a given item in the inventory of the player when the
  * {@link #getSlot(int)} is different to {@link InventorySlot#INVALID_ITEM_ID}.
  * <p>

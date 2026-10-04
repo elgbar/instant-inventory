@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStats;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
@@ -66,7 +67,7 @@ import org.apache.commons.lang3.tuple.Pair;
 @Slf4j
 @Singleton
 @NoArgsConstructor
-public class EquipFeature implements Feature {
+public class EquipFeature implements StatefulFeature {
 
   public static final Set<String> EQUIP_OPTIONS = Set.of("Wear", "Wield", "Equip");
   public static final String EQUIP_CONFIG_KEY = "instantEquip";
@@ -89,6 +90,8 @@ public class EquipFeature implements Feature {
   private WidgetService widgetService;
   @Inject
   private InventoryService inventoryService;
+  @Inject
+  private InstantInventoryConfig config;
 
   /**
    * The last tick each slot was equipped
@@ -216,8 +219,9 @@ public class EquipFeature implements Feature {
     return index == EquipmentInventorySlot.WEAPON.getSlotIdx();
   }
 
+  @NonNull
   @Override
-  public @NonNull String getConfigKey() {
+  public String getConfigKey() {
     return EQUIP_CONFIG_KEY;
   }
 }

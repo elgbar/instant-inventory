@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,11 +38,11 @@ import static org.mockito.Mockito.verify;
 import java.lang.reflect.Method;
 import net.runelite.client.config.ConfigItem;
 import no.elg.ii.InstantInventoryConfig;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
 import org.junit.Test;
 
-public abstract class FeatureTestMother<T extends Feature> {
+public abstract class StatefulFeatureTestMother<T extends StatefulFeature> {
 
   /**
    * @return A {@link org.mockito.Spy} instance of this feature
@@ -51,7 +51,7 @@ public abstract class FeatureTestMother<T extends Feature> {
 
   @Test
   public void configTest() {
-    Feature feature = createNewInstance();
+    StatefulFeature feature = createNewInstance();
 
     try {
       Method method = InstantInventoryConfig.class.getMethod(feature.getConfigKey());
@@ -67,7 +67,7 @@ public abstract class FeatureTestMother<T extends Feature> {
 
   @Test
   public void reset_calls_state_resetAll() {
-    Feature feature = createNewInstance();
+    StatefulFeature feature = createNewInstance();
     InventoryState mockState = mock(InventoryState.class);
     doReturn(mockState).when(feature).getState();
     doNothing().when(mockState).resetAll();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,11 +42,11 @@ import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
-import no.elg.ii.test.FeatureTestMother;
+import no.elg.ii.test.StatefulFeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
 
-public class CleanHerbFeatureTest extends FeatureTestMother<CleanHerbFeature> {
+public class CleanHerbFeatureTest extends StatefulFeatureTestMother<CleanHerbFeature> {
 
   @Override
   public CleanHerbFeature createNewInstance() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,8 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.service.VarService;
@@ -58,7 +59,7 @@ import no.elg.ii.util.WidgetUtils;
 @Slf4j
 @Singleton
 @NoArgsConstructor
-public class WithdrawFeature implements Feature {
+public class WithdrawFeature implements StatefulFeature {
 
   public static final String WITHDRAW_PREFIX_OPTION = "Withdraw-";
   public static final String WITHDRAW_CONFIG_KEY = "instantWithdraw";
@@ -66,11 +67,9 @@ public class WithdrawFeature implements Feature {
   @Inject
   @VisibleForTesting
   Client client;
-
   @Inject
   @VisibleForTesting
   public ItemManager itemManager;
-
   @Inject
   @Getter
   private InventoryState state;
@@ -78,6 +77,8 @@ public class WithdrawFeature implements Feature {
   private WidgetService widgetService;
   @Inject
   private VarService varService;
+  @Inject
+  private InstantInventoryConfig config;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -185,8 +186,9 @@ public class WithdrawFeature implements Feature {
     return varService.isVarbitFalse(VarbitID.BANK_LEAVEPLACEHOLDERS);
   }
 
+  @NonNull
   @Override
-  public @NonNull String getConfigKey() {
+  public String getConfigKey() {
     return WITHDRAW_CONFIG_KEY;
   }
 }

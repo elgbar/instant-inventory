@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  */
 package no.elg.ii.feature;
 
-import com.google.common.annotations.VisibleForTesting;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -42,13 +41,12 @@ import no.elg.ii.service.WidgetService;
 
 @Slf4j
 @NoArgsConstructor
-public abstract class HideFeature implements Feature {
+public abstract class HideFeature implements StatefulFeature {
 
   @Inject
   public InstantInventoryPlugin plugin;
 
   @Inject
-  @VisibleForTesting
   protected InstantInventoryConfig config;
 
   @Inject

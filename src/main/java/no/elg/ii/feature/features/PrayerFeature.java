@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Elg
+ * Copyright (c) 2025-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,8 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.PrayerState;
 import no.elg.ii.model.PrayerInfo;
 import no.elg.ii.service.VarService;
@@ -61,7 +62,7 @@ import no.elg.ii.util.WidgetUtils;
 @Slf4j
 @Singleton
 @NoArgsConstructor
-public class PrayerFeature implements Feature {
+public class PrayerFeature implements StatefulFeature {
 
   public static final String PRAYER_CONFIG_KEY = "instantPrayer";
 
@@ -100,6 +101,8 @@ public class PrayerFeature implements Feature {
 
   @Inject
   private WidgetService widgetService;
+  @Inject
+  private InstantInventoryConfig config;
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
@@ -302,8 +305,9 @@ public class PrayerFeature implements Feature {
     }
   }
 
+  @NonNull
   @Override
-  public @NonNull String getConfigKey() {
+  public String getConfigKey() {
     return PRAYER_CONFIG_KEY;
   }
 }

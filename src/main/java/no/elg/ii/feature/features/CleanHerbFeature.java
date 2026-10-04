@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,14 +37,15 @@ import net.runelite.api.Skill;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
-import no.elg.ii.feature.Feature;
+import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.model.HerbInfo;
 import no.elg.ii.service.WidgetService;
 
 @Singleton
 @NoArgsConstructor
-public class CleanHerbFeature implements Feature {
+public class CleanHerbFeature implements StatefulFeature {
 
   public static final String CLEAN_OPTION = "Clean";
   public static final String CLEAN_CONFIG_KEY = "instantClean";
@@ -59,6 +60,9 @@ public class CleanHerbFeature implements Feature {
 
   @Inject
   private WidgetService widgetService;
+
+  @Inject
+  private InstantInventoryConfig config;
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -79,8 +83,8 @@ public class CleanHerbFeature implements Feature {
     }
   }
 
-  @Override
   @NonNull
+  @Override
   public String getConfigKey() {
     return CLEAN_CONFIG_KEY;
   }

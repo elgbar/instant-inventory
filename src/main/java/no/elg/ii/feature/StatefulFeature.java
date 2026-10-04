@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,37 +28,18 @@ package no.elg.ii.feature;
 
 
 import lombok.NonNull;
-import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.plugins.Plugin;
 import no.elg.ii.feature.state.FeatureState;
 
 /**
  * A feature of the instant inventory plugin. Features have a {@link #getState()} which hold how the client know the difference between server and client.
  */
-public interface Feature {
+public interface StatefulFeature extends StatelessFeature {
 
   /**
    * @return The state of the feature
    */
   @NonNull
   FeatureState getState();
-
-  @NonNull
-  String getConfigKey();
-
-  /**
-   * Method run when this feature is loaded in, either on {@link Plugin#startUp()} or when
-   * {@link ConfigChanged} and this feature is enabled in the config and not already loaded.
-   */
-  default void onEnable() {
-  }
-
-  /**
-   * Method run when this feature is disabled, either on {@link Plugin#shutDown()} or when
-   * {@link ConfigChanged} and this feature is disabled in the config and is loaded.
-   */
-  default void onDisable() {
-  }
 
   /**
    * Reset the feature to its initial state.

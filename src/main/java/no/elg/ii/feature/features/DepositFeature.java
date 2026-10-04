@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -138,8 +138,9 @@ public class DepositFeature extends HideFeature {
     }
   }
 
+  @NonNull
   @Override
-  public @NonNull String getConfigKey() {
+  public String getConfigKey() {
     return DEPOSIT_CONFIG_KEY;
   }
 }

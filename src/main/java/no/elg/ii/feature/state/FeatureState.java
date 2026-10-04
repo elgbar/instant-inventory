@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Elg
+ * Copyright (c) 2025-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,10 @@
 
 package no.elg.ii.feature.state;
 
+import no.elg.ii.feature.StatefulFeature;
+
 /**
- *
+ * State of a {@link StatefulFeature}, used to know the difference between server and client.
  */
 public interface FeatureState {
 

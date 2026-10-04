@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,8 +38,8 @@ import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
-import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.HideFeature;
+import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.features.CleanHerbFeature;
 import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
@@ -94,7 +94,7 @@ public class TestSetup {
     return feature;
   }
 
-  private static void setupCommonFeature(Feature feature, Client client) {
+  private static void setupCommonFeature(StatefulFeature feature, Client client) {
     var inventoryService = mock(InventoryService.class);
     var widgetService = mock(WidgetService.class);
 
