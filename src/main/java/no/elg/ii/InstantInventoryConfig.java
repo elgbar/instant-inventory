@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -146,9 +146,9 @@ public interface InstantInventoryConfig extends Config {
   @ConfigItem(
     keyName = SPEC_CONFIG_KEY,
     section = FEATURE_SECTION,
-    name = "Spec Bar Instant Highlight",
+    name = "Highlight Spec Bar Instantly",
     description = "Highlight the special attack bar instantly",
-    position = 4
+    position = 6
   )
   default boolean instantSpec() {
     return true;
