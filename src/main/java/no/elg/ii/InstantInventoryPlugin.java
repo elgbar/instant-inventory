@@ -90,10 +90,18 @@ public class InstantInventoryPlugin extends Plugin {
   protected void startUp() {
     eventBus.register(ensureWidgetStateService);
     eventBus.register(disallowModifiedWidgetInteractionService);
+    GameState gameState = client.getGameState();
+    if (gameState == GameState.LOGGED_IN) {
+      log.debug("Starting up instant inventory. During the game state {}, will update all feature statues", gameState);
+      featureManager.updateAllFeatureStatus();
+    } else {
+      log.debug("Starting up instant inventory. During the game state {}, no reset is done", gameState);
+    }
   }
 
   @Override
   protected void shutDown() {
+    log.debug("Shutting down instant inventory plugin");
     // Disable all features when the plugin shuts down
     featureManager.disableAllFeatures();
     eventBus.unregister(ensureWidgetStateService);
