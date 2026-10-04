@@ -57,11 +57,11 @@ public class SpecialAttackFeature implements Feature {
   private static final int SPEC_ACTIVE_COLOR = Color.YELLOW.getRGB();
   private static final int SPEC_INACTIVE_COLOR = Color.BLACK.getRGB();
   /**
-   * @see net.runelite.api.SpriteID.MINIMAP_ORB_SPECIAL
+   * @see net.runelite.api.SpriteID#MINIMAP_ORB_SPECIAL
    */
   private static final int SPRITE_ID_SPEC_ORB_FILLER_INACTIVE = SpriteID.OrbFiller._9;
   /**
-   * @see net.runelite.api.SpriteID.MINIMAP_ORB_SPECIAL_ACTIVATED
+   * @see net.runelite.api.SpriteID#MINIMAP_ORB_SPECIAL_ACTIVATED
    */
   private static final int SPRITE_ID_SPEC_ORB_FILLER_ACTIVE = SpriteID.OrbFiller._10;
 
