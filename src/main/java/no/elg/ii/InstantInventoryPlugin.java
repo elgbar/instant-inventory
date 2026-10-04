@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2025 Elg
+ * Copyright (c) 2022-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@ package no.elg.ii;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
-import java.util.Set;
 import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -44,7 +43,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.FeatureManager;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
@@ -90,7 +88,6 @@ public class InstantInventoryPlugin extends Plugin {
 
   @Override
   protected void startUp() {
-    featureManager.updateAllFeatureStatus();
     eventBus.register(ensureWidgetStateService);
     eventBus.register(disallowModifiedWidgetInteractionService);
   }
@@ -120,10 +117,7 @@ public class InstantInventoryPlugin extends Plugin {
   public void onGameStateChanged(GameStateChanged event) {
     if (event.getGameState() == GameState.LOGGED_IN) {
       log.debug("Resetting features as the GameState changed to {}", event.getGameState());
-      Set<Feature> activeFeatures = featureManager.getActiveFeatures();
-      for (Feature feature : activeFeatures) {
-        feature.reset();
-      }
+      featureManager.updateAllFeatureStatus();
     }
   }
 

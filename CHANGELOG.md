@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* [#37](https://github.com/elgbar/instant-inventory/pull/37) Fix NPE on startup
+
 ### Removed
 
 ---
