@@ -154,7 +154,7 @@ public class WithdrawFeature implements StatefulFeature {
     if (emptyWidget != null) {
       widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw);
       updateBankItem(bankWidget, quantityToWithdraw);
-      getState().setSlot(emptyWidget.getIndex(), bankWidget.getItemId(), quantityToWithdraw, widgetService.getChangeOpacity());
+      getState().setSlot(emptyWidget.getIndex(), actualItemId, quantityToWithdraw, widgetService.getChangeOpacity());
       return false;
     }
     return true;

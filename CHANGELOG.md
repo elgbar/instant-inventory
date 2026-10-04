@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * [#33](https://github.com/elgbar/instant-inventory/issues/33) Disallow all interaction with modified inventory widgets
 * Fix using deprecated API
 * Fix herb cleaning not working on the Huasca herb
+* Fix flickering with unnoted item when withdrawing noted notable items
 
 ---
 
