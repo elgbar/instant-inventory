@@ -37,10 +37,11 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.SpriteID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.feature.Feature;
 import no.elg.ii.feature.state.InventoryState;
@@ -55,13 +56,20 @@ public class SpecialAttackFeature implements Feature {
   public static final String SPEC_CONFIG_KEY = "instantSpec";
   private static final int SPEC_ACTIVE_COLOR = Color.YELLOW.getRGB();
   private static final int SPEC_INACTIVE_COLOR = Color.BLACK.getRGB();
+  /**
+   * @see net.runelite.api.SpriteID.MINIMAP_ORB_SPECIAL
+   */
+  private static final int SPRITE_ID_SPEC_ORB_FILLER_INACTIVE = SpriteID.OrbFiller._9;
+  /**
+   * @see net.runelite.api.SpriteID.MINIMAP_ORB_SPECIAL_ACTIVATED
+   */
+  private static final int SPRITE_ID_SPEC_ORB_FILLER_ACTIVE = SpriteID.OrbFiller._10;
+
+  private static final int TOGGLE_QUICK_SPECIAL_ATTACK_SCRIPT_ID = 2793;
 
   @Inject
   @VisibleForTesting
   Client client;
-  @Inject
-  @VisibleForTesting
-  ClientThread clientThread;
 
   @Inject
   private VarService varService;
@@ -70,18 +78,48 @@ public class SpecialAttackFeature implements Feature {
   @Getter
   private InventoryState state;
 
+
+  /* (non-javadoc)
+   * Uses the ScriptPreFired event because the SA_ATTACK varbit is updated by the TOGGLE_QUICK_PRAYER_SCRIPT_ID
+   */
+  @Subscribe
+  public void onScriptPreFired(final ScriptPreFired event) {
+    assert client.isClientThread();
+    if (event.getScriptId() == TOGGLE_QUICK_SPECIAL_ATTACK_SCRIPT_ID) {
+      //No need to call updateSpecOrb as it is updated clientside from before
+      updateSpecBar();
+    }
+  }
+
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
+    assert client.isClientThread();
     Widget widget = event.getWidget();
     if (widget != null) {
       String menuOption = event.getMenuOption();
       if (menuOption.contains("Use") && menuOption.contains("Special Attack")) {
-        clientThread.invokeAtTickEnd(this::highlightSpec);
+        updateSpecBar();
+        updateSpecOrb();
       }
     }
   }
 
-  public void highlightSpec() {
+  private void updateSpecOrb() {
+    assert client.isClientThread();
+    Widget specWidget = client.getWidget(InterfaceID.Orbs.SPECENERGY_INDICATOR);
+    if (specWidget != null) {
+      if (varService.isVarpTrue(VarPlayerID.SA_ATTACK)) {
+        // was enabled, mark as disabled
+        specWidget.setSpriteId(SPRITE_ID_SPEC_ORB_FILLER_INACTIVE);
+      } else {
+        // was disabled, mark as enabled
+        specWidget.setSpriteId(SPRITE_ID_SPEC_ORB_FILLER_ACTIVE);
+      }
+    }
+  }
+
+  private void updateSpecBar() {
+    assert client.isClientThread();
     Widget specWidget = client.getWidget(InterfaceID.CombatInterface.SP_INDICATOR);
     if (specWidget != null) {
       if (varService.isVarpTrue(VarPlayerID.SA_ATTACK)) {
