@@ -40,6 +40,7 @@ import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
 import no.elg.ii.feature.features.EquipFeature;
 import no.elg.ii.feature.features.PrayerFeature;
+import no.elg.ii.feature.features.SpecialAttackFeature;
 import no.elg.ii.feature.features.WithdrawFeature;
 
 @Singleton
@@ -72,6 +73,10 @@ public final class Features {
   @VisibleForTesting
   private PrayerFeature prayerFeature;
 
+  @Inject
+  @VisibleForTesting
+  private SpecialAttackFeature specFeature;
+
   public void forEach(@NonNull Consumer<StatelessFeature> action) {
     action.accept(dropFeature);
     action.accept(cleanHerbFeature);
@@ -79,5 +84,6 @@ public final class Features {
     action.accept(equipFeature);
     action.accept(withdrawFeature);
     action.accept(prayerFeature);
+    action.accept(specFeature);
   }
 }

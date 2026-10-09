@@ -42,6 +42,7 @@ import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
 import no.elg.ii.feature.features.EquipFeature;
 import no.elg.ii.feature.features.PrayerFeature;
+import no.elg.ii.feature.features.SpecialAttackFeature;
 import no.elg.ii.feature.features.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.InventoryService;
@@ -81,6 +82,10 @@ public class TestSetup {
 
   public static PrayerFeature createNewInstantPrayer() {
     return spy(new PrayerFeature());
+  }
+
+  public static SpecialAttackFeature createNewSpecFeature() {
+    return spy(new SpecialAttackFeature());
   }
 
   /**

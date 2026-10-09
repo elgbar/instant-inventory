@@ -40,6 +40,7 @@ import no.elg.ii.feature.features.CleanHerbFeature;
 import no.elg.ii.feature.features.DepositFeature;
 import no.elg.ii.feature.features.DropFeature;
 import no.elg.ii.feature.features.EquipFeature;
+import no.elg.ii.feature.features.SpecialAttackFeature;
 import no.elg.ii.feature.features.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
@@ -84,6 +85,7 @@ public abstract class IntegrationTestHelper {
   protected DepositFeature depositFeature;
   protected EquipFeature equipFeature;
   protected WithdrawFeature withdrawFeature;
+  protected SpecialAttackFeature specFeature;
   protected InventoryState inventoryState;
 
   @Before
@@ -97,13 +99,15 @@ public abstract class IntegrationTestHelper {
       TestSetup.createNewDepositFeature(),
       TestSetup.createNewEquipFeature(),
       TestSetup.createNewWithdrawFeature(),
-      TestSetup.createNewInstantPrayer()
+      TestSetup.createNewInstantPrayer(),
+      TestSetup.createNewSpecFeature()
     );
     dropFeature = features.getDropFeature();
     cleanHerbFeature = features.getCleanHerbFeature();
     depositFeature = features.getDepositFeature();
     equipFeature = features.getEquipFeature();
     withdrawFeature = features.getWithdrawFeature();
+    specFeature = features.getSpecFeature();
 
     featureManager = spy(new FeatureManager(eventBus, features, client));
 
