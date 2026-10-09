@@ -32,7 +32,6 @@ import static no.elg.ii.feature.features.DepositFeature.DEPOSIT_CONFIG_KEY;
 import static no.elg.ii.feature.features.DropFeature.DROP_CONFIG_KEY;
 import static no.elg.ii.feature.features.EquipFeature.EQUIP_CONFIG_KEY;
 import static no.elg.ii.feature.features.PrayerFeature.PRAYER_CONFIG_KEY;
-import static no.elg.ii.feature.features.SpecialAttackFeature.SPEC_CONFIG_KEY;
 import static no.elg.ii.feature.features.WithdrawFeature.WITHDRAW_CONFIG_KEY;
 
 import net.runelite.client.config.Config;
@@ -140,17 +139,6 @@ public interface InstantInventoryConfig extends Config {
     position = 5
   )
   default boolean instantPrayer() {
-    return true;
-  }
-
-  @ConfigItem(
-    keyName = SPEC_CONFIG_KEY,
-    section = FEATURE_SECTION,
-    name = "Highlight Spec Bar Instantly",
-    description = "Highlight the special attack bar instantly",
-    position = 6
-  )
-  default boolean instantSpec() {
     return true;
   }
 

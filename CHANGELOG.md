@@ -19,11 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 1.5.0 - 2026-10-09
+
+### Removed
+
+* Remove highlight special attack bar instantly (hopefully temporarily)
+  * Reason given was "Modification to the special attack is not permitted."
+  * https://github.com/runelite/plugin-hub/pull/17809#issuecomment-5983841883
+
+---
+
 ## 1.4.0 - 2026-10-04
 
 ### Added
 
-* [#29](https://github.com/elgbar/instant-inventory/pull/29) New feature, instant special attack, Thanks @BenChaimberg
+* [#29](https://github.com/elgbar/instant-inventory/pull/29) New feature, highlight special attack bar instantly, Thanks
+  @BenChaimberg
 
 ### Fixed
 
