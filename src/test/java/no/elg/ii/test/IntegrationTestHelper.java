@@ -43,6 +43,7 @@ import no.elg.ii.feature.features.EquipFeature;
 import no.elg.ii.feature.features.SpecialAttackFeature;
 import no.elg.ii.feature.features.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.overlay.ItemOpacityOverlays;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
@@ -69,6 +70,8 @@ public abstract class IntegrationTestHelper {
   protected DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
   @Mock
   protected WidgetService widgetService;
+  @Mock
+  protected ItemOpacityOverlays itemOpacityOverlays;
 
   /**
    * Created in {@link #setUp()} rather than with {@link Mock} so the JUnit thread counts as the
@@ -116,6 +119,6 @@ public abstract class IntegrationTestHelper {
     cleanHerbFeature.state = inventoryState;
     depositFeature.state = inventoryState;
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService));
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService, itemOpacityOverlays));
   }
 }

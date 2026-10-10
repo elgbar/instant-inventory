@@ -26,7 +26,7 @@
  */
 package no.elg.ii;
 
-import static no.elg.ii.InstantInventoryConfig.DEFAULT_CHANGE_OPACITY;
+import static no.elg.ii.InstantInventoryConfig.DEFAULT_ITEM_FILL_OPACITY;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
@@ -47,6 +47,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.FeatureManager;
 import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.overlay.ItemOpacityOverlays;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 
@@ -86,10 +87,14 @@ public class InstantInventoryPlugin extends Plugin {
   @Inject
   DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
 
+  @Inject
+  ItemOpacityOverlays itemOpacityOverlays;
+
   @Override
   protected void startUp() {
     eventBus.register(ensureWidgetStateService);
     eventBus.register(disallowModifiedWidgetInteractionService);
+    itemOpacityOverlays.startUp();
     GameState gameState = client.getGameState();
     if (gameState == GameState.LOGGED_IN) {
       log.debug("Starting up instant inventory. During the game state {}, will update all feature statues", gameState);
@@ -106,6 +111,7 @@ public class InstantInventoryPlugin extends Plugin {
     clientThread.invoke(featureManager::disableAllFeatures);
     eventBus.unregister(ensureWidgetStateService);
     eventBus.unregister(disallowModifiedWidgetInteractionService);
+    itemOpacityOverlays.shutDown();
   }
 
   /* (non-javadoc)
@@ -145,6 +151,6 @@ public class InstantInventoryPlugin extends Plugin {
   public void resetConfiguration() {
     //since fillOpacityPercent is by default = changeOpacityPercent we must manually set it to the correct opacity
     // otherwise it will be what changeOpacityPercent before the reset
-    config.fillOpacityPercent(DEFAULT_CHANGE_OPACITY);
+    config.fillOpacityPercent(DEFAULT_ITEM_FILL_OPACITY);
   }
 }

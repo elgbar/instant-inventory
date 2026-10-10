@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix `Deposit inventory` not hiding withdrawn items the server has not added yet
 * Fix items withdrawn right after depositing, dropping or equipping being predicted in the wrong slot
 * Fix equipping item while nothing is equipped in that slot wrongly completely hides the item
+* Fix [#12](https://github.com/elgbar/instant-inventory/issues/12) Overlays from other plugins, such as the tags of
+  Inventory Tags, now fade with the item they are drawn on
 
 ### Removed
 

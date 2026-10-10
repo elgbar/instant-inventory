@@ -138,10 +138,13 @@ public class EquipFeature implements StatefulFeature {
       Item extraItem = itemIds.getRight();
       if (extraItem != null) {
         log.trace("There is also something in the off-slot ({}), will replace that too", WidgetUtils.debugInfo(extraItem));
-        Optional<Widget> offhandWidget = inventoryService.getAllOpenInventoryWidgets().filter(WidgetUtils::isEmpty).findFirst().map(IndexedWidget::getWidget);
-        if (offhandWidget.isPresent()) {
+        Optional<Widget> maybeOffhandWidget = inventoryService.getAllOpenInventoryWidgets().filter(WidgetUtils::isEmpty).findFirst().map(IndexedWidget::getWidget);
+        if (maybeOffhandWidget.isPresent()) {
+          Widget offhandWidget = maybeOffhandWidget.get();
           widgetService.setFakeWidgetItem(widget, toReplaceItem, SlotChange.REPLACE);
-          widgetService.setFakeWidgetItem(offhandWidget.get(), extraItem, SlotChange.FILL);
+          widgetService.setFakeWidgetItem(offhandWidget, extraItem, SlotChange.FILL);
+          state.setSlot(widget, SlotChange.REPLACE);
+          state.setSlot(offhandWidget.getIndex(), extraItem.getId(), extraItem.getQuantity(), SlotChange.FILL);
         } else {
           //There was no slot to put the offhand item in, so the items will not be equipped
           log.debug("Will not equip two-handed item, as there is no slot to put the offhand item in");
@@ -150,8 +153,8 @@ public class EquipFeature implements StatefulFeature {
       } else {
         log.trace("No off-hand item to replace, will only change the clicked slot");
         widgetService.setFakeWidgetItem(widget, toReplaceItem, SlotChange.REPLACE);
+        state.setSlot(widget, SlotChange.REPLACE);
       }
-      state.setSlot(widget, SlotChange.REPLACE);
     } else {
       log.trace("No item to replace, expecting the item to be emptied");
       state.setSlot(widget, SlotChange.EMPTY);

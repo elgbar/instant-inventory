@@ -60,9 +60,24 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   }
 
   @Test
+  public void startUp_adds_item_opacity_overlays_when_not_logged_in() {
+    doReturn(GameState.STARTING).when(client).getGameState();
+
+    plugin.startUp();
+
+    verify(itemOpacityOverlays).startUp();
+  }
+
+  @Test
   public void shutDown_disables_all_features() {
     plugin.shutDown();
     verify(featureManager).disableAllFeatures();
+  }
+
+  @Test
+  public void shutDown_removes_item_opacity_overlays() {
+    plugin.shutDown();
+    verify(itemOpacityOverlays).shutDown();
   }
 
   @Test
