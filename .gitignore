@@ -8,3 +8,4 @@ nb-configuration.xml
 nbproject/
 /.idea/
 *.exe.stackdump
+/.claude/

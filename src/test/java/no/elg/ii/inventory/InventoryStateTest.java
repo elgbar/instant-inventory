@@ -34,19 +34,25 @@ import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
+import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
+import java.util.stream.Stream;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
+import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.test.TestSetup;
@@ -61,6 +67,8 @@ public class InventoryStateTest {
   private InventoryState inventoryState;
   private InstantInventoryConfig config;
   private Client client;
+  private InventoryService inventoryService;
+  private WidgetService widgetService;
 
   private final int index = 3;
   private final int itemId = 1;
@@ -77,8 +85,8 @@ public class InventoryStateTest {
       }
     });
     client = TestSetup.mockClient();
-    var inventoryService = mock(InventoryService.class);
-    var widgetService = mock(WidgetService.class);
+    inventoryService = mock(InventoryService.class);
+    widgetService = mock(WidgetService.class);
 
     inventoryState = new InventoryState(config, client, inventoryService, widgetService);
   }
@@ -207,5 +215,35 @@ public class InventoryStateTest {
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(quantity, inventoryState.getSlot(index).getQuantity());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
+  }
+
+  @Test
+  public void validateState_filling_slot_left_empty_by_server_draws_widget_empty() {
+    Widget widget = mock(Widget.class);
+    showInInventory(widget);
+    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE, true);
+
+    // The server did not put the withdrawn item in this slot, so only the predicted item is drawn there
+    inventoryState.validateState(index, null);
+
+    assertSame(RESET_SLOT, inventoryState.getSlot(index));
+    verify(widgetService).setOpacity(widget, FULLY_TRANSPARENT, true);
+  }
+
+  @Test
+  public void validateState_other_slot_left_empty_by_server_makes_widget_opaque() {
+    Widget widget = mock(Widget.class);
+    showInInventory(widget);
+    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
+
+    // The server removed the item, and the client has already drawn the slot as empty
+    inventoryState.validateState(index, null);
+
+    assertSame(RESET_SLOT, inventoryState.getSlot(index));
+    verify(widgetService).setAsFullyOpaque(widget);
+  }
+
+  private void showInInventory(Widget widget) {
+    doAnswer(invocation -> Stream.of(new IndexedWidget(index, widget))).when(inventoryService).getAllOpenInventoryWidgets();
   }
 }

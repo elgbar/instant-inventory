@@ -28,6 +28,7 @@ package no.elg.ii.feature.state;
 
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
@@ -105,7 +106,7 @@ public class InventoryState implements FeatureState {
    */
   public void setSlot(Widget widget, int opacity) {
     int index = widget.getIndex();
-    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity));
+    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity, false));
   }
 
   /**
@@ -115,7 +116,19 @@ public class InventoryState implements FeatureState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setSlot(int index, int itemId, int quantity, int opacity) {
-    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, opacity));
+    setSlot(index, itemId, quantity, opacity, false);
+  }
+
+  /**
+   * Update the {@code itemId} at {@code index} will also update which tick the item was modified
+   *
+   * @param index   The index of the item
+   * @param itemId  The new itemId, intended to be the current item in the players inventory
+   * @param filling Whether the item is predicted to appear in a slot that is empty on the server, see
+   *                {@link InventorySlot#isFilling()}
+   */
+  public void setSlot(int index, int itemId, int quantity, int opacity, boolean filling) {
+    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, opacity, filling));
   }
 
   private void setSlot(int index, @Nonnull InventorySlot slot) {
@@ -180,8 +193,9 @@ public class InventoryState implements FeatureState {
     assert this.client.isClientThread();
     if (isValidIndex(index)) {
       log.trace("Resetting index {}", index);
+      boolean wasFilling = slots[index].isFilling();
       slots[index] = InventorySlot.RESET_SLOT;
-      resetWidgetInSlot(index, item, hasItem);
+      resetWidgetInSlot(index, item, hasItem, wasFilling);
     } else {
       log.debug("Tried to reset invalid index {}", index);
     }
@@ -189,8 +203,11 @@ public class InventoryState implements FeatureState {
 
   /**
    * Update all inventory widgets to reflect the actual state of the inventory
+   *
+   * @param wasFilling Whether the slot predicted an item the server had not added yet, see
+   *                   {@link InventorySlot#isFilling()}
    */
-  private void resetWidgetInSlot(int index, @Nullable Item maybeItem, boolean hasItem) {
+  private void resetWidgetInSlot(int index, @Nullable Item maybeItem, boolean hasItem, boolean wasFilling) {
     assert this.client.isClientThread();
     Item item;
     if (hasItem) {
@@ -205,9 +222,14 @@ public class InventoryState implements FeatureState {
 
     Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllOpenInventoryWidgets().filter(it -> it.getIndex() == index);
     if (item == null || item.getId() < 0) {
-      //There is no item at this index, so we hide the widget
-      //Make sure items that are not in the inventory are hidden
-      indexedWidgetStream.forEach(it -> widgetService.setAsFullyOpaque(it.getWidget()));
+      if (wasFilling) {
+        //The server has nothing here, so remove the predicted item. The client draws an empty slot as a fully transparent blank item
+        indexedWidgetStream.forEach(it -> widgetService.setOpacity(it.getWidget(), FULLY_TRANSPARENT, true));
+      } else {
+        //There is no item at this index, so we hide the widget
+        //Make sure items that are not in the inventory are hidden
+        indexedWidgetStream.forEach(it -> widgetService.setAsFullyOpaque(it.getWidget()));
+      }
     } else {
       //Update the item to the actual item
       indexedWidgetStream.forEach(it -> {

@@ -72,11 +72,14 @@ public class WithdrawFeature implements StatefulFeature {
   public ItemManager itemManager;
   @Inject
   @Getter
-  private InventoryState state;
+  @VisibleForTesting
+  InventoryState state;
   @Inject
-  private WidgetService widgetService;
+  @VisibleForTesting
+  WidgetService widgetService;
   @Inject
-  private VarService varService;
+  @VisibleForTesting
+  VarService varService;
   @Inject
   private InstantInventoryConfig config;
 
@@ -120,7 +123,11 @@ public class WithdrawFeature implements StatefulFeature {
         //There is a matching widget, so we can just update the quantity
         updateBankItem(bankWidget, quantityToWithdraw);
         widgetService.updateQuantity(inventoryWidget, quantityToWithdraw);
-        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity(), widgetService.getChangeOpacity());
+        @Nullable
+        InventorySlot stack = getState().getSlot(inventoryWidget.getIndex());
+        //The stack might be a withdrawal the server has not added yet
+        boolean filling = stack != null && stack.isFilling();
+        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity(), widgetService.getChangeOpacity(), filling);
       } else {
         fillFirstEmpty(bankWidget, bankWidgetItemId, quantityToWithdraw);
       }
@@ -143,7 +150,7 @@ public class WithdrawFeature implements StatefulFeature {
   }
 
   /**
-   * @return {@code false} if there is no more space in the inventory, {@code true} otherwise
+   * @return {@code true} if there is no more space in the inventory, {@code false} otherwise
    */
   private boolean fillFirstEmpty(Widget bankWidget, int actualItemId, int quantityToWithdraw) {
     var emptyWidget = findFirst(client, InterfaceID.Bankside.ITEMS, widget -> {
@@ -154,7 +161,8 @@ public class WithdrawFeature implements StatefulFeature {
     if (emptyWidget != null) {
       widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw);
       updateBankItem(bankWidget, quantityToWithdraw);
-      getState().setSlot(emptyWidget.getIndex(), actualItemId, quantityToWithdraw, widgetService.getChangeOpacity());
+      //The slot stays empty on the server until it has handled the withdrawal
+      getState().setSlot(emptyWidget.getIndex(), actualItemId, quantityToWithdraw, widgetService.getChangeOpacity(), true);
       return false;
     }
     return true;

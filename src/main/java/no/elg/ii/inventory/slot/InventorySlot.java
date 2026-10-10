@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,8 @@ public class InventorySlot {
    */
   public static final int NO_CHANGED_TICK = -1;
 
-  public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, FULLY_TRANSPARENT);
-  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0, FULLY_TRANSPARENT);
+  public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, FULLY_TRANSPARENT, false);
+  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0, FULLY_TRANSPARENT, false);
 
   /**
    * When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
@@ -68,6 +68,13 @@ public class InventorySlot {
    * The opacity this slot should be rendered with
    */
   int opacity;
+  /**
+   * Whether the item is predicted to appear in a slot that is empty on the server, like a withdrawn item.
+   * <p>
+   * The client draws such a slot as empty until the server has added the item, so an empty widget does not mean the
+   * prediction is over
+   */
+  boolean filling;
 
   /**
    * @return Whether this slot is valid, i.e. has an item id

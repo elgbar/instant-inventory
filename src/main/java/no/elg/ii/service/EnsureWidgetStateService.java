@@ -73,7 +73,8 @@ public class EnsureWidgetStateService {
   }
 
   private static boolean isDifferent(Widget widget, InventorySlot slot) {
-    return slot.hasValidItemId() && !WidgetUtils.isEmpty(widget)
+    // A filling slot is drawn empty by the client until the server adds the item, e.g., when a withdrawal arrives a tick late
+    return slot.hasValidItemId() && (slot.isFilling() || !WidgetUtils.isEmpty(widget))
       && (widget.getItemId() != slot.getItemId()
       || widget.getItemQuantity() != slot.getQuantity()
       || widget.getOpacity() != slot.getOpacity());
@@ -82,7 +83,8 @@ public class EnsureWidgetStateService {
   private void setWidgetFromSlot(Widget widget, InventorySlot slot) {
     log.debug("Widget inconsistent with internal inventory state! Displayed widget {} should have item id {}, quantity {}, opacity {}", WidgetUtils.debugInfo(widget), slot.getItemId(), slot.getQuantity(), slot.getOpacity());
     widgetService.updateVisibleWidget(widget, slot.getItemId(), slot.getQuantity());
-    widgetService.setOpacity(widget, slot.getOpacity(), true);
+    // Replacing the item of a filling slot with the empty item would make it different again on the next frame
+    widgetService.setOpacity(widget, slot.getOpacity(), !slot.isFilling());
   }
 
 }
