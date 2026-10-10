@@ -33,7 +33,6 @@ import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
-import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -94,7 +93,7 @@ public class InventoryStateTest {
 
   private void setAll(int itemId) {
     for (int index = 0; index < INVENTORY_SIZE; index++) {
-      inventoryState.setSlot(index, itemId, 0, FULLY_OPAQUE);
+      inventoryState.setSlot(index, itemId, 0);
     }
   }
 
@@ -130,7 +129,7 @@ public class InventoryStateTest {
   @Test
   public void validateState_differentItemIdFromCurrent_resets() {
     doReturn(2).when(client).getTickCount();
-    inventoryState.setSlot(index, itemId, 0, FULLY_OPAQUE);
+    inventoryState.setSlot(index, itemId, 0);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(2, inventoryState.getSlot(index).getChangedTick());
@@ -143,7 +142,7 @@ public class InventoryStateTest {
 
   @Test
   public void validateState_timeout_resets_default_is_2() {
-    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
+    inventoryState.setSlot(index, itemId, quantity);
 
     assertEquals(1, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
@@ -160,7 +159,7 @@ public class InventoryStateTest {
   public void validateState_timeout_resets_not_before_configurable_ticks() {
 
     doReturn(DEFAULT_MAX_UNMODIFIED_TICKS + 1).when(config).maxUnmodifiedTicks();
-    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
+    inventoryState.setSlot(index, itemId, quantity);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
@@ -177,7 +176,7 @@ public class InventoryStateTest {
   public void validateState_timeout_resets_customizable_time() {
     int maxUnmodifiedTicks = DEFAULT_MAX_UNMODIFIED_TICKS + 1;
     doReturn(maxUnmodifiedTicks).when(config).maxUnmodifiedTicks();
-    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
+    inventoryState.setSlot(index, itemId, quantity);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(0, inventoryState.getSlot(index).getChangedTick());
@@ -205,7 +204,7 @@ public class InventoryStateTest {
 
   @Test
   public void validateState_not_timeout_and_same_item_does_not_reset() {
-    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
+    inventoryState.setSlot(index, itemId, quantity);
 
     assertEquals(itemId, inventoryState.getSlot(index).getItemId());
     assertEquals(quantity, inventoryState.getSlot(index).getQuantity());
@@ -222,7 +221,7 @@ public class InventoryStateTest {
   public void validateState_filling_slot_left_empty_by_server_draws_widget_empty() {
     Widget widget = mock(Widget.class);
     showInInventory(widget);
-    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE, SlotChange.FILL);
+    inventoryState.setSlot(index, itemId, quantity, SlotChange.FILL);
 
     // The server did not put the withdrawn item in this slot, so only the predicted item is drawn there
     inventoryState.validateState(index, null);
@@ -235,7 +234,7 @@ public class InventoryStateTest {
   public void validateState_other_slot_left_empty_by_server_makes_widget_opaque() {
     Widget widget = mock(Widget.class);
     showInInventory(widget);
-    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE);
+    inventoryState.setSlot(index, itemId, quantity);
 
     // The server removed the item, and the client has already drawn the slot as empty
     inventoryState.validateState(index, null);

@@ -105,12 +105,10 @@ public class InventoryState implements FeatureState {
 
   /**
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
-   *
    */
   public void setSlot(@NonNull Widget widget, @NonNull SlotChange change) {
     int index = widget.getIndex();
-    int opacity = (change == SlotChange.EMPTY) ? widgetService.getHideOpacity() : widgetService.getChangeOpacity();
-    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity, change));
+    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), change));
   }
 
   /**
@@ -119,8 +117,8 @@ public class InventoryState implements FeatureState {
    * @param index  The index of the item
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
-  public void setSlot(int index, int itemId, int quantity, int opacity) {
-    setSlot(index, itemId, quantity, opacity, SlotChange.REPLACE);
+  public void setSlot(int index, int itemId, int quantity) {
+    setSlot(index, itemId, quantity, SlotChange.REPLACE);
   }
 
   /**
@@ -130,8 +128,8 @@ public class InventoryState implements FeatureState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    * @param change What the server is predicted to do with the slot
    */
-  public void setSlot(int index, int itemId, int quantity, int opacity, @NonNull SlotChange change) {
-    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, opacity, change));
+  public void setSlot(int index, int itemId, int quantity, @NonNull SlotChange change) {
+    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, change));
   }
 
   private void setSlot(int index, @Nonnull InventorySlot slot) {

@@ -41,7 +41,6 @@ import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.model.HerbInfo;
-import no.elg.ii.service.WidgetService;
 
 @Singleton
 @NoArgsConstructor
@@ -60,10 +59,6 @@ public class CleanHerbFeature implements StatefulFeature {
   public InventoryState state;
 
   @Inject
-  @VisibleForTesting
-  public WidgetService widgetService;
-
-  @Inject
   private InstantInventoryConfig config;
 
   @Subscribe
@@ -79,7 +74,7 @@ public class CleanHerbFeature implements StatefulFeature {
         }
         int herbloreLevel = client.getBoostedSkillLevel(Skill.HERBLORE);
         if (herbloreLevel >= herbInfo.getMinLevel()) {
-          getState().setSlot(widget.getIndex(), herbInfo.getCleanItemId(), widget.getItemQuantity(), widgetService.getChangeOpacity());
+          getState().setSlot(widget.getIndex(), herbInfo.getCleanItemId(), widget.getItemQuantity());
         }
       }
     }

@@ -30,8 +30,12 @@ package no.elg.ii.service;
 import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 import static net.runelite.api.gameval.ItemID.PLANTPOT_EMPTY;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -51,8 +55,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class EnsureWidgetStateServiceTest {
 
   private static final int INDEX = 3;
-  private static final int CHANGE_OPACITY = 63;
-  private static final int HIDE_OPACITY = 204;
+  private static final int FILL_OPACITY = 63;
 
   @Mock
   private InventoryService inventoryService;
@@ -74,34 +77,37 @@ public class EnsureWidgetStateServiceTest {
   @Test
   public void onBeforeRender_filling_slot_drawn_empty_by_the_client_is_redrawn() {
     // A withdrawal clicked just before the tick ended, so the server handles it a tick later
-    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, CHANGE_OPACITY, SlotChange.FILL);
+    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, SlotChange.FILL);
     showInInventory();
+    doReturn(FILL_OPACITY).when(widgetService).getOpacity(SlotChange.FILL);
     // The inventory update for an earlier withdrawal redraws every slot, and an empty slot gets the blank item
     doReturn(BLANKOBJECT).when(widget).getItemId();
 
     service.onBeforeRender(new BeforeRender());
 
     verify(widgetService).updateVisibleWidget(widget, PLANTPOT_EMPTY, 1);
-    verify(widgetService).setOpacity(widget, CHANGE_OPACITY, false);
+    verify(widgetService).setOpacity(widget, FILL_OPACITY, false);
   }
 
   @Test
   public void onBeforeRender_filling_slot_already_drawn_is_left_alone() {
-    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, CHANGE_OPACITY, SlotChange.FILL);
+    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, SlotChange.FILL);
     showInInventory();
+    doReturn(FILL_OPACITY).when(widgetService).getOpacity(SlotChange.FILL);
     doReturn(PLANTPOT_EMPTY).when(widget).getItemId();
     doReturn(1).when(widget).getItemQuantity();
-    doReturn(CHANGE_OPACITY).when(widget).getOpacity();
+    doReturn(FILL_OPACITY).when(widget).getOpacity();
 
     service.onBeforeRender(new BeforeRender());
 
-    verifyNoInteractions(widgetService);
+    verify(widgetService, never()).updateVisibleWidget(any(Widget.class), anyInt(), anyInt());
+    verify(widgetService, never()).setOpacity(any(Widget.class), anyInt(), anyBoolean());
   }
 
   @Test
   public void onBeforeRender_hidden_slot_drawn_empty_by_the_client_stays_empty() {
     // A dropped or deposited item
-    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, HIDE_OPACITY, SlotChange.EMPTY);
+    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, SlotChange.EMPTY);
     showInInventory();
     // The server removed the item and the client drew the slot as a fully transparent blank item. The name of the old
     // item may still be there

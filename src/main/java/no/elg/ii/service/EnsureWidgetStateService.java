@@ -62,7 +62,7 @@ public class EnsureWidgetStateService {
 
   @Subscribe
   public void onBeforeRender(BeforeRender event) {
-    forceWidgetState(EnsureWidgetStateService::isDifferent, this::setWidgetFromSlot);
+    forceWidgetState(this::isDifferent, this::setWidgetFromSlot);
   }
 
   private void forceWidgetState(BiPredicate<Widget, InventorySlot> widgetFilter, BiConsumer<Widget, InventorySlot> force) {
@@ -72,19 +72,20 @@ public class EnsureWidgetStateService {
         .forEach(slotWidget -> force.accept(slotWidget.getWidget(), iis.getSlot())));
   }
 
-  private static boolean isDifferent(Widget widget, InventorySlot slot) {
+  private boolean isDifferent(Widget widget, InventorySlot slot) {
     // A filling slot is drawn empty by the client until the server adds the item, e.g., when a withdrawal arrives a tick late
     return slot.hasValidItemId() && (slot.isFilling() || !WidgetUtils.isEmpty(widget))
       && (widget.getItemId() != slot.getItemId()
       || widget.getItemQuantity() != slot.getQuantity()
-      || widget.getOpacity() != slot.getOpacity());
+      || widget.getOpacity() != widgetService.getOpacity(slot.getChange()));
   }
 
   private void setWidgetFromSlot(Widget widget, InventorySlot slot) {
-    log.debug("Widget inconsistent with internal inventory state! Displayed widget {} should have item id {}, quantity {}, opacity {}", WidgetUtils.debugInfo(widget), slot.getItemId(), slot.getQuantity(), slot.getOpacity());
+    int opacity = widgetService.getOpacity(slot.getChange());
+    log.debug("Widget inconsistent with internal inventory state! Displayed widget {} should have item id {}, quantity {}, opacity {}", WidgetUtils.debugInfo(widget), slot.getItemId(), slot.getQuantity(), opacity);
     widgetService.updateVisibleWidget(widget, slot.getItemId(), slot.getQuantity());
     // Replacing the item of a filling slot with the empty item would make it different again on the next frame
-    widgetService.setOpacity(widget, slot.getOpacity(), !slot.isFilling());
+    widgetService.setOpacity(widget, opacity, !slot.isFilling());
   }
 
 }

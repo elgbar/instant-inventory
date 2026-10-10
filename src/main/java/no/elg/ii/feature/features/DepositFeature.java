@@ -119,7 +119,7 @@ public class DepositFeature extends HideFeature {
         } else {
           int ui = widget.getItemQuantity() - toTake;
           log.debug("Updating item quantity from {} be {}", widget.getItemQuantity(), ui);
-          getState().setSlot(widget.getIndex(), widget.getItemId(), ui, widgetService.getChangeOpacity());
+          getState().setSlot(widget.getIndex(), widget.getItemId(), ui);
           actualTaken = toTake;
         }
 

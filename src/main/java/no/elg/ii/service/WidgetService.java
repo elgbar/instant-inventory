@@ -39,6 +39,7 @@ import net.runelite.api.Item;
 import net.runelite.api.widgets.ItemQuantityMode;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtils;
 
@@ -69,6 +70,24 @@ public class WidgetService {
 
   public int getHideOpacity() {
     return intPercentToOpacityValue(config.hideOpacityPercent());
+  }
+
+  public int getFillOpacity() {
+    return intPercentToOpacityValue(config.fillOpacityPercent());
+  }
+
+  /**
+   * @return The opacity of an inventory slot predicted to change like {@code change}
+   */
+  public int getOpacity(@Nonnull SlotChange change) {
+    switch (change) {
+      case EMPTY:
+        return getHideOpacity();
+      case FILL:
+        return getFillOpacity();
+      default:
+        return getChangeOpacity();
+    }
   }
 
   public int getPrayerEnableOpacity() {
@@ -130,9 +149,13 @@ public class WidgetService {
     updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
   }
 
+  /**
+   * Draw the item of the widget like the client draws an empty slot, the caller decides the opacity
+   */
   public void setEmptyItem(@Nonnull Widget widget) {
     widget.setItemQuantityMode(ItemQuantityMode.NEVER);
-    setFakeWidgetItem(widget, BLANKOBJECT, 1, "");
+    widget.setName("");
+    updateVisibleWidget(widget, BLANKOBJECT, 1);
   }
 
   /**
@@ -144,14 +167,17 @@ public class WidgetService {
     }
   }
 
-  public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount, /*Nullable*/ String maybeName) {
+  /**
+   * @param change How the slot of {@code dstWidget} is predicted to change, which decides the opacity of the item
+   */
+  public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount, /*Nullable*/ String maybeName, @Nonnull SlotChange change) {
     setWidgetNameIfPresent(dstWidget, maybeName);
     updateVisibleWidget(dstWidget, itemId, amount);
-    setAsChangeOpacity(dstWidget, false); //this can never be true as it will cause an infinite loop
+    setOpacity(dstWidget, getOpacity(change), false); //this can never be true as it will cause an infinite loop
   }
 
-  public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
-    setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity(), null);
+  public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem, @Nonnull SlotChange change) {
+    setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity(), null, change);
   }
 
   /**

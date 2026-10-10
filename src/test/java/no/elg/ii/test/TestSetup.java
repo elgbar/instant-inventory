@@ -55,7 +55,6 @@ public class TestSetup {
   public static CleanHerbFeature createNewCleanHerbFeature() {
     CleanHerbFeature feature = spy(new CleanHerbFeature());
     feature.client = mockClient();
-    feature.widgetService = mock(WidgetService.class);
     feature.state = newInventoryState(feature.client);
     return feature;
   }

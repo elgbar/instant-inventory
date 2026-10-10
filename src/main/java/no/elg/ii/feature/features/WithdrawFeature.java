@@ -129,7 +129,7 @@ public class WithdrawFeature implements StatefulFeature {
         InventorySlot stack = getState().getSlot(inventoryWidget.getIndex());
         //The stack might be a withdrawal the server has not added yet
         SlotChange change = stack != null && stack.isFilling() ? SlotChange.FILL : SlotChange.REPLACE;
-        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity(), widgetService.getChangeOpacity(), change);
+        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity(), change);
       } else {
         fillFirstEmpty(bankWidget, bankWidgetItemId, quantityToWithdraw);
       }
@@ -162,10 +162,10 @@ public class WithdrawFeature implements StatefulFeature {
       return slot != null && (slot.isEmptying() || (isEmpty(widget) && !slot.hasValidItemId()));
     });
     if (emptyWidget != null) {
-      widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw, bankWidget.getName());
+      widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw, bankWidget.getName(), SlotChange.FILL);
       updateBankItem(bankWidget, quantityToWithdraw);
       //The slot stays empty on the server until it has handled the withdrawal
-      getState().setSlot(emptyWidget.getIndex(), actualItemId, quantityToWithdraw, widgetService.getChangeOpacity(), SlotChange.FILL);
+      getState().setSlot(emptyWidget.getIndex(), actualItemId, quantityToWithdraw, SlotChange.FILL);
       return false;
     }
     return true;

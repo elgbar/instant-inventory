@@ -56,8 +56,6 @@ public class WithdrawFeatureTest extends StatefulFeatureTestMother<WithdrawFeatu
   private static final int INDEX = 5;
   private static final int BANK_QUANTITY = 137;
   private static final String BANK_ITEM_NAME = "<col=ff9040>Empty plant pot</col>";
-  private static final int CHANGE_OPACITY = 63;
-  private static final int HIDE_OPACITY = 204;
 
   @Override
   public WithdrawFeature createNewInstance() {
@@ -89,7 +87,7 @@ public class WithdrawFeatureTest extends StatefulFeatureTestMother<WithdrawFeatu
     feature.onMenuOptionClicked(withdrawOne(bankItem));
 
     // Without a name the slot looks empty, so depositing the inventory would not hide it
-    verify(feature.widgetService).setFakeWidgetItem(emptySlot, PLANTPOT_EMPTY, 1, BANK_ITEM_NAME);
+    verify(feature.widgetService).setFakeWidgetItem(emptySlot, PLANTPOT_EMPTY, 1, BANK_ITEM_NAME, SlotChange.FILL);
   }
 
   @Test
@@ -97,7 +95,7 @@ public class WithdrawFeatureTest extends StatefulFeatureTestMother<WithdrawFeatu
     WithdrawFeature feature = createWiredInstance();
     inventorySlot(feature);
     // Depositing the inventory earlier in the tick, which the server handles before this withdrawal
-    feature.getState().setSlot(INDEX, PLANTPOT_UNFIRED, 1, HIDE_OPACITY, SlotChange.EMPTY);
+    feature.getState().setSlot(INDEX, PLANTPOT_UNFIRED, 1, SlotChange.EMPTY);
 
     feature.onMenuOptionClicked(withdrawOne(bankItem(feature, false)));
 
@@ -112,7 +110,7 @@ public class WithdrawFeatureTest extends StatefulFeatureTestMother<WithdrawFeatu
     Widget stack = inventorySlot(feature);
     doReturn(PLANTPOT_EMPTY).when(stack).getItemId();
     // Depositing the inventory earlier in the tick, which the server handles before this withdrawal
-    feature.getState().setSlot(INDEX, PLANTPOT_EMPTY, 10, HIDE_OPACITY, SlotChange.EMPTY);
+    feature.getState().setSlot(INDEX, PLANTPOT_EMPTY, 10, SlotChange.EMPTY);
 
     feature.onMenuOptionClicked(withdrawOne(bankItem(feature, true)));
 
@@ -128,7 +126,7 @@ public class WithdrawFeatureTest extends StatefulFeatureTestMother<WithdrawFeatu
     Widget stack = inventorySlot(feature);
     doReturn(PLANTPOT_EMPTY).when(stack).getItemId();
     // The withdrawal that started the stack is still on its way
-    feature.getState().setSlot(INDEX, PLANTPOT_EMPTY, 1, CHANGE_OPACITY, SlotChange.FILL);
+    feature.getState().setSlot(INDEX, PLANTPOT_EMPTY, 1, SlotChange.FILL);
 
     feature.onMenuOptionClicked(withdrawOne(bankItem(feature, true)));
 

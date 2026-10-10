@@ -187,6 +187,22 @@ public interface InstantInventoryConfig extends Config {
 
   @ConfigItem(
     section = APPEARANCE_SECTION,
+    keyName = "fillOpacityPercent",
+    name = "Added items opacity",
+    description = "How transparent items are when added to an empty inventory slot." +
+      "<p>A lower value will cause items to be more transparent",
+    position = 25
+  )
+  @Range(max = 100)
+  @Units(Units.PERCENT)
+  default int fillOpacityPercent() {
+    // Added items used the changed items opacity before this setting existed. RuneLite saves this default the first
+    // time the plugin loads, so it is copied once rather than following later changes
+    return changeOpacityPercent();
+  }
+
+  @ConfigItem(
+    section = APPEARANCE_SECTION,
     keyName = "prayerDisableOpacityPercent",
     name = "Disabled prayer opacity",
     description =
