@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## 1.6.0 - 2026-10-09
+
+### Added
+
+* [#29](https://github.com/elgbar/instant-inventory/pull/29) New feature, highlight special attack bar instantly, Thanks
+  @BenChaimberg
+
+---
+
 ## 1.5.0 - 2026-10-09
 
 ### Removed
@@ -33,8 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* [#29](https://github.com/elgbar/instant-inventory/pull/29) New feature, highlight special attack bar instantly, Thanks
-  @BenChaimberg
+* ~[#29](https://github.com/elgbar/instant-inventory/pull/29) New feature, highlight special attack bar instantly,
+  Thanks
+  @BenChaimberg~
 
 ### Fixed
 
