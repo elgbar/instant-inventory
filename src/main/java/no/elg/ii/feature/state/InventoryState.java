@@ -52,6 +52,7 @@ import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.inventory.slot.IndexedInventorySlot;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
@@ -103,10 +104,12 @@ public class InventoryState implements FeatureState {
 
   /**
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
+   *
+   * @param change What the server is predicted to do with the slot
    */
-  public void setSlot(Widget widget, int opacity) {
+  public void setSlot(Widget widget, int opacity, SlotChange change) {
     int index = widget.getIndex();
-    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity, false));
+    setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity, change));
   }
 
   /**
@@ -116,19 +119,18 @@ public class InventoryState implements FeatureState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    */
   public void setSlot(int index, int itemId, int quantity, int opacity) {
-    setSlot(index, itemId, quantity, opacity, false);
+    setSlot(index, itemId, quantity, opacity, SlotChange.REPLACE);
   }
 
   /**
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
    *
-   * @param index   The index of the item
-   * @param itemId  The new itemId, intended to be the current item in the players inventory
-   * @param filling Whether the item is predicted to appear in a slot that is empty on the server, see
-   *                {@link InventorySlot#isFilling()}
+   * @param index  The index of the item
+   * @param itemId The new itemId, intended to be the current item in the players inventory
+   * @param change What the server is predicted to do with the slot
    */
-  public void setSlot(int index, int itemId, int quantity, int opacity, boolean filling) {
-    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, opacity, filling));
+  public void setSlot(int index, int itemId, int quantity, int opacity, SlotChange change) {
+    setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, opacity, change));
   }
 
   private void setSlot(int index, @Nonnull InventorySlot slot) {
@@ -248,6 +250,18 @@ public class InventoryState implements FeatureState {
    */
   public boolean isTooEarlyToReset(InventorySlot slot) {
     return msSinceChange(slot) < config.minChangedMs();
+  }
+
+  public boolean isEmptying(Widget widget) {
+    @Nullable
+    InventorySlot slot = getSlot(widget.getIndex());
+    return slot != null && slot.isEmptying();
+  }
+
+  public boolean isFilling(Widget widget) {
+    @Nullable
+    InventorySlot slot = getSlot(widget.getIndex());
+    return slot != null && slot.isFilling();
   }
 
   @Override

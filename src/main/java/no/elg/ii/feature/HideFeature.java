@@ -38,6 +38,7 @@ import net.runelite.client.callback.ClientThread;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.InstantInventoryPlugin;
 import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.service.WidgetService;
 
 @Slf4j
@@ -65,6 +66,6 @@ public abstract class HideFeature implements StatefulFeature {
   public WidgetService widgetService;
 
   protected void hide(@Nonnull Widget widget) {
-    getState().setSlot(widget, widgetService.getHideOpacity());
+    getState().setSlot(widget, widgetService.getHideOpacity(), SlotChange.EMPTY);
   }
 }

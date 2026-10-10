@@ -29,6 +29,7 @@ package no.elg.ii.inventory.slot;
 
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 
+import javax.annotation.Nonnull;
 import lombok.Value;
 
 @Value
@@ -45,8 +46,9 @@ public class InventorySlot {
    */
   public static final int NO_CHANGED_TICK = -1;
 
-  public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, FULLY_TRANSPARENT, false);
-  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0, FULLY_TRANSPARENT, false);
+  // Neither is a prediction, as they have no valid item id, so their change is never read
+  public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, FULLY_TRANSPARENT, SlotChange.REPLACE);
+  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0, FULLY_TRANSPARENT, SlotChange.REPLACE);
 
   /**
    * When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified
@@ -69,18 +71,30 @@ public class InventorySlot {
    */
   int opacity;
   /**
-   * Whether the item is predicted to appear in a slot that is empty on the server, like a withdrawn item.
-   * <p>
-   * The client draws such a slot as empty until the server has added the item, so an empty widget does not mean the
-   * prediction is over
+   * What the server is predicted to do with this slot
    */
-  boolean filling;
+  @Nonnull
+  SlotChange change;
 
   /**
    * @return Whether this slot is valid, i.e. has an item id
    */
   public boolean hasValidItemId() {
     return itemId >= 0;
+  }
+
+  /**
+   * @return Whether the item is predicted to appear in a slot that is empty on the server, see {@link SlotChange#FILL}
+   */
+  public boolean isFilling() {
+    return change == SlotChange.FILL;
+  }
+
+  /**
+   * @return Whether the item is predicted to leave this slot, see {@link SlotChange#EMPTY}
+   */
+  public boolean isEmptying() {
+    return change == SlotChange.EMPTY;
   }
 
   /**

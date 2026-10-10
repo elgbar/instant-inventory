@@ -57,6 +57,7 @@ import net.runelite.client.game.ItemStats;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
@@ -157,7 +158,7 @@ public class EquipFeature implements StatefulFeature {
       widgetService.setEmptyItem(widget);
       opacity = widgetService.getHideOpacity();
     }
-    state.setSlot(widget, opacity);
+    state.setSlot(widget, opacity, toReplaceItem == null ? SlotChange.EMPTY : SlotChange.REPLACE);
   }
 
   /**

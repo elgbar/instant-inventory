@@ -52,6 +52,7 @@ import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.WidgetService;
@@ -221,7 +222,7 @@ public class InventoryStateTest {
   public void validateState_filling_slot_left_empty_by_server_draws_widget_empty() {
     Widget widget = mock(Widget.class);
     showInInventory(widget);
-    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE, true);
+    inventoryState.setSlot(index, itemId, quantity, FULLY_OPAQUE, SlotChange.FILL);
 
     // The server did not put the withdrawn item in this slot, so only the predicted item is drawn there
     inventoryState.validateState(index, null);

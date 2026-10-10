@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,11 @@
 
 package no.elg.ii.util;
 
+import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
+
 import javax.annotation.Nonnull;
 import lombok.NoArgsConstructor;
 import net.runelite.api.Item;
-import net.runelite.api.NullItemID;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.model.IndexedWidget;
 
@@ -51,15 +52,6 @@ public final class WidgetUtils {
    * Item is fully opaque, i.e., visible
    */
   public static final int FULLY_OPAQUE = 0;
-
-  /**
-   * This is the item id used by {@code clientscript}s to set a slot as empty
-   *
-   * @see <a href="https://github.com/runelite/runelite/wiki/Working-with-client-scripts">Working with client scripts</a>
-   * @see <a href="https://github.com/Joshua-F/osrs-dumps/tree/master/script">cs2-scripts</a>
-   * @see <a href="https://github.com/Joshua-F/osrs-dumps/tree/master/script/%5Bproc,bankmain_drawitem%5D.cs2#L41">Example: [proc,bankmain_drawitem].cs2</a>
-   */
-  public static final int THE_EMPTY_ITEM_ID = NullItemID.NULL_6512;
 
   @Nonnull
   public static String debugInfo(@Nonnull Widget widget) {
@@ -85,7 +77,7 @@ public final class WidgetUtils {
     return widget.isHidden()
       || widget.getName().isEmpty()
       || widget.getOpacity() == FULLY_TRANSPARENT
-      || widget.getItemId() == THE_EMPTY_ITEM_ID;
+      || widget.getItemId() == BLANKOBJECT;
   }
 
   public static boolean isNotEmpty(@Nonnull Widget widget) {

@@ -51,6 +51,7 @@ import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.inventory.slot.InventorySlot;
+import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.service.VarService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.Util;
@@ -118,7 +119,8 @@ public class WithdrawFeature implements StatefulFeature {
     int quantityToWithdraw = Math.min(bankWidget.getItemQuantity(), amount);
 
     if (bankWidgetComposition.isStackable()) {
-      Widget inventoryWidget = findFirst(client, InterfaceID.Bankside.ITEMS, w -> w.getItemId() == bankWidgetItemId);
+      //A stack on its way out is gone by the time the server handles this withdrawal
+      Widget inventoryWidget = findFirst(client, InterfaceID.Bankside.ITEMS, w -> w.getItemId() == bankWidgetItemId && !getState().isEmptying(w));
       if (inventoryWidget != null) {
         //There is a matching widget, so we can just update the quantity
         updateBankItem(bankWidget, quantityToWithdraw);
@@ -126,8 +128,8 @@ public class WithdrawFeature implements StatefulFeature {
         @Nullable
         InventorySlot stack = getState().getSlot(inventoryWidget.getIndex());
         //The stack might be a withdrawal the server has not added yet
-        boolean filling = stack != null && stack.isFilling();
-        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity(), widgetService.getChangeOpacity(), filling);
+        SlotChange change = stack != null && stack.isFilling() ? SlotChange.FILL : SlotChange.REPLACE;
+        getState().setSlot(inventoryWidget.getIndex(), bankWidgetItemId, inventoryWidget.getItemQuantity(), widgetService.getChangeOpacity(), change);
       } else {
         fillFirstEmpty(bankWidget, bankWidgetItemId, quantityToWithdraw);
       }
@@ -156,13 +158,14 @@ public class WithdrawFeature implements StatefulFeature {
     var emptyWidget = findFirst(client, InterfaceID.Bankside.ITEMS, widget -> {
       @Nullable
       InventorySlot slot = getState().getSlot(widget.getIndex());
-      return isEmpty(widget) && slot != null && !slot.hasValidItemId();
+      //The server handles clicks in order, so a slot being emptied is empty by the time it handles this withdrawal
+      return slot != null && (slot.isEmptying() || (isEmpty(widget) && !slot.hasValidItemId()));
     });
     if (emptyWidget != null) {
-      widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw);
+      widgetService.setFakeWidgetItem(emptyWidget, actualItemId, quantityToWithdraw, bankWidget.getName());
       updateBankItem(bankWidget, quantityToWithdraw);
       //The slot stays empty on the server until it has handled the withdrawal
-      getState().setSlot(emptyWidget.getIndex(), actualItemId, quantityToWithdraw, widgetService.getChangeOpacity(), true);
+      getState().setSlot(emptyWidget.getIndex(), actualItemId, quantityToWithdraw, widgetService.getChangeOpacity(), SlotChange.FILL);
       return false;
     }
     return true;

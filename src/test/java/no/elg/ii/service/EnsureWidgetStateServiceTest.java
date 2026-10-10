@@ -27,9 +27,9 @@
 
 package no.elg.ii.service;
 
+import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 import static net.runelite.api.gameval.ItemID.PLANTPOT_EMPTY;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
-import static no.elg.ii.util.WidgetUtils.THE_EMPTY_ITEM_ID;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -38,6 +38,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import java.util.stream.Stream;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.widgets.Widget;
+import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.test.TestSetup;
 import org.junit.Before;
@@ -73,10 +74,10 @@ public class EnsureWidgetStateServiceTest {
   @Test
   public void onBeforeRender_filling_slot_drawn_empty_by_the_client_is_redrawn() {
     // A withdrawal clicked just before the tick ended, so the server handles it a tick later
-    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, CHANGE_OPACITY, true);
+    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, CHANGE_OPACITY, SlotChange.FILL);
     showInInventory();
     // The inventory update for an earlier withdrawal redraws every slot, and an empty slot gets the blank item
-    doReturn(THE_EMPTY_ITEM_ID).when(widget).getItemId();
+    doReturn(BLANKOBJECT).when(widget).getItemId();
 
     service.onBeforeRender(new BeforeRender());
 
@@ -86,7 +87,7 @@ public class EnsureWidgetStateServiceTest {
 
   @Test
   public void onBeforeRender_filling_slot_already_drawn_is_left_alone() {
-    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, CHANGE_OPACITY, true);
+    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, CHANGE_OPACITY, SlotChange.FILL);
     showInInventory();
     doReturn(PLANTPOT_EMPTY).when(widget).getItemId();
     doReturn(1).when(widget).getItemQuantity();
@@ -100,7 +101,7 @@ public class EnsureWidgetStateServiceTest {
   @Test
   public void onBeforeRender_hidden_slot_drawn_empty_by_the_client_stays_empty() {
     // A dropped or deposited item
-    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, HIDE_OPACITY);
+    service.state.setSlot(INDEX, PLANTPOT_EMPTY, 1, HIDE_OPACITY, SlotChange.EMPTY);
     showInInventory();
     // The server removed the item and the client drew the slot as a fully transparent blank item. The name of the old
     // item may still be there

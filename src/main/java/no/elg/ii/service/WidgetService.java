@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,9 @@
 
 package no.elg.ii.service;
 
+import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
-import static no.elg.ii.util.WidgetUtils.THE_EMPTY_ITEM_ID;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -132,16 +132,26 @@ public class WidgetService {
 
   public void setEmptyItem(@Nonnull Widget widget) {
     widget.setItemQuantityMode(ItemQuantityMode.NEVER);
-    setFakeWidgetItem(widget, THE_EMPTY_ITEM_ID, 1);
+    setFakeWidgetItem(widget, BLANKOBJECT, 1, "");
   }
 
-  public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount) {
+  /**
+   * Set the name of the widget if the name is not null
+   */
+  public void setWidgetNameIfPresent(@Nonnull Widget widget, String maybeName) {
+    if (maybeName != null) {
+      widget.setName(maybeName);
+    }
+  }
+
+  public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount, /*Nullable*/ String maybeName) {
+    setWidgetNameIfPresent(dstWidget, maybeName);
     updateVisibleWidget(dstWidget, itemId, amount);
     setAsChangeOpacity(dstWidget, false); //this can never be true as it will cause an infinite loop
   }
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
-    setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity());
+    setFakeWidgetItem(dstWidget, srcItem.getId(), srcItem.getQuantity(), null);
   }
 
   /**

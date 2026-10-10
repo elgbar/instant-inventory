@@ -133,6 +133,25 @@ public class DropFeatureTest extends StatefulFeatureTestMother<DropFeature> {
   }
 
   @Test
+  public void onMenuOptionClicked_dropped_item_is_emptying() {
+    int index = 1;
+    DropFeature feature = createNewInstance();
+
+    Widget widget = mock(Widget.class);
+    doReturn(index).when(widget).getIndex();
+
+    MenuEntry menuEntry = mock(MenuEntry.class);
+    doReturn(DropFeature.DROP_OPTION).when(menuEntry).getOption();
+    doReturn(widget).when(menuEntry).getWidget();
+    doReturn(false).when(feature).willDropWarningBeShownForItem(anyInt(), anyInt());
+
+    feature.onMenuOptionClicked(new MenuOptionClicked(menuEntry));
+
+    // The slot is empty on the server once it has handled the drop, so an item withdrawn after it can land there
+    assertTrue(feature.getState().getSlot(index).isEmptying());
+  }
+
+  @Test
   public void configKey_is_CLEAN_CONFIG_KEY() {
     DropFeature feature = createNewInstance();
     assertEquals(DROP_CONFIG_KEY, feature.getConfigKey());
