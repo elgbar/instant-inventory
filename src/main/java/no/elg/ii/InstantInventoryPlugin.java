@@ -26,6 +26,8 @@
  */
 package no.elg.ii;
 
+import static no.elg.ii.InstantInventoryConfig.DEFAULT_CHANGE_OPACITY;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -137,5 +139,12 @@ public class InstantInventoryPlugin extends Plugin {
   @Provides
   public InstantInventoryConfig provideConfig(ConfigManager configManager) {
     return configManager.getConfig(InstantInventoryConfig.class);
+  }
+
+  @Override
+  public void resetConfiguration() {
+    //since fillOpacityPercent is by default = changeOpacityPercent we must manually set it to the correct opacity
+    // otherwise it will be what changeOpacityPercent before the reset
+    config.fillOpacityPercent(DEFAULT_CHANGE_OPACITY);
   }
 }

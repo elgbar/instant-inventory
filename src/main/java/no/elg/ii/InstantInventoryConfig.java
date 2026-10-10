@@ -156,6 +156,11 @@ public interface InstantInventoryConfig extends Config {
 
   /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  int DEFAULT_ITEM_CHANGE_OPACITY = 75;  //% transparent
+  int DEFAULT_ITEM_FILL_OPACITY = 75;  //% transparent
+  int DEFAULT_ITEM_HIDE_OPACITY = 20;  //% transparent
+  int DEFAULT_PRAYER_DISABLE_OPACITY = 15;  //% transparent
+  int DEFAULT_PRAYER_ENABLE_OPACITY = 80;  //% transparent
 
   @ConfigItem(
     section = APPEARANCE_SECTION,
@@ -168,7 +173,7 @@ public interface InstantInventoryConfig extends Config {
   @Range(max = 100)
   @Units(Units.PERCENT)
   default int hideOpacityPercent() {
-    return 20; //% transparent
+    return DEFAULT_ITEM_HIDE_OPACITY;
   }
 
   @ConfigItem(
@@ -182,7 +187,7 @@ public interface InstantInventoryConfig extends Config {
   @Range(max = 100)
   @Units(Units.PERCENT)
   default int changeOpacityPercent() {
-    return 75; //% transparent
+    return DEFAULT_ITEM_CHANGE_OPACITY;
   }
 
   @ConfigItem(
@@ -202,6 +207,15 @@ public interface InstantInventoryConfig extends Config {
   }
 
   @ConfigItem(
+    keyName = "fillOpacityPercent",
+    hidden = true,
+    name = "",
+    description = ""
+  )
+  default void fillOpacityPercent(int fillOpacityPercent) {
+  }
+
+  @ConfigItem(
     section = APPEARANCE_SECTION,
     keyName = "prayerDisableOpacityPercent",
     name = "Disabled prayer opacity",
@@ -217,7 +231,7 @@ public interface InstantInventoryConfig extends Config {
   @Range(max = 100)
   @Units(Units.PERCENT)
   default int prayerDisableOpacityPercent() {
-    return 15; //% transparent
+    return DEFAULT_PRAYER_DISABLE_OPACITY;
   }
 
   @ConfigItem(
@@ -236,7 +250,7 @@ public interface InstantInventoryConfig extends Config {
   @Range(max = 100)
   @Units(Units.PERCENT)
   default int prayerEnableOpacityPercent() {
-    return 80; //% transparent
+    return DEFAULT_PRAYER_ENABLE_OPACITY;
   }
 
   /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
