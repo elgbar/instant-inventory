@@ -133,7 +133,6 @@ public class EquipFeature implements StatefulFeature {
     }
 
     @Nullable Item toReplaceItem = itemIds.getLeft();
-    int opacity;
     if (toReplaceItem != null) {
       log.trace("An item was equipped in the slot (to replace: {}), will replace it with {}", WidgetUtils.debugInfo(toReplaceItem), WidgetUtils.debugInfo(widget));
       Item extraItem = itemIds.getRight();
@@ -152,13 +151,11 @@ public class EquipFeature implements StatefulFeature {
         log.trace("No off-hand item to replace, will only change the clicked slot");
         widgetService.setFakeWidgetItem(widget, toReplaceItem);
       }
-      opacity = widgetService.getChangeOpacity();
+      state.setSlot(widget, SlotChange.REPLACE);
     } else {
-      log.trace("No other item to replace, will show the slot as empty");
-      widgetService.setEmptyItem(widget);
-      opacity = widgetService.getHideOpacity();
+      log.trace("No item to replace, expecting the item to be emptied");
+      state.setSlot(widget, SlotChange.EMPTY);
     }
-    state.setSlot(widget, opacity, toReplaceItem == null ? SlotChange.EMPTY : SlotChange.REPLACE);
   }
 
   /**

@@ -105,10 +105,10 @@ public class InventoryState implements FeatureState {
   /**
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
    *
-   * @param change What the server is predicted to do with the slot
    */
-  public void setSlot(Widget widget, int opacity, SlotChange change) {
+  public void setSlot(Widget widget, SlotChange change) {
     int index = widget.getIndex();
+    int opacity = (change == SlotChange.EMPTY) ? widgetService.getHideOpacity() : widgetService.getChangeOpacity();
     setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity, change));
   }
 

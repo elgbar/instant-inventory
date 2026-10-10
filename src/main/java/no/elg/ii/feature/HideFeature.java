@@ -66,6 +66,6 @@ public abstract class HideFeature implements StatefulFeature {
   public WidgetService widgetService;
 
   protected void hide(@Nonnull Widget widget) {
-    getState().setSlot(widget, widgetService.getHideOpacity(), SlotChange.EMPTY);
+    getState().setSlot(widget, SlotChange.EMPTY);
   }
 }

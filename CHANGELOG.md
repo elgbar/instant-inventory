@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix a withdrawn item vanishing, and the next withdrawal skipping a slot, when withdrawing just before a tick ends
 * Fix `Deposit inventory` not hiding withdrawn items the server has not added yet
 * Fix items withdrawn right after depositing, dropping or equipping being predicted in the wrong slot
+* Fix equipping item while nothing is equipped in that slot wrongly completely hides the item
 
 ### Removed
 
