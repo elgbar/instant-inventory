@@ -52,9 +52,7 @@ import no.elg.ii.service.EnsureWidgetStateService;
 @AllArgsConstructor
 @NoArgsConstructor
 @PluginDescriptor(
-  name = "Instant Inventory",
-  description = "Perform inventory actions instantly",
-  tags = {"qol", "client", "drop", "clean", "herb", "equip", "withdraw", "item", "prayer"}
+  name = "Instant Inventory"
 )
 public class InstantInventoryPlugin extends Plugin {
 
