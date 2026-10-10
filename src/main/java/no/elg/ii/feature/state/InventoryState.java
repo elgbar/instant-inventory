@@ -41,6 +41,7 @@ import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
@@ -106,7 +107,7 @@ public class InventoryState implements FeatureState {
    * Update the {@code itemId} at {@code index} will also update which tick the item was modified
    *
    */
-  public void setSlot(Widget widget, SlotChange change) {
+  public void setSlot(@NonNull Widget widget, @NonNull SlotChange change) {
     int index = widget.getIndex();
     int opacity = (change == SlotChange.EMPTY) ? widgetService.getHideOpacity() : widgetService.getChangeOpacity();
     setSlot(index, new InventorySlot(client.getTickCount(), widget.getItemId(), widget.getItemQuantity(), opacity, change));
@@ -129,7 +130,7 @@ public class InventoryState implements FeatureState {
    * @param itemId The new itemId, intended to be the current item in the players inventory
    * @param change What the server is predicted to do with the slot
    */
-  public void setSlot(int index, int itemId, int quantity, int opacity, SlotChange change) {
+  public void setSlot(int index, int itemId, int quantity, int opacity, @NonNull SlotChange change) {
     setSlot(index, new InventorySlot(client.getTickCount(), itemId, quantity, opacity, change));
   }
 
@@ -164,6 +165,7 @@ public class InventoryState implements FeatureState {
   /**
    * @return The slots and its index we're currently modifying
    */
+  @NonNull
   public Stream<IndexedInventorySlot> getActiveSlots() {
     assert this.client.isClientThread();
     //noinspection DataFlowIssue Safe as we are always within the size of the inventory
@@ -253,13 +255,11 @@ public class InventoryState implements FeatureState {
   }
 
   public boolean isEmptying(Widget widget) {
-    @Nullable
     InventorySlot slot = getSlot(widget.getIndex());
     return slot != null && slot.isEmptying();
   }
 
   public boolean isFilling(Widget widget) {
-    @Nullable
     InventorySlot slot = getSlot(widget.getIndex());
     return slot != null && slot.isFilling();
   }
