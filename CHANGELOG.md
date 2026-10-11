@@ -19,11 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix [#18](https://github.com/elgbar/instant-inventory/issues/18) use `null` when dropping then clicking on the same
+  tick with hide opacity at 0%
 * Fix buggy withdraw item at the end of a server tick
 * Fix depositing item just withdrawn are not hidden correctly
 * Fix wrong slot prediction when quickly withdrawing an item, depositing it, then withdrawing another item
 * Fix equipping item while nothing is equipped in that slot wrongly completely hides the item
-* Fix [#12](https://github.com/elgbar/instant-inventory/issues/12) Overlays from other plugins, such as the tags of
+* Fix [#12](https://github.com/elgbar/instant-inventory/issues/12) overlays from other plugins, such as the tags of
   Inventory Tags, now fade with the item they are drawn on
 
 ### Removed

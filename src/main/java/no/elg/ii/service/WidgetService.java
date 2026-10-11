@@ -27,7 +27,6 @@
 
 package no.elg.ii.service;
 
-import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 
@@ -36,7 +35,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import net.runelite.api.Item;
-import net.runelite.api.widgets.ItemQuantityMode;
 import net.runelite.api.widgets.Widget;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.inventory.slot.SlotChange;
@@ -125,15 +123,9 @@ public class WidgetService {
 
   /**
    * Change the opacity of the widget to {@code opacity}
-   *
-   * @param hideFully If the widget item id can be changed if the opacity is fully transparent
    */
-  public void setOpacity(@Nonnull Widget widget, int opacity, boolean hideFully) {
-    if (hideFully && opacity == FULLY_TRANSPARENT) {
-      //When the opacity should be fully transparent we want to change the widget to not display overlay for the given item
-      setEmptyItem(widget);
-    }
-    widget.setHidden(false);
+  public void setOpacity(@Nonnull Widget widget, int opacity) {
+    widget.setHidden(opacity == FULLY_TRANSPARENT);
     widget.setOpacity(opacity);
   }
 
@@ -147,15 +139,6 @@ public class WidgetService {
 
   public void updateVisibleWidget(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
     updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
-  }
-
-  /**
-   * Draw the item of the widget like the client draws an empty slot, the caller decides the opacity
-   */
-  public void setEmptyItem(@Nonnull Widget widget) {
-    widget.setItemQuantityMode(ItemQuantityMode.NEVER);
-    widget.setName("");
-    updateVisibleWidget(widget, BLANKOBJECT, 1);
   }
 
   /**
