@@ -30,6 +30,7 @@ package no.elg.ii.util;
 import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.NoArgsConstructor;
 import net.runelite.api.Item;
 import net.runelite.api.widgets.Widget;
@@ -82,5 +83,59 @@ public final class WidgetUtils {
 
   public static boolean isNotEmpty(@Nonnull Widget widget) {
     return !isEmpty(widget);
+  }
+
+  /**
+   * Make the widget fully visible
+   */
+  public static void setAsFullyOpaque(@Nonnull Widget widget) {
+    setOpacity(widget, FULLY_OPAQUE);
+  }
+
+  /**
+   * Change the opacity of the widget to {@code opacity}
+   */
+  public static void setOpacity(@Nonnull Widget widget, int opacity) {
+    assert 0 <= opacity && opacity <= FULLY_TRANSPARENT;
+    widget.setHidden(opacity == FULLY_TRANSPARENT);
+    widget.setOpacity(opacity);
+  }
+
+  /**
+   * Set the itemId and quantity of a widget without changing the opacity or any other attributes
+   */
+  public static void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
+    dstWidget.setItemId(itemId);
+    dstWidget.setItemQuantity(amount);
+  }
+
+  public static void updateVisibleWidget(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
+    updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
+  }
+
+  /**
+   * Set the name of the widget if the name is not null
+   */
+  public static void setWidgetNameIfPresent(@Nonnull Widget widget, @Nullable String maybeName) {
+    if (maybeName != null) {
+      widget.setName(maybeName);
+    }
+  }
+
+  /**
+   * Add {@code delta} from the quantity of {@code widget}
+   *
+   * @param widget the widget to update
+   * @param delta  the amount to add
+   */
+  public static void updateQuantity(@Nonnull Widget widget, int delta) {
+    setQuantity(widget, widget.getItemQuantity() + delta);
+  }
+
+  /**
+   * Set the quantity of {@code widget} to {@code quantity}
+   */
+  public static void setQuantity(@Nonnull Widget widget, int quantity) {
+    widget.setItemQuantity(quantity);
   }
 }

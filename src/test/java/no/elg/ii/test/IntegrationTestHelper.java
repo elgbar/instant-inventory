@@ -47,7 +47,6 @@ import no.elg.ii.overlay.ItemOpacityOverlays;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
-import no.elg.ii.service.WidgetService;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -68,8 +67,6 @@ public abstract class IntegrationTestHelper {
   protected EnsureWidgetStateService ensureWidgetStateService;
   @Mock
   protected DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
-  @Mock
-  protected WidgetService widgetService;
   @Mock
   protected ItemOpacityOverlays itemOpacityOverlays;
 
@@ -114,7 +111,7 @@ public abstract class IntegrationTestHelper {
 
     featureManager = spy(new FeatureManager(eventBus, features, client));
 
-    inventoryState = new InventoryState(instantInventoryConfig, client, inventoryService, widgetService);
+    inventoryState = new InventoryState(instantInventoryConfig, client, inventoryService);
     dropFeature.state = inventoryState;
     cleanHerbFeature.state = inventoryState;
     depositFeature.state = inventoryState;

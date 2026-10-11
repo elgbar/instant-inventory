@@ -46,7 +46,6 @@ import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.HideFeature;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.service.InventoryService;
-import no.elg.ii.service.WidgetService;
 import no.elg.ii.test.StatefulFeatureTestMother;
 import no.elg.ii.test.TestSetup;
 import org.junit.Test;
@@ -110,8 +109,7 @@ public class DropFeatureTest extends StatefulFeatureTestMother<DropFeature> {
     doReturn(0).when(config).minChangedMs();
     Client client = TestSetup.mockClient();
     var inventoryService = mock(InventoryService.class);
-    var widgetService = mock(WidgetService.class);
-    InventoryState inventoryState = new InventoryState(config, client, inventoryService, widgetService);
+    InventoryState inventoryState = new InventoryState(config, client, inventoryService);
     feature.state = inventoryState;
     doReturn(false).when(feature).willDropWarningBeShownForItem(anyInt(), anyInt());
 

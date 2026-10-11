@@ -45,7 +45,6 @@ import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
 import no.elg.ii.service.VarService;
-import no.elg.ii.service.WidgetService;
 import no.elg.ii.util.Util;
 import no.elg.ii.util.WidgetUtils;
 
@@ -130,7 +129,7 @@ public class DepositFeature extends HideFeature {
         if (bankInventoryContainer != null) {
           for (Widget bankWidget : bankInventoryContainer.getDynamicChildren()) {
             if (itemManager.canonicalize(bankWidget.getItemId()) == canonItemId) {
-              WidgetService.setQuantity(bankWidget, bankWidget.getItemQuantity() + actualTaken);
+              WidgetUtils.setQuantity(bankWidget, bankWidget.getItemQuantity() + actualTaken);
               return;
             }
           }

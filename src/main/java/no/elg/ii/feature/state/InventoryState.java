@@ -56,7 +56,7 @@ import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
-import no.elg.ii.service.WidgetService;
+import no.elg.ii.util.WidgetUtils;
 
 /**
  * Hold the state of the players inventory. The state is checked every server tick in
@@ -95,9 +95,6 @@ public class InventoryState implements FeatureState {
 
   @Inject
   private InventoryService inventoryService;
-
-  @Inject
-  private WidgetService widgetService;
 
   {
     Arrays.fill(slots, InventorySlot.UNMODIFIED_SLOT);
@@ -226,17 +223,17 @@ public class InventoryState implements FeatureState {
     if (item == null || item.getId() < 0) {
       if (wasFilling) {
         //The server has nothing here, so remove the predicted item. The client draws an empty slot as a fully transparent blank item
-        indexedWidgetStream.forEach(it -> WidgetService.setOpacity(it.getWidget(), FULLY_TRANSPARENT));
+        indexedWidgetStream.forEach(it -> WidgetUtils.setOpacity(it.getWidget(), FULLY_TRANSPARENT));
       } else {
         //There is no item at this index, so we hide the widget
         //Make sure items that are not in the inventory are hidden
-        indexedWidgetStream.forEach(it -> widgetService.setAsFullyOpaque(it.getWidget()));
+        indexedWidgetStream.forEach(it -> WidgetUtils.setAsFullyOpaque(it.getWidget()));
       }
     } else {
       //Update the item to the actual item
       indexedWidgetStream.forEach(it -> {
-        widgetService.setAsFullyOpaque(it.getWidget());
-        widgetService.updateVisibleWidget(it.getWidget(), item);
+        WidgetUtils.setAsFullyOpaque(it.getWidget());
+        WidgetUtils.updateVisibleWidget(it.getWidget(), item);
       });
     }
   }

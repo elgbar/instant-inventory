@@ -124,7 +124,7 @@ public class WithdrawFeature implements StatefulFeature {
       if (inventoryWidget != null) {
         //There is a matching widget, so we can just update the quantity
         updateBankItem(bankWidget, quantityToWithdraw);
-        WidgetService.updateQuantity(inventoryWidget, quantityToWithdraw);
+        WidgetUtils.updateQuantity(inventoryWidget, quantityToWithdraw);
         @Nullable
         InventorySlot stack = getState().getSlot(inventoryWidget.getIndex());
         //The stack might be a withdrawal the server has not added yet
@@ -172,14 +172,14 @@ public class WithdrawFeature implements StatefulFeature {
   }
 
   private void updateBankItem(@NonNull Widget bankWidget, int quantityToWithdraw) {
-    WidgetService.updateQuantity(bankWidget, -quantityToWithdraw);
+    WidgetUtils.updateQuantity(bankWidget, -quantityToWithdraw);
     log.debug("Removing {} from bank widget {}", quantityToWithdraw, WidgetUtils.debugInfo(bankWidget));
     if (bankWidget.getItemQuantity() == 0) {
       if (isPlaceholdersDisabled()) {
         log.debug("Hiding bank widget, new quantity is 0 and placeholders are disabled");
         widgetService.setAsHideOpacity(bankWidget);
       } else {
-        WidgetService.setOpacity(bankWidget, ZERO_QUANTITY_BANK_ITEM_OPACITY);
+        WidgetUtils.setOpacity(bankWidget, ZERO_QUANTITY_BANK_ITEM_OPACITY);
       }
     } else {
       widgetService.setAsChangeOpacity(bankWidget);

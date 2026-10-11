@@ -83,9 +83,9 @@ public class EnsureWidgetStateService {
   private void setWidgetFromSlot(Widget widget, InventorySlot slot) {
     int opacity = widgetService.getOpacity(slot.getChange());
     log.debug("Widget inconsistent with internal inventory state! Displayed widget {} should have item id {}, quantity {}, opacity {}", WidgetUtils.debugInfo(widget), slot.getItemId(), slot.getQuantity(), opacity);
-    WidgetService.updateVisibleWidget(widget, slot.getItemId(), slot.getQuantity());
+    WidgetUtils.updateVisibleWidget(widget, slot.getItemId(), slot.getQuantity());
     // Replacing the item of a filling slot with the empty item would make it different again on the next frame
-    WidgetService.setOpacity(widget, opacity);
+    WidgetUtils.setOpacity(widget, opacity);
   }
 
 }

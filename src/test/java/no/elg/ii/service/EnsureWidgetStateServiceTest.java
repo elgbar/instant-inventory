@@ -30,8 +30,6 @@ package no.elg.ii.service;
 import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 import static net.runelite.api.gameval.ItemID.PLANTPOT_EMPTY;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -85,8 +83,10 @@ public class EnsureWidgetStateServiceTest {
 
     service.onBeforeRender(new BeforeRender());
 
-    verify(widgetService).updateVisibleWidget(widget, PLANTPOT_EMPTY, 1);
-    verify(widgetService).setOpacity(widget, FILL_OPACITY, false);
+    verify(widget).setItemId(PLANTPOT_EMPTY);
+    verify(widget).setItemQuantity(1);
+    verify(widget).setHidden(false);
+    verify(widget).setOpacity(FILL_OPACITY);
   }
 
   @Test
@@ -100,8 +100,9 @@ public class EnsureWidgetStateServiceTest {
 
     service.onBeforeRender(new BeforeRender());
 
-    verify(widgetService, never()).updateVisibleWidget(any(Widget.class), anyInt(), anyInt());
-    verify(widgetService, never()).setOpacity(any(Widget.class), anyInt(), anyBoolean());
+    verify(widget, never()).setItemId(anyInt());
+    verify(widget, never()).setItemQuantity(anyInt());
+    verify(widget, never()).setOpacity(anyInt());
   }
 
   @Test

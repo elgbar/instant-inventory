@@ -33,6 +33,7 @@ import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -54,7 +55,6 @@ import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
-import no.elg.ii.service.WidgetService;
 import no.elg.ii.test.TestSetup;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,7 +68,6 @@ public class InventoryStateTest {
   private InstantInventoryConfig config;
   private Client client;
   private InventoryService inventoryService;
-  private WidgetService widgetService;
 
   private final int index = 3;
   private final int itemId = 1;
@@ -86,9 +85,8 @@ public class InventoryStateTest {
     });
     client = TestSetup.mockClient();
     inventoryService = mock(InventoryService.class);
-    widgetService = mock(WidgetService.class);
 
-    inventoryState = new InventoryState(config, client, inventoryService, widgetService);
+    inventoryState = new InventoryState(config, client, inventoryService);
   }
 
   private void setAll(int itemId) {
@@ -227,7 +225,8 @@ public class InventoryStateTest {
     inventoryState.validateState(index, null);
 
     assertSame(RESET_SLOT, inventoryState.getSlot(index));
-    verify(widgetService).setOpacity(widget, FULLY_TRANSPARENT);
+    verify(widget).setHidden(true);
+    verify(widget).setOpacity(FULLY_TRANSPARENT);
   }
 
   @Test
@@ -240,7 +239,8 @@ public class InventoryStateTest {
     inventoryState.validateState(index, null);
 
     assertSame(RESET_SLOT, inventoryState.getSlot(index));
-    verify(widgetService).setAsFullyOpaque(widget);
+    verify(widget).setHidden(false);
+    verify(widget).setOpacity(FULLY_OPAQUE);
   }
 
   private void showInInventory(Widget widget) {
