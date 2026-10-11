@@ -19,9 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fix a withdrawn item vanishing, and the next withdrawal skipping a slot, when withdrawing just before a tick ends
-* Fix `Deposit inventory` not hiding withdrawn items the server has not added yet
-* Fix items withdrawn right after depositing, dropping or equipping being predicted in the wrong slot
+* Fix buggy withdraw item at the end of a server tick
+* Fix depositing item just withdrawn are not hidden correctly
+* Fix wrong slot prediction when quickly withdrawing an item, depositing it, then withdrawing another item
 * Fix equipping item while nothing is equipped in that slot wrongly completely hides the item
 * Fix [#12](https://github.com/elgbar/instant-inventory/issues/12) Overlays from other plugins, such as the tags of
   Inventory Tags, now fade with the item they are drawn on
