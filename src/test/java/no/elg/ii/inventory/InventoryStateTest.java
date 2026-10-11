@@ -227,7 +227,7 @@ public class InventoryStateTest {
     inventoryState.validateState(index, null);
 
     assertSame(RESET_SLOT, inventoryState.getSlot(index));
-    verify(widgetService).setOpacity(widget, FULLY_TRANSPARENT, true);
+    verify(widgetService).setOpacity(widget, FULLY_TRANSPARENT);
   }
 
   @Test

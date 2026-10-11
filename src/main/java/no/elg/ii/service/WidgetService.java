@@ -31,6 +31,7 @@ import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
@@ -99,32 +100,31 @@ public class WidgetService {
   /**
    * Set the opacity of the widget to the user specified change opacity
    *
-   * @param hideFully If the widget item id can be changed if the opacity is fully transparent
    */
-  public void setAsChangeOpacity(@Nonnull Widget widget, boolean hideFully) {
-    setOpacity(widget, getChangeOpacity(), hideFully);
+  public void setAsChangeOpacity(@Nonnull Widget widget) {
+    setOpacity(widget, getChangeOpacity());
   }
 
   /**
    * Set the opacity of the widget to the user specified hide opacity
    *
-   * @param hideFully If the widget item id can be changed if the opacity is fully transparent
    */
-  public void setAsHideOpacity(@Nonnull Widget widget, boolean hideFully) {
-    setOpacity(widget, getHideOpacity(), hideFully);
+  public void setAsHideOpacity(@Nonnull Widget widget) {
+    setOpacity(widget, getHideOpacity());
   }
 
   /**
    * Make the widget fully visible
    */
-  public void setAsFullyOpaque(@Nonnull Widget widget) {
-    setOpacity(widget, FULLY_OPAQUE, false);
+  public static void setAsFullyOpaque(@Nonnull Widget widget) {
+    setOpacity(widget, FULLY_OPAQUE);
   }
 
   /**
    * Change the opacity of the widget to {@code opacity}
    */
-  public void setOpacity(@Nonnull Widget widget, int opacity) {
+  public static void setOpacity(@Nonnull Widget widget, int opacity) {
+    assert 0 <= opacity && opacity <= FULLY_TRANSPARENT;
     widget.setHidden(opacity == FULLY_TRANSPARENT);
     widget.setOpacity(opacity);
   }
@@ -132,19 +132,19 @@ public class WidgetService {
   /**
    * Set the itemId and quantity of a widget without changing the opacity or any other attributes
    */
-  public void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
+  public static void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
     dstWidget.setItemId(itemId);
     dstWidget.setItemQuantity(amount);
   }
 
-  public void updateVisibleWidget(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
+  public static void updateVisibleWidget(@Nonnull Widget dstWidget, @Nonnull Item srcItem) {
     updateVisibleWidget(dstWidget, srcItem.getId(), srcItem.getQuantity());
   }
 
   /**
    * Set the name of the widget if the name is not null
    */
-  public void setWidgetNameIfPresent(@Nonnull Widget widget, String maybeName) {
+  public static void setWidgetNameIfPresent(@Nonnull Widget widget, @Nullable String maybeName) {
     if (maybeName != null) {
       widget.setName(maybeName);
     }
@@ -153,10 +153,10 @@ public class WidgetService {
   /**
    * @param change How the slot of {@code dstWidget} is predicted to change, which decides the opacity of the item
    */
-  public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount, /*Nullable*/ String maybeName, @Nonnull SlotChange change) {
+  public void setFakeWidgetItem(@Nonnull Widget dstWidget, int itemId, int amount, @Nullable String maybeName, @Nonnull SlotChange change) {
     setWidgetNameIfPresent(dstWidget, maybeName);
     updateVisibleWidget(dstWidget, itemId, amount);
-    setOpacity(dstWidget, getOpacity(change), false); //this can never be true as it will cause an infinite loop
+    setOpacity(dstWidget, getOpacity(change)); //this can never be true as it will cause an infinite loop
   }
 
   public void setFakeWidgetItem(@Nonnull Widget dstWidget, @Nonnull Item srcItem, @Nonnull SlotChange change) {
@@ -169,14 +169,14 @@ public class WidgetService {
    * @param widget the widget to update
    * @param delta  the amount to add
    */
-  public void updateQuantity(@Nonnull Widget widget, int delta) {
+  public static void updateQuantity(@Nonnull Widget widget, int delta) {
     setQuantity(widget, widget.getItemQuantity() + delta);
   }
 
   /**
    * Set the quantity of {@code widget} to {@code quantity}
    */
-  public void setQuantity(@Nonnull Widget widget, int quantity) {
+  public static void setQuantity(@Nonnull Widget widget, int quantity) {
     widget.setItemQuantity(quantity);
   }
 }

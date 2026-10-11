@@ -226,7 +226,7 @@ public class InventoryState implements FeatureState {
     if (item == null || item.getId() < 0) {
       if (wasFilling) {
         //The server has nothing here, so remove the predicted item. The client draws an empty slot as a fully transparent blank item
-        indexedWidgetStream.forEach(it -> widgetService.setOpacity(it.getWidget(), FULLY_TRANSPARENT, true));
+        indexedWidgetStream.forEach(it -> WidgetService.setOpacity(it.getWidget(), FULLY_TRANSPARENT));
       } else {
         //There is no item at this index, so we hide the widget
         //Make sure items that are not in the inventory are hidden
