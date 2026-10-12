@@ -193,7 +193,7 @@ public class InventoryState implements FeatureState {
     if (isValidIndex(index)) {
       log.trace("Resetting index {}", index);
       boolean wasFilling = slots[index].isFilling();
-      slots[index] = InventorySlot.RESET_SLOT;
+      slots[index] = InventorySlot.UNMODIFIED_SLOT;
       resetWidgetInSlot(index, item, hasItem, wasFilling);
     } else {
       log.debug("Tried to reset invalid index {}", index);
@@ -283,7 +283,7 @@ public class InventoryState implements FeatureState {
   public void validateState(int index, @Nullable Item item) {
     assert this.client.isClientThread();
     InventorySlot slot = getSlot(index);
-    if (slot == null || slot == InventorySlot.UNMODIFIED_SLOT || slot == InventorySlot.RESET_SLOT) {
+    if (slot == null || slot == InventorySlot.UNMODIFIED_SLOT) {
       // This item is not modified (or at least not by us) so we do not need to do anything
       return;
     }

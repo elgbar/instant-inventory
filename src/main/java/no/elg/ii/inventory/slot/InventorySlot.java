@@ -46,7 +46,6 @@ public class InventorySlot {
 
   // Neither is a prediction, as they have no valid item id, so their change is never read
   public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, SlotChange.REPLACE);
-  public static final InventorySlot RESET_SLOT = new InventorySlot(NO_CHANGED_TICK, RESET_ITEM_ID, 0, SlotChange.REPLACE);
 
   /**
    * When this slot was modified, or {@link InventorySlot#NO_CHANGED_TICK} if it has not been (or cannot be) modified

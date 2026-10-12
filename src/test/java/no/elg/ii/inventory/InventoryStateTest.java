@@ -31,7 +31,7 @@ import static no.elg.ii.feature.state.InventoryState.DEFAULT_MAX_UNMODIFIED_TICK
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
-import static no.elg.ii.inventory.slot.InventorySlot.RESET_SLOT;
+import static no.elg.ii.inventory.slot.InventorySlot.UNMODIFIED_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
@@ -120,7 +120,7 @@ public class InventoryStateTest {
 
       assertFalse(slot.hasValidItemId());
       assertFalse(slot.hasChangedTick());
-      assertSame(slot, RESET_SLOT);
+      assertSame(slot, UNMODIFIED_SLOT);
     }
   }
 
@@ -224,7 +224,7 @@ public class InventoryStateTest {
     // The server did not put the withdrawn item in this slot, so only the predicted item is drawn there
     inventoryState.validateState(index, null);
 
-    assertSame(RESET_SLOT, inventoryState.getSlot(index));
+    assertSame(UNMODIFIED_SLOT, inventoryState.getSlot(index));
     verify(widget).setHidden(true);
     verify(widget).setOpacity(FULLY_TRANSPARENT);
   }
@@ -238,7 +238,7 @@ public class InventoryStateTest {
     // The server removed the item, and the client has already drawn the slot as empty
     inventoryState.validateState(index, null);
 
-    assertSame(RESET_SLOT, inventoryState.getSlot(index));
+    assertSame(UNMODIFIED_SLOT, inventoryState.getSlot(index));
     verify(widget).setHidden(false);
     verify(widget).setOpacity(FULLY_OPAQUE);
   }
