@@ -37,14 +37,13 @@ public class InventorySlot {
    * Indicate that the item is not a real item, but rather a placeholder
    */
   public static final int INVALID_ITEM_ID = -1;
-  public static final int RESET_ITEM_ID = -2;
 
   /**
    * Indicate the item has not been modified
    */
   public static final int NO_CHANGED_TICK = -1;
 
-  // Neither is a prediction, as they have no valid item id, so their change is never read
+  // Not a prediction, as it has no valid item id, so it is neither filling nor emptying
   public static final InventorySlot UNMODIFIED_SLOT = new InventorySlot(NO_CHANGED_TICK, INVALID_ITEM_ID, 0, SlotChange.REPLACE);
 
   /**

@@ -30,7 +30,6 @@ package no.elg.ii.inventory;
 import static no.elg.ii.feature.state.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
-import static no.elg.ii.inventory.slot.InventorySlot.RESET_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.UNMODIFIED_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
@@ -134,7 +133,7 @@ public class InventoryStateTest {
 
     inventoryState.validateState(index, item);
 
-    assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
+    assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
   }
 
@@ -149,7 +148,7 @@ public class InventoryStateTest {
 
     inventoryState.validateState(index, item);
 
-    assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
+    assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
   }
 
@@ -183,7 +182,7 @@ public class InventoryStateTest {
 
     inventoryState.validateState(index, item);
 
-    assertEquals(RESET_ITEM_ID, inventoryState.getSlot(index).getItemId());
+    assertEquals(INVALID_ITEM_ID, inventoryState.getSlot(index).getItemId());
     assertEquals(NO_CHANGED_TICK, inventoryState.getSlot(index).getChangedTick());
   }
 
