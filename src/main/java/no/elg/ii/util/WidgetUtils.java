@@ -86,19 +86,22 @@ public final class WidgetUtils {
   }
 
   /**
-   * Make the widget fully visible
-   */
-  public static void setAsFullyOpaque(@Nonnull Widget widget) {
-    setOpacity(widget, FULLY_OPAQUE);
-  }
-
-  /**
    * Change the opacity of the widget to {@code opacity}
    */
   public static void setOpacity(@Nonnull Widget widget, int opacity) {
-    assert 0 <= opacity && opacity <= FULLY_TRANSPARENT;
+    setOpacityAndUnhide(widget, opacity);
     widget.setHidden(opacity == FULLY_TRANSPARENT);
+  }
+
+  /**
+   * Used if we reset the state to an empty item, then we don't track it anymore so it must be not hidden by us.
+   * <p>
+   * Change the opacity of the widget to {@code opacity} and unhide it.
+   */
+  public static void setOpacityAndUnhide(@Nonnull Widget widget, int opacity) {
+    assert 0 <= opacity && opacity <= FULLY_TRANSPARENT;
     widget.setOpacity(opacity);
+    widget.setHidden(false);
   }
 
   /**

@@ -28,6 +28,7 @@ package no.elg.ii.feature.state;
 
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
+import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -222,17 +223,18 @@ public class InventoryState implements FeatureState {
     Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllOpenInventoryWidgets().filter(it -> it.getIndex() == index);
     if (item == null || item.getId() < 0) {
       if (wasFilling) {
-        //The server has nothing here, so remove the predicted item. The client draws an empty slot as a fully transparent blank item
-        indexedWidgetStream.forEach(it -> WidgetUtils.setOpacity(it.getWidget(), FULLY_TRANSPARENT));
+        // Drawn like the client draws an empty slot in the inventory next to the bank, which never unhides a slot,
+        // so the client's next draw of this slot shows its item again
+        indexedWidgetStream.forEach(it -> WidgetUtils.setOpacityAndUnhide(it.getWidget(), FULLY_TRANSPARENT));
       } else {
         //There is no item at this index, so we hide the widget
         //Make sure items that are not in the inventory are hidden
-        indexedWidgetStream.forEach(it -> WidgetUtils.setAsFullyOpaque(it.getWidget()));
+        indexedWidgetStream.forEach(it -> WidgetUtils.setOpacityAndUnhide(it.getWidget(), FULLY_OPAQUE));
       }
     } else {
       //Update the item to the actual item
       indexedWidgetStream.forEach(it -> {
-        WidgetUtils.setAsFullyOpaque(it.getWidget());
+        WidgetUtils.setOpacityAndUnhide(it.getWidget(), FULLY_OPAQUE);
         WidgetUtils.updateVisibleWidget(it.getWidget(), item);
       });
     }

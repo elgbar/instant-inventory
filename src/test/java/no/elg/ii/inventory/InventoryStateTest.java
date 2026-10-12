@@ -225,7 +225,8 @@ public class InventoryStateTest {
     inventoryState.validateState(index, null);
 
     assertSame(UNMODIFIED_SLOT, inventoryState.getSlot(index));
-    verify(widget).setHidden(true);
+    // Hidden would be permanent, as the inventory next to the bank never unhides a slot when the item arrives late
+    verify(widget).setHidden(false);
     verify(widget).setOpacity(FULLY_TRANSPARENT);
   }
 

@@ -31,6 +31,7 @@ import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 import static net.runelite.api.gameval.ItemID.PLANTPOT_EMPTY;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -85,7 +86,8 @@ public class EnsureWidgetStateServiceTest {
 
     verify(widget).setItemId(PLANTPOT_EMPTY);
     verify(widget).setItemQuantity(1);
-    verify(widget).setHidden(false);
+    verify(widget, atLeastOnce()).setHidden(false);
+    verify(widget, never()).setHidden(true);
     verify(widget).setOpacity(FILL_OPACITY);
   }
 
