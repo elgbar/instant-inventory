@@ -77,7 +77,9 @@ public class EnsureWidgetStateService {
     return slot.hasValidItemId() && (slot.isFilling() || !WidgetUtils.isEmpty(widget))
       && (widget.getItemId() != slot.getItemId()
       || widget.getItemQuantity() != slot.getQuantity()
-      || widget.getOpacity() != widgetService.getOpacity(slot.getChange()));
+      || widget.getOpacity() != widgetService.getOpacity(slot.getChange())
+      || widget.isSelfHidden() != widgetService.shouldBeHidden(slot.getChange())
+    );
   }
 
   private void setWidgetFromSlot(Widget widget, InventorySlot slot) {

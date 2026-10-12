@@ -91,6 +91,10 @@ public class WidgetService {
     }
   }
 
+  public boolean shouldBeHidden(@Nonnull SlotChange change) {
+    return getOpacity(change) == FULLY_TRANSPARENT;
+  }
+
   public int getPrayerEnableOpacity() {
     return intPercentToOpacityValue(config.prayerEnableOpacityPercent());
   }
