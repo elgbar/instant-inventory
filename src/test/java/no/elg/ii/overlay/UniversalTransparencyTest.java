@@ -27,7 +27,7 @@
 
 package no.elg.ii.overlay;
 
-import static no.elg.ii.overlay.ItemOpacityOverlays.lerpChannels;
+import static no.elg.ii.overlay.UniversalTransparency.lerpChannels;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.junit.Assert.assertEquals;
@@ -64,7 +64,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class ItemOpacityOverlaysTest {
+public class UniversalTransparencyTest {
 
   private static final int BACKGROUND = 0xFF102030;
   private static final int TAG = 0xFFFF0000;
@@ -92,7 +92,7 @@ public class ItemOpacityOverlaysTest {
 
   private Client client;
   private InventoryState state;
-  private ItemOpacityOverlays itemOpacityOverlays;
+  private UniversalTransparency universalTransparency;
   private Overlay captureOverlay;
   private Overlay blendOverlay;
 
@@ -100,10 +100,10 @@ public class ItemOpacityOverlaysTest {
   public void setUp() {
     client = TestSetup.mockClient();
     state = TestSetup.newInventoryState(client);
-    itemOpacityOverlays = new ItemOpacityOverlays(client, overlayManager, inventoryService, state, new InstantInventoryConfig() {
+    universalTransparency = new UniversalTransparency(client, overlayManager, inventoryService, state, new InstantInventoryConfig() {
     });
 
-    itemOpacityOverlays.startUp();
+    universalTransparency.startUp();
     ArgumentCaptor<Overlay> added = ArgumentCaptor.forClass(Overlay.class);
     verify(overlayManager, times(2)).add(added.capture());
     captureOverlay = added.getAllValues().get(0);
@@ -214,7 +214,7 @@ public class ItemOpacityOverlaysTest {
 
   @Test
   public void shutDown_removes_both_overlays() {
-    itemOpacityOverlays.shutDown();
+    universalTransparency.shutDown();
 
     verify(overlayManager).remove(captureOverlay);
     verify(overlayManager).remove(blendOverlay);

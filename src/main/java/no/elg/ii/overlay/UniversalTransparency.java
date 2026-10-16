@@ -74,8 +74,7 @@ import no.elg.ii.service.InventoryService;
 @Singleton
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemOpacityOverlays {
-
+public class UniversalTransparency {
 
   @Inject
   private Client client;

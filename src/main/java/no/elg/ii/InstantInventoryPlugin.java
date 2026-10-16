@@ -47,7 +47,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.FeatureManager;
 import no.elg.ii.feature.state.InventoryState;
-import no.elg.ii.overlay.ItemOpacityOverlays;
+import no.elg.ii.overlay.UniversalTransparency;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 
@@ -88,13 +88,13 @@ public class InstantInventoryPlugin extends Plugin {
   DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
 
   @Inject
-  ItemOpacityOverlays itemOpacityOverlays;
+  UniversalTransparency universalTransparency;
 
   @Override
   protected void startUp() {
     eventBus.register(ensureWidgetStateService);
     eventBus.register(disallowModifiedWidgetInteractionService);
-    itemOpacityOverlays.startUp();
+    universalTransparency.startUp();
     GameState gameState = client.getGameState();
     if (gameState == GameState.LOGGED_IN) {
       log.debug("Starting up instant inventory. During the game state {}, will update all feature statues", gameState);
@@ -111,7 +111,7 @@ public class InstantInventoryPlugin extends Plugin {
     clientThread.invoke(featureManager::disableAllFeatures);
     eventBus.unregister(ensureWidgetStateService);
     eventBus.unregister(disallowModifiedWidgetInteractionService);
-    itemOpacityOverlays.shutDown();
+    universalTransparency.shutDown();
   }
 
   /* (non-javadoc)
@@ -139,7 +139,7 @@ public class InstantInventoryPlugin extends Plugin {
   public void onConfigChanged(ConfigChanged configChanged) {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
       clientThread.invoke(() -> {
-          itemOpacityOverlays.onConfigChange();
+          universalTransparency.onConfigChange();
           featureManager.updateAllFeatureStatus();
         }
       );
