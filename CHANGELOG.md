@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix equipping on main-hand and one off-hand on the same tick while having a 2h equipped would duplicate the equipped
+  item
 * Fix [#18](https://github.com/elgbar/instant-inventory/issues/18) use `null` when dropping then clicking on the same
   tick with hide opacity at 0%
 * Fix buggy withdraw item at the end of a server tick
