@@ -76,7 +76,7 @@ public interface InstantInventoryConfig extends Config {
     name = "Advanced",
     description = "Advanced settings for all features",
     position = 40,
-    closedByDefault = false
+    closedByDefault = true
   )
   String ADVANCED_SECTION = "instant-inventory-advanced";
 
