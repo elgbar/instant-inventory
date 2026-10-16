@@ -39,6 +39,7 @@ import javax.inject.Singleton;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -57,6 +58,7 @@ import net.runelite.client.game.ItemStats;
 import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.StatefulFeature;
 import no.elg.ii.feature.state.InventoryState;
+import no.elg.ii.inventory.slot.InventorySlot;
 import no.elg.ii.inventory.slot.SlotChange;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
@@ -86,11 +88,14 @@ public class EquipFeature implements StatefulFeature {
 
   @Inject
   @Getter
-  private InventoryState state;
+  @VisibleForTesting
+  InventoryState state;
   @Inject
-  private WidgetService widgetService;
+  @VisibleForTesting
+  WidgetService widgetService;
   @Inject
-  private InventoryService inventoryService;
+  @VisibleForTesting
+  InventoryService inventoryService;
   @Inject
   private InstantInventoryConfig config;
 
@@ -98,6 +103,11 @@ public class EquipFeature implements StatefulFeature {
    * The last tick each slot was equipped
    */
   private final Map</*slotIdx*/ Integer, /*last tick count changed*/ Integer> lastEquipped = new HashMap<>(EquipmentInventorySlot.values().length);
+
+  /**
+   * What equipping will put in each worn slot, as the worn container does not show it until the server has handled it
+   */
+  private final Map</*slotIdx*/ Integer, WornPrediction> predictedWorn = new HashMap<>(EquipmentInventorySlot.values().length);
 
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
@@ -148,7 +158,6 @@ public class EquipFeature implements StatefulFeature {
         } else {
           //There was no slot to put the offhand item in, so the items will not be equipped
           log.debug("Will not equip two-handed item, as there is no slot to put the offhand item in");
-          return;
         }
       } else {
         log.trace("No off-hand item to replace, will only change the clicked slot");
@@ -185,14 +194,16 @@ public class EquipFeature implements StatefulFeature {
         return null;
       }
       final int slotOfClickedItem = clickedEquipment.getSlot();
-      toReplace = equipmentContainer.getItem(slotOfClickedItem);
+      toReplace = getWornItem(equipmentContainer, slotOfClickedItem);
+      predictWorn(slotOfClickedItem, new Item(widget.getItemId(), widget.getItemQuantity()), widget);
 
       if (isWeaponSlot(slotOfClickedItem)) {
         if (clickedEquipment.isTwoHanded()) {
-          extra = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx());
+          extra = getWornItem(equipmentContainer, EquipmentInventorySlot.SHIELD.getSlotIdx());
+          predictWorn(EquipmentInventorySlot.SHIELD.getSlotIdx(), null, widget);
         }
       } else if (isShieldSlot(slotOfClickedItem)) {
-        var weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
+        var weaponItem = getWornItem(equipmentContainer, EquipmentInventorySlot.WEAPON.getSlotIdx());
         if (weaponItem != null) {
           ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId());
           if (weaponStat != null && weaponStat.isEquipable()) {
@@ -200,6 +211,7 @@ public class EquipFeature implements StatefulFeature {
             if (weaponStatEquipment != null && weaponStatEquipment.isTwoHanded()) {
               //If we click a shield while have a two-handed weapon equipped, the weapon get unequipped
               extra = weaponItem;
+              predictWorn(EquipmentInventorySlot.WEAPON.getSlotIdx(), null, widget);
             }
           }
         }
@@ -210,6 +222,32 @@ public class EquipFeature implements StatefulFeature {
       return Pair.of(extra, null);
     }
     return Pair.of(toReplace, extra);
+  }
+
+  /**
+   * @param item   What will be worn in the slot, or null if it will be empty
+   * @param widget The inventory item being equipped
+   */
+  private void predictWorn(int slotIdx, @Nullable Item item, @Nonnull Widget widget) {
+    predictedWorn.put(slotIdx, new WornPrediction(item, widget.getIndex(), client.getTickCount()));
+  }
+
+  /**
+   * A prediction is used for as long as the inventory slot the item was equipped from shows the equip, so it lasts until
+   * the server has handled it, see {@link InventoryState#validateState(int, Item)}
+   *
+   * @return What will be worn in the slot once the server has handled what was equipped
+   */
+  @Nullable
+  private Item getWornItem(@Nonnull ItemContainer equipmentContainer, int slotIdx) {
+    WornPrediction prediction = predictedWorn.get(slotIdx);
+    if (prediction != null) {
+      InventorySlot equippedFrom = state.getSlot(prediction.getInventoryIndex());
+      if (equippedFrom != null && equippedFrom.getChangedTick() == prediction.getEquippedTick()) {
+        return prediction.getItem();
+      }
+    }
+    return equipmentContainer.getItem(slotIdx);
   }
 
   private static boolean isShieldSlot(int index) {
@@ -229,5 +267,22 @@ public class EquipFeature implements StatefulFeature {
   @Override
   public boolean isEnabledInConfig() {
     return config.instantEquip();
+  }
+
+  @Value
+  private static class WornPrediction {
+    /**
+     * What will be worn, or null if the slot will be empty
+     */
+    @Nullable
+    Item item;
+    /**
+     * The inventory slot the item was equipped from
+     */
+    int inventoryIndex;
+    /**
+     * The tick the item was equipped
+     */
+    int equippedTick;
   }
 }
