@@ -132,6 +132,10 @@ public class EquipFeature implements StatefulFeature {
   }
 
   protected void equip(@Nonnull Widget widget) {
+    if (state.isEmptying(widget)) {
+      log.debug("The item is already leaving the slot, so the server will not equip it again");
+      return;
+    }
     ItemContainer inventoryContainer = inventoryService.getCurrentInventoryContainer();
     if (inventoryContainer == null) {
       log.debug("Failed to find the inventory container");

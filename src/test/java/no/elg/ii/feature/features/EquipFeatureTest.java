@@ -62,8 +62,6 @@ import org.mockito.Mockito;
 
 public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
 
-  // Not 0, as no slot has been equipped then
-  private static final int TICK = 10;
   private static final int MAIN_HAND_INDEX = 3;
   private static final int OFF_HAND_INDEX = 7;
 
@@ -79,6 +77,11 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
    * What the server says is worn, by equipment slot
    */
   private final Map<Integer, Item> worn = new HashMap<>();
+
+  /**
+   * The tick the client is at. Not 0, as no slot has been equipped then
+   */
+  private int tick = 10;
 
   @Override
   public EquipFeature createNewInstance() {
@@ -128,7 +131,25 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
 
     feature.onMenuOptionClicked(equip(mainHand));
     // The main hand was equipped too late in the tick for the server to handle it, so the two-handed weapon is still worn
-    doReturn(TICK + 1).when(feature.client).getTickCount();
+    tick++;
+    feature.onMenuOptionClicked(equip(offHand));
+
+    verify(feature.widgetService, never()).setFakeWidgetItem(eq(offHand), any(Item.class), any());
+    assertTrue(feature.getState().getSlot(OFF_HAND_INDEX).isEmptying());
+  }
+
+  @Test
+  public void onMenuOptionClicked_item_clicked_again_while_being_equipped_keeps_emptying() {
+    EquipFeature feature = createWiredInstance();
+    worn.put(EquipmentInventorySlot.WEAPON.getSlotIdx(), TWO_HANDED);
+    Widget mainHand = inventoryItem(MAIN_HAND_INDEX, BRONZE_SWORD);
+    Widget offHand = inventoryItem(OFF_HAND_INDEX, BRONZE_SQ_SHIELD);
+
+    feature.onMenuOptionClicked(equip(mainHand));
+    tick++;
+    feature.onMenuOptionClicked(equip(offHand));
+    // The off-hand has left the slot by the time the server handles this, so it is not equipped again
+    tick++;
     feature.onMenuOptionClicked(equip(offHand));
 
     verify(feature.widgetService, never()).setFakeWidgetItem(eq(offHand), any(Item.class), any());
@@ -144,7 +165,7 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
 
     feature.onMenuOptionClicked(equip(offHand));
     // The server did not equip the off-hand, so the inventory shows what the server says again
-    doReturn(TICK + 1).when(feature.client).getTickCount();
+    tick++;
     feature.getState().resetState(OFF_HAND_INDEX);
     feature.onMenuOptionClicked(equip(mainHand));
 
@@ -154,7 +175,10 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
 
   private EquipFeature createWiredInstance() {
     EquipFeature feature = createNewInstance();
-    feature.client = TestSetup.mockClient();
+    feature.client = TestSetup.mockClient(invocation ->
+      "getTickCount".equals(invocation.getMethod().getName())
+        ? tick
+        : Mockito.RETURNS_DEFAULTS.answer(invocation));
     feature.clientThread = TestSetup.inlineClientThread();
     feature.itemManager = mock(ItemManager.class, withSettings().defaultAnswer(invocation ->
       "getItemStats".equals(invocation.getMethod().getName())
@@ -169,7 +193,6 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
         ? worn.get(invocation.<Integer>getArgument(0))
         : Mockito.RETURNS_DEFAULTS.answer(invocation)));
     doReturn(wornContainer).when(feature.client).getItemContainer(InventoryID.WORN);
-    doReturn(TICK).when(feature.client).getTickCount();
     return feature;
   }
 

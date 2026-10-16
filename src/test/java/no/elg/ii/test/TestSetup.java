@@ -96,12 +96,20 @@ public class TestSetup {
    * in tests that never reach such an assert.
    */
   public static Client mockClient() {
+    return mockClient(Mockito.RETURNS_DEFAULTS);
+  }
+
+  /**
+   * Like {@link #mockClient()}, but every method other than {@link Client#isClientThread()} answers with
+   * {@code otherwise}
+   */
+  public static Client mockClient(Answer<Object> otherwise) {
     Thread clientThread = Thread.currentThread();
     Answer<Object> clientThreadAware = invocation -> {
       if ("isClientThread".equals(invocation.getMethod().getName())) {
         return Thread.currentThread() == clientThread;
       }
-      return Mockito.RETURNS_DEFAULTS.answer(invocation);
+      return otherwise.answer(invocation);
     };
     return mock(Client.class, withSettings().defaultAnswer(clientThreadAware));
   }
