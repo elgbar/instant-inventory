@@ -374,5 +374,20 @@ public interface InstantInventoryConfig extends Config {
     return Util.TICK_LENGTH_MS / 2;
   }
 
+  @ConfigItem(
+    section = ADVANCED_SECTION,
+    keyName = "redrawHiddenInventories",
+    name = "Fix Inventory Flicker",
+    description =
+      "Redraw inventories hidden by another interface, e.g., the bank, when the items in the inventory change."
+        + "<p>"
+        + "<p>The game does not redraw a hidden inventory, so when closing the bank the inventory briefly shows the"
+        + "<p>items it had when the bank was opened.",
+    position = 30
+  )
+  default boolean redrawHiddenInventories() {
+    return true;
+  }
+
 
 }

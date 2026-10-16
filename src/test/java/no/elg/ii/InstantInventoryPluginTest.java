@@ -69,6 +69,20 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   }
 
   @Test
+  public void startUp_registers_redraw_hidden_inventory_service() {
+    plugin.startUp();
+
+    verify(eventBus).register(redrawHiddenInventoryService);
+  }
+
+  @Test
+  public void shutDown_unregisters_redraw_hidden_inventory_service() {
+    plugin.shutDown();
+
+    verify(eventBus).unregister(redrawHiddenInventoryService);
+  }
+
+  @Test
   public void shutDown_disables_all_features() {
     plugin.shutDown();
     verify(featureManager).disableAllFeatures();

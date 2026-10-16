@@ -50,6 +50,7 @@ import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.overlay.UniversalTransparency;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
+import no.elg.ii.service.RedrawHiddenInventoryService;
 
 @Slf4j
 @AllArgsConstructor
@@ -90,10 +91,14 @@ public class InstantInventoryPlugin extends Plugin {
   @Inject
   UniversalTransparency universalTransparency;
 
+  @Inject
+  RedrawHiddenInventoryService redrawHiddenInventoryService;
+
   @Override
   protected void startUp() {
     eventBus.register(ensureWidgetStateService);
     eventBus.register(disallowModifiedWidgetInteractionService);
+    eventBus.register(redrawHiddenInventoryService);
     universalTransparency.startUp();
     GameState gameState = client.getGameState();
     if (gameState == GameState.LOGGED_IN) {
@@ -111,6 +116,7 @@ public class InstantInventoryPlugin extends Plugin {
     clientThread.invoke(featureManager::disableAllFeatures);
     eventBus.unregister(ensureWidgetStateService);
     eventBus.unregister(disallowModifiedWidgetInteractionService);
+    eventBus.unregister(redrawHiddenInventoryService);
     universalTransparency.shutDown();
   }
 

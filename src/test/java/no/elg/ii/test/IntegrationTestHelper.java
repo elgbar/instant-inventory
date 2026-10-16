@@ -47,6 +47,7 @@ import no.elg.ii.overlay.UniversalTransparency;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
+import no.elg.ii.service.RedrawHiddenInventoryService;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -69,6 +70,8 @@ public abstract class IntegrationTestHelper {
   protected DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
   @Mock
   protected UniversalTransparency universalTransparency;
+  @Mock
+  protected RedrawHiddenInventoryService redrawHiddenInventoryService;
 
   /**
    * Created in {@link #setUp()} rather than with {@link Mock} so the JUnit thread counts as the
@@ -116,6 +119,6 @@ public abstract class IntegrationTestHelper {
     cleanHerbFeature.state = inventoryState;
     depositFeature.state = inventoryState;
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService, universalTransparency));
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService, universalTransparency, redrawHiddenInventoryService));
   }
 }

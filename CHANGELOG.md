@@ -14,11 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The opacity of items added to an empty inventory slot, e.g., withdrawn items, is configurable separately from changed
   items
   * By default, it uses will be populated with the value from `Changed items opacity` to make it backwards compatible
+* Redraw inventories hidden by another interface, so closing, e.g., the bank no longer briefly shows the items the
+  inventory had when the bank was opened
+  * Can be turned off with `Fix Inventory Flicker` in the advanced settings
 
 ### Changed
 
 ### Fixed
 
+* Fix flickering when exiting an interface which has a different inventory than the normal one
 * Fix equipping on main-hand and one off-hand on the same tick while having a 2h equipped would duplicate the equipped
   item
 * Fix [#18](https://github.com/elgbar/instant-inventory/issues/18) use `null` when dropping then clicking on the same
