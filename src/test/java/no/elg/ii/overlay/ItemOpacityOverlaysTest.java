@@ -51,6 +51,7 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
@@ -99,7 +100,8 @@ public class ItemOpacityOverlaysTest {
   public void setUp() {
     client = TestSetup.mockClient();
     state = TestSetup.newInventoryState(client);
-    itemOpacityOverlays = new ItemOpacityOverlays(client, overlayManager, inventoryService, state);
+    itemOpacityOverlays = new ItemOpacityOverlays(client, overlayManager, inventoryService, state, new InstantInventoryConfig() {
+    });
 
     itemOpacityOverlays.startUp();
     ArgumentCaptor<Overlay> added = ArgumentCaptor.forClass(Overlay.class);

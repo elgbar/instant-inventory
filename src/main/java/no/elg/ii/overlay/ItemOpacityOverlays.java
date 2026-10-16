@@ -45,6 +45,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Value;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
@@ -56,6 +57,7 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
+import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
@@ -74,11 +76,6 @@ import no.elg.ii.service.InventoryService;
 @NoArgsConstructor
 public class ItemOpacityOverlays {
 
-  /**
-   * How far outside an item other overlays draw. Inventory Tags draws its underline two pixels below the item, from
-   * its left edge to one pixel past its right edge
-   */
-  private static final Insets OVERLAY_INSETS = new Insets(0, 0, 3, 1);
 
   @Inject
   private Client client;
@@ -92,11 +89,27 @@ public class ItemOpacityOverlays {
   @Inject
   private InventoryState state;
 
+  @Inject
+  private InstantInventoryConfig config;
+
+
+  /**
+   * How far outside an item other overlays draw. Inventory Tags draws its underline two pixels below the item, from
+   * its left edge to one pixel past its right edge
+   */
+  @NonNull
+  private final Insets overlayInsert = new Insets(0, 0, 0, 0);
+
   private final List<Snapshot> snapshots = new ArrayList<>();
   private final Overlay captureOverlay = new CaptureItemPixelsOverlay();
   private final Overlay blendOverlay = new BlendItemPixelsOverlay();
 
+  public void recreateOverlayInsert() {
+    overlayInsert.set(config.insertTop(), config.insertLeft(), config.insertBottom(), config.insertRight());
+  }
+
   public void startUp() {
+    recreateOverlayInsert();
     overlayManager.add(captureOverlay);
     overlayManager.add(blendOverlay);
   }
@@ -104,6 +117,14 @@ public class ItemOpacityOverlays {
   public void shutDown() {
     overlayManager.remove(captureOverlay);
     overlayManager.remove(blendOverlay);
+  }
+
+  public void onConfigChange() {
+    if (config.enableItemOpacityOverlay()) {
+      startUp();
+    } else {
+      shutDown();
+    }
   }
 
   /**
@@ -185,12 +206,12 @@ public class ItemOpacityOverlays {
   }
 
   @Nonnull
-  private static Rectangle withOverlayInsets(@Nonnull Rectangle bounds) {
+  private Rectangle withOverlayInsets(@Nonnull Rectangle bounds) {
     return new Rectangle(
-      bounds.x - OVERLAY_INSETS.left,
-      bounds.y - OVERLAY_INSETS.top,
-      bounds.width + OVERLAY_INSETS.left + OVERLAY_INSETS.right,
-      bounds.height + OVERLAY_INSETS.top + OVERLAY_INSETS.bottom
+      bounds.x - overlayInsert.left,
+      bounds.y - overlayInsert.top,
+      bounds.width + overlayInsert.left + overlayInsert.right,
+      bounds.height + overlayInsert.top + overlayInsert.bottom
     );
   }
 
@@ -205,6 +226,7 @@ public class ItemOpacityOverlays {
 
   @Value
   private static class Snapshot {
+    @NonNull
     Rectangle area;
     int[] pixels;
     int opacity;

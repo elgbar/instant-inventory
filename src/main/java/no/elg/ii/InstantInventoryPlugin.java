@@ -138,7 +138,12 @@ public class InstantInventoryPlugin extends Plugin {
   @Subscribe
   public void onConfigChanged(ConfigChanged configChanged) {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
-      clientThread.invoke(featureManager::updateAllFeatureStatus);
+      clientThread.invoke(() -> {
+          itemOpacityOverlays.onConfigChange();
+          featureManager.updateAllFeatureStatus();
+        }
+      );
+
     }
   }
 
