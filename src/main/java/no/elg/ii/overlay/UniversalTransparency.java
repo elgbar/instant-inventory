@@ -49,6 +49,8 @@ import lombok.NonNull;
 import lombok.Value;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
+import net.runelite.api.Constants;
+import net.runelite.api.SpritePixels;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.api.widgets.WidgetUtil;
@@ -61,6 +63,7 @@ import no.elg.ii.InstantInventoryConfig;
 import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.model.IndexedWidget;
 import no.elg.ii.service.InventoryService;
+import no.elg.ii.util.Util;
 
 /**
  * Make what other plugins draw on a faded inventory item, such as the tags of the Inventory Tags plugin, as transparent
@@ -68,13 +71,20 @@ import no.elg.ii.service.InventoryService;
  * <p>
  * Other plugins draw their overlays at full opacity and cannot be told otherwise. Instead, two overlays wrap the
  * overlays drawn after an inventory interface: {@link CaptureItemPixelsOverlay} copies the pixels of each faded item
- * before any other overlay draws on it, and {@link BlendItemPixelsOverlay} blends the copies back in after all of them
- * have. What the other overlays drew on the item thereby ends up with the same opacity as the item.
+ * and draws the item opaque over them before any other overlay draws on it, and {@link BlendItemPixelsOverlay} adds
+ * what the other overlays changed on the opaque item to the copies after all of them have drawn. What the other
+ * overlays drew on the item thereby ends up with the same opacity as the item, and covers the item as much as it
+ * covers the item when it is not faded.
  */
 @Singleton
 @AllArgsConstructor
 @NoArgsConstructor
 public class UniversalTransparency {
+
+  /**
+   * The shadow the {@code inventory_init} client script gives inventory items
+   */
+  private static final int INVENTORY_ITEM_SHADOW = 0x333333;
 
   @Inject
   private Client client;
@@ -127,7 +137,7 @@ public class UniversalTransparency {
   }
 
   /**
-   * Copy the pixels of each faded item before other overlays draw on them
+   * Copy the pixels of each faded item, then draw the item opaque, before other overlays draw on them
    */
   private void capture(@Nonnull Collection<WidgetItem> widgetItems) {
     snapshots.clear();
@@ -148,13 +158,29 @@ public class UniversalTransparency {
       }
       Rectangle area = withOverlayInsets(widgetItem.getCanvasBounds()).intersection(bufferBounds);
       if (!area.isEmpty()) {
-        snapshots.add(new Snapshot(area, copyPixels(buffer, area), widget.getOpacity()));
+        int[] faded = copyPixels(buffer, area);
+        drawOpaque(widgetItem);
+        snapshots.add(new Snapshot(area, faded, copyPixels(buffer, area), widget.getOpacity()));
       }
     }
   }
 
   /**
-   * Blend the copied pixels back in, so what other overlays drew on the items gets the opacity of the items
+   * Draw an item over its faded self the way the client draws an opaque item, so other overlays draw on the item as
+   * they do when it is not faded. Otherwise, the faded item would show through what they draw over it.
+   */
+  private void drawOpaque(@Nonnull WidgetItem widgetItem) {
+    Widget widget = widgetItem.getWidget();
+    SpritePixels sprite = client.createItemSprite(widgetItem.getId(), widgetItem.getQuantity(), widget.getBorderType(),
+      INVENTORY_ITEM_SHADOW, widget.getItemQuantityMode(), false, Constants.CLIENT_DEFAULT_ZOOM);
+    if (sprite != null) {
+      Rectangle bounds = widgetItem.getCanvasBounds();
+      sprite.drawAt(bounds.x, bounds.y);
+    }
+  }
+
+  /**
+   * Add what other overlays changed on the opaque items to the copied faded pixels, at the opacity of the items
    */
   private void blend() {
     if (snapshots.isEmpty()) {
@@ -169,7 +195,8 @@ public class UniversalTransparency {
       for (int row = 0; row < area.height; row++) {
         for (int column = 0; column < area.width; column++) {
           int index = (area.y + row) * width + area.x + column;
-          pixels[index] = lerpChannels(snapshot.getPixels()[row * area.width + column], pixels[index], visibility);
+          int snapshotIndex = row * area.width + column;
+          pixels[index] = blendChannels(snapshot.getFaded()[snapshotIndex], snapshot.getOpaque()[snapshotIndex], pixels[index], visibility);
         }
       }
     }
@@ -177,18 +204,18 @@ public class UniversalTransparency {
   }
 
   /**
-   * Interpolate each 8-bit channel of a pixel
+   * Add the change from {@code opaque} to {@code drawn} to {@code faded}, scaled by {@code visibility}, in each 8-bit
+   * channel of a pixel. When {@code opaque} is {@code faded}, this moves from {@code faded} towards {@code drawn}.
    *
-   * @param fraction How far to move from {@code from} towards {@code to}, from 0 (stay at {@code from}) to 255 (become
-   *                 {@code to})
+   * @param visibility How much of the change to add, from 0 (none, stay at {@code faded}) to 255 (all of it)
    */
   @VisibleForTesting
-  static int lerpChannels(int from, int to, int fraction) {
+  static int blendChannels(int faded, int opaque, int drawn, int visibility) {
     int result = 0;
     for (int shift = 0; shift < Integer.SIZE; shift += Byte.SIZE) {
-      int fromChannel = (from >>> shift) & 0xFF;
-      int toChannel = (to >>> shift) & 0xFF;
-      result |= (fromChannel + (toChannel - fromChannel) * fraction / 0xFF) << shift;
+      int fadedChannel = (faded >>> shift) & 0xFF;
+      int change = ((drawn >>> shift) & 0xFF) - ((opaque >>> shift) & 0xFF);
+      result |= Util.coerceIn(fadedChannel + change * visibility / 0xFF, 0, 0xFF) << shift;
     }
     return result;
   }
@@ -227,7 +254,14 @@ public class UniversalTransparency {
   private static class Snapshot {
     @NonNull
     Rectangle area;
-    int[] pixels;
+    /**
+     * The pixels of the faded item, as the client drew them
+     */
+    int[] faded;
+    /**
+     * The pixels of the item drawn opaque over {@link #faded}, before other overlays drew on it
+     */
+    int[] opaque;
     int opacity;
   }
 

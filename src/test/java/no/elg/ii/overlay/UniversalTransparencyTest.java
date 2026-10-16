@@ -27,11 +27,12 @@
 
 package no.elg.ii.overlay;
 
-import static no.elg.ii.overlay.UniversalTransparency.lerpChannels;
+import static no.elg.ii.overlay.UniversalTransparency.blendChannels;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -44,7 +45,10 @@ import java.util.List;
 import java.util.stream.Stream;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
+import net.runelite.api.Constants;
+import net.runelite.api.SpritePixels;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.widgets.ItemQuantityMode;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.ui.overlay.Overlay;
@@ -68,9 +72,19 @@ public class UniversalTransparencyTest {
 
   private static final int BACKGROUND = 0xFF102030;
   private static final int TAG = 0xFFFF0000;
+  /**
+   * Differs from {@link #BACKGROUND} by a multiple of five in each channel, so fading it to a fifth by
+   * {@link #FADED_OPACITY} loses nothing to rounding
+   */
+  private static final int ITEM_PIXEL = 0xFF6A7A8A;
   private static final int FADED_OPACITY = 204;
   private static final int INDEX = 5;
   private static final int ITEM_ID = 1;
+  private static final int ITEM_BORDER = 2;
+  /**
+   * The shadow the {@code inventory_init} client script gives inventory items
+   */
+  private static final int INVENTORY_ITEM_SHADOW = 0x333333;
 
   /**
    * An item with room around it in {@link #frame} for overlays drawn outside it
@@ -101,6 +115,26 @@ public class UniversalTransparencyTest {
     client = TestSetup.mockClient();
     state = TestSetup.newInventoryState(client);
     universalTransparency = new UniversalTransparency(client, overlayManager, inventoryService, state, new InstantInventoryConfig() {
+      // Insets reaching from ITEM_BOUNDS to ITEM_AND_UNDERLINE
+      @Override
+      public int insertTop() {
+        return 0;
+      }
+
+      @Override
+      public int insertLeft() {
+        return 0;
+      }
+
+      @Override
+      public int insertBottom() {
+        return 3;
+      }
+
+      @Override
+      public int insertRight() {
+        return 1;
+      }
     });
 
     universalTransparency.startUp();
@@ -133,6 +167,26 @@ public class UniversalTransparencyTest {
     return widget;
   }
 
+  /**
+   * An item sprite the size of {@link #ITEM_BOUNDS}, which the client draws as opaque {@link #ITEM_PIXEL}s
+   */
+  private SpritePixels itemSprite() {
+    SpritePixels sprite = mock(SpritePixels.class);
+    doAnswer(invocation -> {
+      Rectangle drawn = new Rectangle(invocation.getArgument(0), invocation.getArgument(1), ITEM_BOUNDS.width, ITEM_BOUNDS.height);
+      frame.fill(drawn, ITEM_PIXEL);
+      return null;
+    }).when(sprite).drawAt(anyInt(), anyInt());
+    return sprite;
+  }
+
+  /**
+   * @return {@code pixel} drawn over {@link #BACKGROUND} with the opacity of a faded item
+   */
+  private static int faded(int pixel) {
+    return blendChannels(BACKGROUND, BACKGROUND, pixel, FULLY_TRANSPARENT - FADED_OPACITY);
+  }
+
   private void assertFrame(Rectangle fadedArea, int fadedPixel) {
     for (int y = 0; y < frame.getHeight(); y++) {
       for (int x = 0; x < frame.getWidth(); x++) {
@@ -160,7 +214,22 @@ public class UniversalTransparencyTest {
 
     renderFrame(new WidgetItem(ITEM_ID, 1, ITEM_BOUNDS, widget, null));
 
-    assertFrame(ITEM_AND_UNDERLINE, lerpChannels(BACKGROUND, TAG, FULLY_TRANSPARENT - FADED_OPACITY));
+    assertFrame(ITEM_AND_UNDERLINE, faded(TAG));
+  }
+
+  @Test
+  public void opaque_overlays_cover_a_faded_item_as_they_cover_the_item_when_it_is_not_faded() {
+    Widget widget = predictedWidget(FADED_OPACITY);
+    doReturn(ITEM_BORDER).when(widget).getBorderType();
+    doReturn(ItemQuantityMode.STACKABLE).when(widget).getItemQuantityMode();
+    SpritePixels sprite = itemSprite();
+    doReturn(sprite).when(client).createItemSprite(ITEM_ID, 1, ITEM_BORDER, INVENTORY_ITEM_SHADOW, ItemQuantityMode.STACKABLE, false, Constants.CLIENT_DEFAULT_ZOOM);
+    // The client draws the faded item
+    frame.fill(ITEM_BOUNDS, faded(ITEM_PIXEL));
+
+    renderFrame(new WidgetItem(ITEM_ID, 1, ITEM_BOUNDS, widget, null));
+
+    assertFrame(ITEM_AND_UNDERLINE, faded(TAG));
   }
 
   @Test
@@ -209,7 +278,7 @@ public class UniversalTransparencyTest {
 
     renderFrame(new WidgetItem(ITEM_ID, 1, new Rectangle(8, 8, 4, 3), widget, null));
 
-    assertFrame(new Rectangle(8, 8, 2, 2), lerpChannels(BACKGROUND, TAG, FULLY_TRANSPARENT - FADED_OPACITY));
+    assertFrame(new Rectangle(8, 8, 2, 2), faded(TAG));
   }
 
   @Test
@@ -221,19 +290,26 @@ public class UniversalTransparencyTest {
   }
 
   @Test
-  public void lerpChannels_with_no_fraction_is_from() {
-    assertEquals(BACKGROUND, lerpChannels(BACKGROUND, TAG, 0));
+  public void blendChannels_with_no_visibility_is_faded() {
+    assertEquals(BACKGROUND, blendChannels(BACKGROUND, ITEM_PIXEL, TAG, 0));
   }
 
   @Test
-  public void lerpChannels_with_full_fraction_is_to() {
-    assertEquals(TAG, lerpChannels(BACKGROUND, TAG, 0xFF));
+  public void blendChannels_with_full_visibility_adds_all_of_the_change() {
+    assertEquals(0x50505050, blendChannels(0x10101010, 0x20202020, 0x60606060, 0xFF));
+    assertEquals(TAG, blendChannels(BACKGROUND, BACKGROUND, TAG, 0xFF));
   }
 
   @Test
-  public void lerpChannels_interpolates_each_channel_on_its_own() {
-    assertEquals(0x80808080, lerpChannels(0x00000000, 0xFFFFFFFF, 0x80));
-    assertEquals(0x7F7F7F7F, lerpChannels(0xFFFFFFFF, 0x00000000, 0x80));
+  public void blendChannels_blends_each_channel_on_its_own() {
+    assertEquals(0x80808080, blendChannels(0x00000000, 0x00000000, 0xFFFFFFFF, 0x80));
+    assertEquals(0x7F7F7F7F, blendChannels(0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x80));
+  }
+
+  @Test
+  public void blendChannels_keeps_each_channel_within_a_byte() {
+    assertEquals(0xFFFFFFFF, blendChannels(0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0xFF));
+    assertEquals(0x00000000, blendChannels(0x00000000, 0xFFFFFFFF, 0x00000000, 0xFF));
   }
 
   /**
@@ -253,6 +329,12 @@ public class UniversalTransparencyTest {
 
     void fill(int pixel) {
       Arrays.fill(pixels, pixel);
+    }
+
+    void fill(Rectangle area, int pixel) {
+      for (int y = area.y; y < area.y + area.height; y++) {
+        Arrays.fill(pixels, y * width + area.x, y * width + area.x + area.width, pixel);
+      }
     }
 
     int get(int x, int y) {
