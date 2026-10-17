@@ -11,14 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Redraw inventories hidden by another interface, so closing, e.g., the bank no longer briefly shows the items the
-  inventory had when the bank was opened
-  * Can be turned off with `Fix Inventory Flicker` in the advanced settings
-
 ### Changed
 
 ### Fixed
 
+### Removed
+
+---
+
+## 1.6.1 - 2026-10-17
+
+### Fixed
+
+* Fix flickering inventory when exiting a bank and similar situations
+  * Can be turned off with `Fix Inventory Flicker` in the advanced settings
 * Fix flickering when exiting an interface which has a different inventory than the normal one
 * Fix equipping on main-hand and one off-hand on the same tick while having a 2h equipped would duplicate the equipped
   item
@@ -30,8 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix equipping item while nothing is equipped in that slot wrongly completely hides the item
 * Fix [#12](https://github.com/elgbar/instant-inventory/issues/12) overlays from other plugins, such as the tags of
   Inventory Tags, now fade with the item they are drawn on
-
-### Removed
 
 ---
 
