@@ -11,9 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* The opacity of items added to an empty inventory slot, e.g., withdrawn items, is configurable separately from changed
-  items
-  * By default, it uses will be populated with the value from `Changed items opacity` to make it backwards compatible
 * Redraw inventories hidden by another interface, so closing, e.g., the bank no longer briefly shows the items the
   inventory had when the bank was opened
   * Can be turned off with `Fix Inventory Flicker` in the advanced settings

@@ -60,15 +60,6 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   }
 
   @Test
-  public void startUp_adds_item_opacity_overlays_when_not_logged_in() {
-    doReturn(GameState.STARTING).when(client).getGameState();
-
-    plugin.startUp();
-
-    verify(universalTransparency).startUp();
-  }
-
-  @Test
   public void startUp_registers_redraw_hidden_inventory_service() {
     plugin.startUp();
 
@@ -86,12 +77,6 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   public void shutDown_disables_all_features() {
     plugin.shutDown();
     verify(featureManager).disableAllFeatures();
-  }
-
-  @Test
-  public void shutDown_removes_item_opacity_overlays() {
-    plugin.shutDown();
-    verify(universalTransparency).shutDown();
   }
 
   @Test
