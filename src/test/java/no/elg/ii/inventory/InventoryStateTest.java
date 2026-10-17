@@ -27,23 +27,26 @@
 
 package no.elg.ii.inventory;
 
+import static net.runelite.api.gameval.ItemID.BLANKOBJECT;
 import static no.elg.ii.feature.state.InventoryState.DEFAULT_MAX_UNMODIFIED_TICKS;
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.inventory.slot.InventorySlot.NO_CHANGED_TICK;
 import static no.elg.ii.inventory.slot.InventorySlot.UNMODIFIED_SLOT;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
-import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.withSettings;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
@@ -72,6 +75,12 @@ public class InventoryStateTest {
   private final int itemId = 1;
   private final int quantity = 2;
   private final Item item = new Item(itemId, quantity);
+
+  private static final String WITHDRAWN_ITEM_NAME = "<col=ff9040>Anti-dragon shield</col>";
+  /**
+   * Any opacity a prediction can be drawn with
+   */
+  private static final int PREDICTION_OPACITY = 63;
 
   @Before
   public void setUp() {
@@ -216,34 +225,65 @@ public class InventoryStateTest {
 
   @Test
   public void validateState_filling_slot_left_empty_by_server_draws_widget_empty() {
-    Widget widget = mock(Widget.class);
+    Widget widget = slotWidget(itemId, quantity, WITHDRAWN_ITEM_NAME, PREDICTION_OPACITY, false);
     showInInventory(widget);
     inventoryState.setSlot(index, itemId, quantity, SlotChange.FILL);
 
-    // The server did not put the withdrawn item in this slot, so only the predicted item is drawn there
+    // The bank ran out before the server handled the withdrawal, so only the predicted item is drawn there
     inventoryState.validateState(index, null);
 
     assertSame(UNMODIFIED_SLOT, inventoryState.getSlot(index));
-    // Hidden would be permanent, as the inventory next to the bank never unhides a slot when the item arrives late
-    verify(widget).setHidden(false);
-    verify(widget).setOpacity(FULLY_TRANSPARENT);
+    assertDrawnEmpty(widget);
   }
 
   @Test
-  public void validateState_other_slot_left_empty_by_server_makes_widget_opaque() {
-    Widget widget = mock(Widget.class);
+  public void validateState_deposited_withdrawal_the_server_never_added_draws_widget_empty() {
+    // The predicted withdrawal was deposited too, before the server handled either
+    Widget widget = slotWidget(itemId, quantity, WITHDRAWN_ITEM_NAME, FULLY_TRANSPARENT, true);
     showInInventory(widget);
-    inventoryState.setSlot(index, itemId, quantity);
+    inventoryState.setSlot(index, itemId, quantity, SlotChange.EMPTY);
 
-    // The server removed the item, and the client has already drawn the slot as empty
+    // The bank ran out, so the server neither added the item nor had anything to deposit
     inventoryState.validateState(index, null);
 
     assertSame(UNMODIFIED_SLOT, inventoryState.getSlot(index));
-    verify(widget).setHidden(false);
-    verify(widget).setOpacity(FULLY_OPAQUE);
+    assertDrawnEmpty(widget);
   }
 
   private void showInInventory(Widget widget) {
     doAnswer(invocation -> Stream.of(new IndexedWidget(index, widget))).when(inventoryService).getAllOpenInventoryWidgets();
+  }
+
+  /**
+   * Assert the widget is drawn like the client draws an empty slot, so other plugins have no item left to draw on
+   */
+  private static void assertDrawnEmpty(Widget widget) {
+    assertEquals(BLANKOBJECT, widget.getItemId());
+    assertEquals(1, widget.getItemQuantity());
+    assertEquals(FULLY_TRANSPARENT, widget.getOpacity());
+    assertEquals("", widget.getName());
+    // Hidden would be permanent, as the inventory next to the bank never unhides a slot when the item arrives late
+    assertFalse(widget.isHidden());
+  }
+
+  /**
+   * A widget of an inventory slot, which keeps what was last drawn in it like the client's widgets
+   */
+  private static Widget slotWidget(int itemId, int quantity, String name, int opacity, boolean hidden) {
+    Map<String, Object> drawn = new HashMap<>();
+    drawn.put("ItemId", itemId);
+    drawn.put("ItemQuantity", quantity);
+    drawn.put("Name", name);
+    drawn.put("Opacity", opacity);
+    drawn.put("Hidden", hidden);
+    return mock(Widget.class, withSettings().defaultAnswer(invocation -> {
+      String method = invocation.getMethod().getName();
+      if (method.startsWith("set") && invocation.getArguments().length == 1) {
+        drawn.put(method.substring("set".length()), invocation.getArgument(0));
+        return invocation.getMock();
+      }
+      String property = method.replaceFirst("^(get|is)", "");
+      return drawn.containsKey(property) ? drawn.get(property) : RETURNS_DEFAULTS.answer(invocation);
+    }));
   }
 }

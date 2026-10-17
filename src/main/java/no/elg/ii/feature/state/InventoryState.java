@@ -29,7 +29,6 @@ package no.elg.ii.feature.state;
 import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_SIZE;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
-import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
@@ -193,9 +192,8 @@ public class InventoryState implements FeatureState {
     assert this.client.isClientThread();
     if (isValidIndex(index)) {
       log.trace("Resetting index {}", index);
-      boolean wasFilling = slots[index].isFilling();
       slots[index] = InventorySlot.UNMODIFIED_SLOT;
-      resetWidgetInSlot(index, item, hasItem, wasFilling);
+      resetWidgetInSlot(index, item, hasItem);
     } else {
       log.debug("Tried to reset invalid index {}", index);
     }
@@ -203,11 +201,8 @@ public class InventoryState implements FeatureState {
 
   /**
    * Update all inventory widgets to reflect the actual state of the inventory
-   *
-   * @param wasFilling Whether the slot predicted an item the server had not added yet, see
-   *                   {@link InventorySlot#isFilling()}
    */
-  private void resetWidgetInSlot(int index, @Nullable Item maybeItem, boolean hasItem, boolean wasFilling) {
+  private void resetWidgetInSlot(int index, @Nullable Item maybeItem, boolean hasItem) {
     assert this.client.isClientThread();
     Item item;
     if (hasItem) {
@@ -222,15 +217,10 @@ public class InventoryState implements FeatureState {
 
     Stream<IndexedWidget> indexedWidgetStream = inventoryService.getAllOpenInventoryWidgets().filter(it -> it.getIndex() == index);
     if (item == null || item.getId() < 0) {
-      if (wasFilling) {
-        // Drawn like the client draws an empty slot in the inventory next to the bank, which never unhides a slot,
-        // so the client's next draw of this slot shows its item again
-        indexedWidgetStream.forEach(it -> WidgetUtils.setOpacityAndUnhide(it.getWidget(), FULLY_TRANSPARENT));
-      } else {
-        //There is no item at this index, so we hide the widget
-        //Make sure items that are not in the inventory are hidden
-        indexedWidgetStream.forEach(it -> WidgetUtils.setOpacityAndUnhide(it.getWidget(), FULLY_OPAQUE));
-      }
+      // The client does not redraw a slot the server left unchanged, e.g., when a withdrawal fails, so the predicted
+      // item must be removed here. It stays unhidden as the inventory next to the bank never unhides a slot, so the
+      // client's next draw of this slot shows its item again
+      indexedWidgetStream.forEach(it -> WidgetUtils.setEmptySlot(it.getWidget()));
     } else {
       //Update the item to the actual item
       indexedWidgetStream.forEach(it -> {

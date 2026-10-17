@@ -105,6 +105,18 @@ public final class WidgetUtils {
   }
 
   /**
+   * Draw the widget like the client draws an empty inventory slot.
+   * <p>
+   * Only use this for a slot that is empty on the server. Other plugins, such as Menu Entry Swapper, look up the item
+   * of a slot by its item id, so a slot that still holds an item must keep it, see issue #18
+   */
+  public static void setEmptySlot(@Nonnull Widget widget) {
+    widget.setName("");
+    updateVisibleWidget(widget, BLANKOBJECT, 1);
+    setOpacityAndUnhide(widget, FULLY_TRANSPARENT);
+  }
+
+  /**
    * Set the itemId and quantity of a widget without changing the opacity or any other attributes
    */
   public static void updateVisibleWidget(@Nonnull Widget dstWidget, int itemId, int amount) {
