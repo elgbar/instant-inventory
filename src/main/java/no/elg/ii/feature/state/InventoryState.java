@@ -246,11 +246,6 @@ public class InventoryState implements FeatureState {
     return slot != null && slot.isEmptying();
   }
 
-  public boolean isFilling(Widget widget) {
-    InventorySlot slot = getSlot(widget.getIndex());
-    return slot != null && slot.isFilling();
-  }
-
   @Override
   public void validateAll() {
     ItemContainer itemContainer = inventoryService.getCurrentInventoryContainer();
