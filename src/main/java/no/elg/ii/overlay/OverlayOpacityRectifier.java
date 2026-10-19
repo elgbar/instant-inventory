@@ -118,9 +118,11 @@ public class OverlayOpacityRectifier {
   }
 
   public void startUp() {
-    recreateOverlayMargin();
-    overlayManager.add(captureOverlay);
-    overlayManager.add(blendOverlay);
+    if (config.fixItemOpacity()) {
+      recreateOverlayMargin();
+      overlayManager.add(captureOverlay);
+      overlayManager.add(blendOverlay);
+    }
   }
 
   public void shutDown() {
