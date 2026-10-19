@@ -79,7 +79,7 @@ import no.elg.ii.util.Util;
 @Singleton
 @AllArgsConstructor
 @NoArgsConstructor
-public class UniversalTransparency {
+public class OverlayOpacityRectifier {
 
   /**
    * The shadow the {@code inventory_init} client script gives inventory items
@@ -107,18 +107,18 @@ public class UniversalTransparency {
    * its left edge to one pixel past its right edge
    */
   @NonNull
-  private final Insets overlayInsert = new Insets(0, 0, 0, 0);
+  private final Insets overlayMargin = new Insets(0, 0, 0, 0);
 
   private final List<Snapshot> snapshots = new ArrayList<>();
   private final Overlay captureOverlay = new CaptureItemPixelsOverlay();
   private final Overlay blendOverlay = new BlendItemPixelsOverlay();
 
-  public void recreateOverlayInsert() {
-    overlayInsert.set(config.insertTop(), config.insertLeft(), config.insertBottom(), config.insertRight());
+  public void recreateOverlayMargin() {
+    overlayMargin.set(config.topMargin(), config.leftMargin(), config.bottomMargin(), config.rightMargin());
   }
 
   public void startUp() {
-    recreateOverlayInsert();
+    recreateOverlayMargin();
     overlayManager.add(captureOverlay);
     overlayManager.add(blendOverlay);
   }
@@ -129,7 +129,7 @@ public class UniversalTransparency {
   }
 
   public void onConfigChange() {
-    if (config.enableItemOpacityOverlay()) {
+    if (config.fixItemOpacity()) {
       startUp();
     } else {
       shutDown();
@@ -156,7 +156,7 @@ public class UniversalTransparency {
       if (widget.getOpacity() == FULLY_OPAQUE || !predictedWidgets.contains(widget)) {
         continue;
       }
-      Rectangle area = withOverlayInsets(widgetItem.getCanvasBounds()).intersection(bufferBounds);
+      Rectangle area = withOverlayMargin(widgetItem.getCanvasBounds()).intersection(bufferBounds);
       if (!area.isEmpty()) {
         int[] faded = copyPixels(buffer, area);
         drawOpaque(widgetItem);
@@ -232,12 +232,12 @@ public class UniversalTransparency {
   }
 
   @Nonnull
-  private Rectangle withOverlayInsets(@Nonnull Rectangle bounds) {
+  private Rectangle withOverlayMargin(@Nonnull Rectangle bounds) {
     return new Rectangle(
-      bounds.x - overlayInsert.left,
-      bounds.y - overlayInsert.top,
-      bounds.width + overlayInsert.left + overlayInsert.right,
-      bounds.height + overlayInsert.top + overlayInsert.bottom
+      bounds.x - overlayMargin.left,
+      bounds.y - overlayMargin.top,
+      bounds.width + overlayMargin.left + overlayMargin.right,
+      bounds.height + overlayMargin.top + overlayMargin.bottom
     );
   }
 

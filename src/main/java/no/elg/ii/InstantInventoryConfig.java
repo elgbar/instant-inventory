@@ -65,12 +65,12 @@ public interface InstantInventoryConfig extends Config {
   String FEATURE_SECTION = "instant-inventory-features";
 
   @ConfigSection(
-    name = "Universal Transparency",
-    description = "Advanced settings for all features",
+    name = "Item Opacity Fix",
+    description = "Make what other plugins draw on transparent items just as transparent",
     position = 30,
     closedByDefault = true
   )
-  String UNIVERSAL_TRANSPARENCY_SECTION = "instant-inventory-universal-transparency";
+  String ITEM_OPACITY_FIX_SECTION = "instant-inventory-item-opacity-fix";
 
   @ConfigSection(
     name = "Advanced",
@@ -268,67 +268,67 @@ public interface InstantInventoryConfig extends Config {
 
 
   @ConfigItem(
-    section = UNIVERSAL_TRANSPARENCY_SECTION,
-    keyName = "enableItemOpacityOverlay",
-    name = "Universal Item Transparency",
+    section = ITEM_OPACITY_FIX_SECTION,
+    keyName = "fixItemOpacity",
+    name = "Fix item opacity",
     description =
-      "Whether advanced blending using overlays to get a universal transparency normally not allowed because other" +
-        "<p>plugins create overlays where the widget (item) transparency is ignored"
+      "Make what other plugins, such as Inventory Tags, Item Charges or Rune Pouch, draw on items this plugin" +
+        "<p>makes transparent just as transparent. Otherwise they draw fully opaque on top of them"
         + "<p>"
         + "<p>You should normally leave this enabled unless there is a bug",
     position = 30
   )
-  default boolean enableItemOpacityOverlay() {
+  default boolean fixItemOpacity() {
     return true;
   }
 
-  int MAX_INSERT = 8;
+  int MAX_MARGIN = 8;
 
   @ConfigItem(
-    section = UNIVERSAL_TRANSPARENCY_SECTION,
-    keyName = "itemOpacityOverlayInsertTop",
-    name = "Insert Top",
-    description = "How far outside to the top an item other overlays draw",
+    section = ITEM_OPACITY_FIX_SECTION,
+    keyName = "fixItemOpacityTopMargin",
+    name = "Top margin",
+    description = "How many pixels above an item other plugins draw",
     position = 31
   )
-  @Range(max = MAX_INSERT)
-  default int insertTop() {
+  @Range(max = MAX_MARGIN)
+  default int topMargin() {
     return 1;
   }
 
   @ConfigItem(
-    section = UNIVERSAL_TRANSPARENCY_SECTION,
-    keyName = "itemOpacityOverlayInsertLeft",
-    name = "Insert Left",
-    description = "How far outside to the left an item other overlays draw",
+    section = ITEM_OPACITY_FIX_SECTION,
+    keyName = "fixItemOpacityLeftMargin",
+    name = "Left margin",
+    description = "How many pixels to the left of an item other plugins draw",
     position = 32
   )
-  @Range(max = MAX_INSERT)
-  default int insertLeft() {
+  @Range(max = MAX_MARGIN)
+  default int leftMargin() {
     return 3;
   }
 
   @ConfigItem(
-    section = UNIVERSAL_TRANSPARENCY_SECTION,
-    keyName = "itemOpacityOverlayInsertBottom",
-    name = "Insert Bottom",
-    description = "How far outside to the bottom an item other overlays draw",
+    section = ITEM_OPACITY_FIX_SECTION,
+    keyName = "fixItemOpacityBottomMargin",
+    name = "Bottom margin",
+    description = "How many pixels below an item other plugins draw",
     position = 33
   )
-  @Range(max = MAX_INSERT)
-  default int insertBottom() {
+  @Range(max = MAX_MARGIN)
+  default int bottomMargin() {
     return 3;
   }
 
   @ConfigItem(
-    section = UNIVERSAL_TRANSPARENCY_SECTION,
-    keyName = "itemOpacityOverlayInsertRight",
-    name = "Insert Right",
-    description = "How far outside to the right an item other overlays draw",
+    section = ITEM_OPACITY_FIX_SECTION,
+    keyName = "fixItemOpacityRightMargin",
+    name = "Right margin",
+    description = "How many pixels to the right of an item other plugins draw",
     position = 34
   )
-  @Range(max = MAX_INSERT)
-  default int insertRight() {
+  @Range(max = MAX_MARGIN)
+  default int rightMargin() {
     return 1;
   }
 

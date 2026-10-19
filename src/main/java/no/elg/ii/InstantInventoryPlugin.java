@@ -47,7 +47,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import no.elg.ii.feature.FeatureManager;
 import no.elg.ii.feature.state.InventoryState;
-import no.elg.ii.overlay.UniversalTransparency;
+import no.elg.ii.overlay.OverlayOpacityRectifier;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.RedrawHiddenInventoryService;
@@ -89,7 +89,7 @@ public class InstantInventoryPlugin extends Plugin {
   DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
 
   @Inject
-  UniversalTransparency universalTransparency;
+  OverlayOpacityRectifier overlayOpacityRectifier;
 
   @Inject
   RedrawHiddenInventoryService redrawHiddenInventoryService;
@@ -99,7 +99,7 @@ public class InstantInventoryPlugin extends Plugin {
     eventBus.register(ensureWidgetStateService);
     eventBus.register(disallowModifiedWidgetInteractionService);
     eventBus.register(redrawHiddenInventoryService);
-    universalTransparency.startUp();
+    overlayOpacityRectifier.startUp();
     GameState gameState = client.getGameState();
     if (gameState == GameState.LOGGED_IN) {
       log.debug("Starting up instant inventory. During the game state {}, will update all feature statues", gameState);
@@ -117,7 +117,7 @@ public class InstantInventoryPlugin extends Plugin {
     eventBus.unregister(ensureWidgetStateService);
     eventBus.unregister(disallowModifiedWidgetInteractionService);
     eventBus.unregister(redrawHiddenInventoryService);
-    universalTransparency.shutDown();
+    overlayOpacityRectifier.shutDown();
   }
 
   /* (non-javadoc)
@@ -145,7 +145,7 @@ public class InstantInventoryPlugin extends Plugin {
   public void onConfigChanged(ConfigChanged configChanged) {
     if (InstantInventoryConfig.GROUP.equals(configChanged.getGroup())) {
       clientThread.invoke(() -> {
-          universalTransparency.onConfigChange();
+          overlayOpacityRectifier.onConfigChange();
           featureManager.updateAllFeatureStatus();
         }
       );

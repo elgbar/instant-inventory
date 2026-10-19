@@ -65,7 +65,7 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
 
     plugin.startUp();
 
-    verify(universalTransparency).startUp();
+    verify(overlayOpacityRectifier).startUp();
   }
 
   @Test
@@ -91,7 +91,7 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
   @Test
   public void shutDown_removes_item_opacity_overlays() {
     plugin.shutDown();
-    verify(universalTransparency).shutDown();
+    verify(overlayOpacityRectifier).shutDown();
   }
 
   @Test

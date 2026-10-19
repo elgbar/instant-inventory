@@ -27,7 +27,7 @@
 
 package no.elg.ii.overlay;
 
-import static no.elg.ii.overlay.UniversalTransparency.blendChannels;
+import static no.elg.ii.overlay.OverlayOpacityRectifier.blendChannels;
 import static no.elg.ii.util.WidgetUtils.FULLY_OPAQUE;
 import static no.elg.ii.util.WidgetUtils.FULLY_TRANSPARENT;
 import static org.junit.Assert.assertEquals;
@@ -68,7 +68,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
-public class UniversalTransparencyTest {
+public class OverlayOpacityRectifierTest {
 
   private static final int BACKGROUND = 0xFF102030;
   private static final int TAG = 0xFFFF0000;
@@ -106,7 +106,7 @@ public class UniversalTransparencyTest {
 
   private Client client;
   private InventoryState state;
-  private UniversalTransparency universalTransparency;
+  private OverlayOpacityRectifier overlayOpacityRectifier;
   private Overlay captureOverlay;
   private Overlay blendOverlay;
 
@@ -114,30 +114,30 @@ public class UniversalTransparencyTest {
   public void setUp() {
     client = TestSetup.mockClient();
     state = TestSetup.newInventoryState(client);
-    universalTransparency = new UniversalTransparency(client, overlayManager, inventoryService, state, new InstantInventoryConfig() {
-      // Insets reaching from ITEM_BOUNDS to ITEM_AND_UNDERLINE
+    overlayOpacityRectifier = new OverlayOpacityRectifier(client, overlayManager, inventoryService, state, new InstantInventoryConfig() {
+      // Margins reaching from ITEM_BOUNDS to ITEM_AND_UNDERLINE
       @Override
-      public int insertTop() {
+      public int topMargin() {
         return 0;
       }
 
       @Override
-      public int insertLeft() {
+      public int leftMargin() {
         return 0;
       }
 
       @Override
-      public int insertBottom() {
+      public int bottomMargin() {
         return 3;
       }
 
       @Override
-      public int insertRight() {
+      public int rightMargin() {
         return 1;
       }
     });
 
-    universalTransparency.startUp();
+    overlayOpacityRectifier.startUp();
     ArgumentCaptor<Overlay> added = ArgumentCaptor.forClass(Overlay.class);
     verify(overlayManager, times(2)).add(added.capture());
     captureOverlay = added.getAllValues().get(0);
@@ -283,7 +283,7 @@ public class UniversalTransparencyTest {
 
   @Test
   public void shutDown_removes_both_overlays() {
-    universalTransparency.shutDown();
+    overlayOpacityRectifier.shutDown();
 
     verify(overlayManager).remove(captureOverlay);
     verify(overlayManager).remove(blendOverlay);

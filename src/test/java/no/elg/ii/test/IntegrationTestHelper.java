@@ -43,7 +43,7 @@ import no.elg.ii.feature.features.EquipFeature;
 import no.elg.ii.feature.features.SpecialAttackFeature;
 import no.elg.ii.feature.features.WithdrawFeature;
 import no.elg.ii.feature.state.InventoryState;
-import no.elg.ii.overlay.UniversalTransparency;
+import no.elg.ii.overlay.OverlayOpacityRectifier;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
@@ -69,7 +69,7 @@ public abstract class IntegrationTestHelper {
   @Mock
   protected DisallowModifiedWidgetInteractionService disallowModifiedWidgetInteractionService;
   @Mock
-  protected UniversalTransparency universalTransparency;
+  protected OverlayOpacityRectifier overlayOpacityRectifier;
   @Mock
   protected RedrawHiddenInventoryService redrawHiddenInventoryService;
 
@@ -119,6 +119,6 @@ public abstract class IntegrationTestHelper {
     cleanHerbFeature.state = inventoryState;
     depositFeature.state = inventoryState;
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService, universalTransparency, redrawHiddenInventoryService));
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService, overlayOpacityRectifier, redrawHiddenInventoryService));
   }
 }
