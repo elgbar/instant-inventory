@@ -11,15 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* The opacity of items added to an empty inventory slot, e.g., withdrawn items, is configurable separately from changed
-  items
-  * By default, it uses will be populated with the value from `Changed items opacity` to make it backwards compatible
-
 ### Changed
 
 ### Fixed
 
 ### Removed
+
+---
+
+## 1.6.2 - 2026-10-19
+
+### Fixed
+
+* Fix [#12](https://github.com/elgbar/instant-inventory/issues/12) overlays from other plugins, such as the tags of
+  Inventory Tags, now fade with the item they are drawn on
 
 ---
 
@@ -38,8 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix depositing item just withdrawn are not hidden correctly
 * Fix wrong slot prediction when quickly withdrawing an item, depositing it, then withdrawing another item
 * Fix equipping item while nothing is equipped in that slot wrongly completely hides the item
-* Fix [#12](https://github.com/elgbar/instant-inventory/issues/12) overlays from other plugins, such as the tags of
-  Inventory Tags, now fade with the item they are drawn on
 
 ---
 
