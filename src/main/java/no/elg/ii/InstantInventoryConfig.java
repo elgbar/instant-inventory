@@ -64,6 +64,13 @@ public interface InstantInventoryConfig extends Config {
   )
   String FEATURE_SECTION = "instant-inventory-features";
 
+  @ConfigSection(
+    name = "Universal Transparency",
+    description = "Advanced settings for all features",
+    position = 30,
+    closedByDefault = true
+  )
+  String UNIVERSAL_TRANSPARENCY_SECTION = "instant-inventory-universal-transparency";
 
   @ConfigSection(
     name = "Advanced",
@@ -255,6 +262,76 @@ public interface InstantInventoryConfig extends Config {
   default int prayerEnableOpacityPercent() {
     return DEFAULT_PRAYER_ENABLE_OPACITY;
   }
+
+
+  /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  @ConfigItem(
+    section = UNIVERSAL_TRANSPARENCY_SECTION,
+    keyName = "enableItemOpacityOverlay",
+    name = "Universal Item Transparency",
+    description =
+      "Whether advanced blending using overlays to get a universal transparency normally not allowed because other" +
+        "<p>plugins create overlays where the widget (item) transparency is ignored"
+        + "<p>"
+        + "<p>You should normally leave this enabled unless there is a bug",
+    position = 30
+  )
+  default boolean enableItemOpacityOverlay() {
+    return true;
+  }
+
+  int MAX_INSERT = 8;
+
+  @ConfigItem(
+    section = UNIVERSAL_TRANSPARENCY_SECTION,
+    keyName = "itemOpacityOverlayInsertTop",
+    name = "Insert Top",
+    description = "How far outside to the top an item other overlays draw",
+    position = 31
+  )
+  @Range(max = MAX_INSERT)
+  default int insertTop() {
+    return 1;
+  }
+
+  @ConfigItem(
+    section = UNIVERSAL_TRANSPARENCY_SECTION,
+    keyName = "itemOpacityOverlayInsertLeft",
+    name = "Insert Left",
+    description = "How far outside to the left an item other overlays draw",
+    position = 32
+  )
+  @Range(max = MAX_INSERT)
+  default int insertLeft() {
+    return 3;
+  }
+
+  @ConfigItem(
+    section = UNIVERSAL_TRANSPARENCY_SECTION,
+    keyName = "itemOpacityOverlayInsertBottom",
+    name = "Insert Bottom",
+    description = "How far outside to the bottom an item other overlays draw",
+    position = 33
+  )
+  @Range(max = MAX_INSERT)
+  default int insertBottom() {
+    return 3;
+  }
+
+  @ConfigItem(
+    section = UNIVERSAL_TRANSPARENCY_SECTION,
+    keyName = "itemOpacityOverlayInsertRight",
+    name = "Insert Right",
+    description = "How far outside to the right an item other overlays draw",
+    position = 34
+  )
+  @Range(max = MAX_INSERT)
+  default int insertRight() {
+    return 1;
+  }
+
 
   /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
