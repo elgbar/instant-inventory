@@ -33,11 +33,15 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.gameval.VarPlayerID;
 import no.elg.ii.InstantInventoryConfig;
 
 @Slf4j
 @NoArgsConstructor
 public class PrayerState implements FeatureState {
+
+  /** The prayer-book occupies bits 0 through 28 in the alternate-prayer varp. */
+  private static final int PRAYER_BOOK_SLOTS = (1 << 29) - 1;
 
   @Inject
   Client client;
@@ -73,7 +77,7 @@ public class PrayerState implements FeatureState {
   @Override
   public void resetAll() {
     assert client.isClientThread();
-    serverPrayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    serverPrayerState = readServerPrayerState();
     prayerState = serverPrayerState;
     // Keep to record of last state on reset
     lastPrayerState = serverPrayerState;
@@ -82,7 +86,7 @@ public class PrayerState implements FeatureState {
   @Override
   public void validateAll() {
     assert client.isClientThread();
-    serverPrayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    serverPrayerState = readServerPrayerState();
     if (shouldRevalidate()) {
       lastPrayerState = prayerState;
       prayerState = serverPrayerState;
@@ -94,6 +98,18 @@ public class PrayerState implements FeatureState {
   }
 
   /**
+   * RuneScape stores newer replacement prayers in a second varp. Combine it
+   * with the original prayer varbit so the shared prayer-book slot bits are
+   * represented in the same format used by {@code PrayerInfo}.
+   */
+  private int readServerPrayerState() {
+    int regularPrayers = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    int alternatePrayers = client.getServerVarpValue(VarPlayerID.PRAYER_ALLACTIVE_ALTERNATE_0)
+      & PRAYER_BOOK_SLOTS;
+    return regularPrayers | alternatePrayers;
+  }
+
+  /**
    *
    * @return Whether we should revalidate the state from server. This is to avoid overwriting manual changes too early
    */
@@ -102,3 +118,4 @@ public class PrayerState implements FeatureState {
   }
 
 }
+
