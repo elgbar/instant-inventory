@@ -104,7 +104,7 @@ public class SpecialAttackFeature implements StatelessFeature {
     assert client.isClientThread();
     Widget specWidget = client.getWidget(InterfaceID.Orbs.SPECENERGY_INDICATOR);
     if (specWidget != null) {
-      if (varService.isVarpTrue(VarPlayerID.SA_ATTACK)) {
+      if (isSpecAttackActive()) {
         // was enabled, mark as disabled
         specWidget.setSpriteId(SPRITE_ID_SPEC_ORB_FILLER_INACTIVE);
       } else {
@@ -116,9 +116,20 @@ public class SpecialAttackFeature implements StatelessFeature {
 
   private void updateSpecBar() {
     assert client.isClientThread();
+
+    // RuneScape 1.13.3 can display separate main-hand and off-hand special
+    // attack bars. Let those bars follow the game's own state; this prediction
+    // code only understands the original single-bar layout.
+    Widget mainHandBar = client.getWidget(InterfaceID.CombatInterface.SP_ATTACKBAR_MAINHAND);
+    Widget offHandBar = client.getWidget(InterfaceID.CombatInterface.SP_ATTACKBAR_OFFHAND);
+    if ((mainHandBar != null && !mainHandBar.isSelfHidden())
+      || (offHandBar != null && !offHandBar.isSelfHidden())) {
+      return;
+    }
+
     Widget specWidget = client.getWidget(InterfaceID.CombatInterface.SP_INDICATOR);
-    if (specWidget != null) {
-      if (varService.isVarpTrue(VarPlayerID.SA_ATTACK)) {
+    if (specWidget != null && !specWidget.isSelfHidden()) {
+      if (isSpecAttackActive()) {
         // was enabled, mark as disabled
         specWidget.setTextColor(SPEC_INACTIVE_COLOR);
       } else {
@@ -126,6 +137,11 @@ public class SpecialAttackFeature implements StatelessFeature {
         specWidget.setTextColor(SPEC_ACTIVE_COLOR);
       }
     }
+  }
+
+  /** SA_ATTACK is no longer strictly boolean: non-zero values indicate an active spec. */
+  private boolean isSpecAttackActive() {
+    return varService.varpValue(VarPlayerID.SA_ATTACK) != 0;
   }
 
   @Override
@@ -138,3 +154,4 @@ public class SpecialAttackFeature implements StatelessFeature {
     return config.instantSpec();
   }
 }
+
