@@ -31,6 +31,7 @@ import static net.runelite.api.gameval.VarbitID.QUICKPRAYER_ACTIVE;
 import static net.runelite.api.gameval.VarbitID.QUICKPRAYER_SELECTED;
 import static no.elg.ii.model.PrayerInfo.INTERFACE_TO_BIT;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Map;
 import java.util.function.IntBinaryOperator;
 import javax.annotation.Nonnull;
@@ -88,13 +89,16 @@ public class PrayerFeature implements StatefulFeature {
 
   @Inject
   @Getter
-  private PrayerState state;
+  @VisibleForTesting
+  PrayerState state;
 
   @Inject
-  private Client client;
+  @VisibleForTesting
+  Client client;
 
   @Inject
-  private VarService varService;
+  @VisibleForTesting
+  VarService varService;
 
   @Inject
   private ClientThread clientThread;
