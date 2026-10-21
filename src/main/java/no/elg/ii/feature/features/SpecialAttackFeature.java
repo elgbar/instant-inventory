@@ -116,7 +116,7 @@ public class SpecialAttackFeature implements StatelessFeature {
 
   private void updateSpecBar() {
     assert client.isClientThread();
-    Widget specWidget = client.getWidget(InterfaceID.CombatInterface.SP_INDICATOR);
+    Widget specWidget = client.getWidget(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND);
     if (specWidget != null) {
       if (varService.isVarpTrue(VarPlayerID.SA_ATTACK)) {
         // was enabled, mark as disabled
