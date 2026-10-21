@@ -54,7 +54,7 @@ public class SpecialAttackFeature implements StatelessFeature {
 
   public static final String SPEC_CONFIG_KEY = "instantSpec";
   private static final int SPEC_ACTIVE_COLOR = Color.YELLOW.getRGB();
-  private static final int SPEC_INACTIVE_COLOR = Color.BLACK.getRGB();
+  private static final int SPEC_INACTIVE_COLOR = 0x000010;
   /**
    * @see net.runelite.api.SpriteID#MINIMAP_ORB_SPECIAL
    */
