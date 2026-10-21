@@ -29,14 +29,17 @@ package no.elg.ii.feature.features;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.awt.Color;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.events.BeforeRender;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.SpriteID;
 import net.runelite.api.gameval.VarPlayerID;
@@ -72,19 +75,60 @@ public class SpecialAttackFeature implements StatelessFeature {
 
   @Inject
   private VarService varService;
+
   @Inject
   private InstantInventoryConfig config;
 
+  /**
+   * Predicted SA_ATTACK after the last spec click, or {@code null} when the server value should be trusted.
+   * Needed so multiple clicks within one tick toggle from the predicted state, and so a server update for an earlier
+   * click does not flicker the bar and orb back to an outdated state
+   */
+  @Nullable
+  private Integer predictedSpecState;
+  private long lastManuallyModified;
+
   /* (non-javadoc)
-   * Uses the ScriptPreFired event because the SA_ATTACK varbit is updated by the TOGGLE_QUICK_PRAYER_SCRIPT_ID
+   * Uses the ScriptPostFired event because the SA_ATTACK varbit is updated by the TOGGLE_QUICK_SPECIAL_ATTACK_SCRIPT_ID.
+   * And we must know the state to update it properly
    */
   @Subscribe
-  public void onScriptPreFired(final ScriptPreFired event) {
+  public void onScriptPostFired(final ScriptPostFired event) {
     assert client.isClientThread();
     if (event.getScriptId() == TOGGLE_QUICK_SPECIAL_ATTACK_SCRIPT_ID) {
-      //No need to call updateSpecOrb as it is updated clientside from before
-      updateSpecBar();
+      // The orb writes SA_ATTACK clientside, but a server update for an earlier click may still overwrite it
+      predict(varService.varpValue(VarPlayerID.SA_ATTACK));
     }
+  }
+
+  @Subscribe
+  public void onBeforeRender(final BeforeRender event) {
+    assert client.isClientThread();
+    // The game redraws the bar and orb whenever the server updates SA_ATTACK, so keep re-applying the prediction
+    if (predictedSpecState != null) {
+      updateSpecBar(predictedSpecState);
+      updateSpecOrb(predictedSpecState);
+    }
+  }
+
+  @Subscribe
+  public void onGameTick(final GameTick event) {
+    assert client.isClientThread();
+    if (predictedSpecState != null && System.currentTimeMillis() - lastManuallyModified >= config.minChangedMs()) {
+      // Stop overriding, the game has already drawn what the server says
+      predictedSpecState = null;
+    }
+  }
+
+  private void predict(int newSpecState) {
+    predictedSpecState = newSpecState;
+    lastManuallyModified = System.currentTimeMillis();
+    updateSpecBar(newSpecState);
+    updateSpecOrb(newSpecState);
+  }
+
+  private int currentSpecState() {
+    return predictedSpecState != null ? predictedSpecState : varService.varpValue(VarPlayerID.SA_ATTACK);
   }
 
   @Subscribe
@@ -92,39 +136,52 @@ public class SpecialAttackFeature implements StatelessFeature {
     assert client.isClientThread();
     Widget widget = event.getWidget();
     if (widget != null) {
-      String menuOption = event.getMenuOption();
-      if (menuOption.contains("Use") && menuOption.contains("Special Attack")) {
-        updateSpecBar();
-        updateSpecOrb();
+      int hand;
+      int id = widget.getId();
+      if (id == InterfaceID.CombatInterface.SPECIAL_ATTACK_OFFHAND) {
+        hand = SPEC_STATE_OFFHAND;
+      } else if (id == InterfaceID.CombatInterface.SPECIAL_ATTACK || id == InterfaceID.CombatInterface.SPECIAL_ATTACK_MAINHAND) {
+        hand = SPEC_STATE_MAINHAND;
+      } else {
+        return;
       }
+      // Bars are resolved server side, so predict: clicking the active hand turns it off, otherwise switches to it
+      predict(currentSpecState() == hand ? SPEC_STATE_OFF : hand);
     }
   }
 
-  private void updateSpecOrb() {
+  private void updateSpecOrb(int newSpecState) {
     assert client.isClientThread();
     Widget specWidget = client.getWidget(InterfaceID.Orbs.SPECENERGY_INDICATOR);
     if (specWidget != null) {
-      if (varService.isVarpTrue(VarPlayerID.SA_ATTACK)) {
-        // was enabled, mark as disabled
-        specWidget.setSpriteId(SPRITE_ID_SPEC_ORB_FILLER_INACTIVE);
-      } else {
-        // was disabled, mark as enabled
-        specWidget.setSpriteId(SPRITE_ID_SPEC_ORB_FILLER_ACTIVE);
+      specWidget.setSpriteId(newSpecState == SPEC_STATE_OFF ? SPRITE_ID_SPEC_ORB_FILLER_INACTIVE : SPRITE_ID_SPEC_ORB_FILLER_ACTIVE);
+    }
+  }
+
+  private void updateSpecBar(int newSpecState) {
+    assert client.isClientThread();
+    Widget parentSpecWidget = client.getWidget(InterfaceID.CombatInterface.SP_ATTACKBARS_CONTAINER);
+    if (parentSpecWidget != null && !parentSpecWidget.isHidden()) {
+      if (newSpecState == SPEC_STATE_OFF) {
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_INACTIVE_COLOR);
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_INACTIVE_COLOR);
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_INACTIVE_COLOR);
+      } else if (newSpecState == SPEC_STATE_MAINHAND) {
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_ACTIVE_COLOR);
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_ACTIVE_COLOR);
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_INACTIVE_COLOR);
+      } else if (newSpecState == SPEC_STATE_OFFHAND) {
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_INACTIVE_COLOR);
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_INACTIVE_COLOR);
+        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_ACTIVE_COLOR);
       }
     }
   }
 
-  private void updateSpecBar() {
-    assert client.isClientThread();
-    Widget specWidget = client.getWidget(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND);
-    if (specWidget != null) {
-      if (varService.isVarpTrue(VarPlayerID.SA_ATTACK)) {
-        // was enabled, mark as disabled
-        specWidget.setTextColor(SPEC_INACTIVE_COLOR);
-      } else {
-        // was disabled, mark as enabled
-        specWidget.setTextColor(SPEC_ACTIVE_COLOR);
-      }
+  private void colorSpecBar(int interfaceId, int color) {
+    Widget specWidget = client.getWidget(interfaceId);
+    if (specWidget != null && !specWidget.isHidden()) {
+      specWidget.setTextColor(color);
     }
   }
 
@@ -137,4 +194,8 @@ public class SpecialAttackFeature implements StatelessFeature {
   public boolean isEnabledInConfig() {
     return config.instantSpec();
   }
+
+  private final static int SPEC_STATE_OFF = 0;
+  private final static int SPEC_STATE_MAINHAND = 1;
+  private final static int SPEC_STATE_OFFHAND = 2;
 }
