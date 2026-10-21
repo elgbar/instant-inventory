@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Elg
+ * Copyright (c) 2025-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,6 +67,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import net.runelite.api.Prayer;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 
 @NoArgsConstructor
@@ -115,8 +116,11 @@ public final class PrayerInfo {
 
   /**
    * Manual setup of prayer to a bit. These bits reflect what bit the server sets in {@link VarbitID#PRAYER_ALLACTIVE}.
+   * Alternate prayers that replace a prayer in the prayer book (Deadeye, Mystic Vigour, and Zeal for Piety) use the bit of the
+   * prayer they replace, but in {@link VarPlayerID#PRAYER_ALLACTIVE_ALTERNATE_0}.
    *
    * @see VarbitID#PRAYER_ALLACTIVE
+   * @see VarPlayerID#PRAYER_ALLACTIVE_ALTERNATE_0
    */
   @SuppressWarnings({"MagicNumber", "PointlessBitwiseExpression"})
   private static EnumMap<Prayer, Integer> setupPrayerToBit() {
@@ -156,6 +160,7 @@ public final class PrayerInfo {
 
     prayerToBit.put(CHIVALRY, 1 << 25);
     prayerToBit.put(PIETY, 1 << 26);
+//    prayerToBit.put(ZEAL, 1 << 26); // Intentional overlap with PIETY
     prayerToBit.put(RIGOUR, 1 << 24);
     prayerToBit.put(AUGURY, 1 << 27);
     return prayerToBit;

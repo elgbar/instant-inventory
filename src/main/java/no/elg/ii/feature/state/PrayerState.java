@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Elg
+ * Copyright (c) 2025-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import no.elg.ii.InstantInventoryConfig;
+import no.elg.ii.model.PrayerInfo;
 
 @Slf4j
 @NoArgsConstructor
@@ -70,10 +72,22 @@ public class PrayerState implements FeatureState {
     lastManuallyModified = System.currentTimeMillis();
   }
 
+
+  /**
+   * Prayers are split into two, {@link VarbitID#PRAYER_ALLACTIVE} and {@link VarPlayerID#PRAYER_ALLACTIVE_ALTERNATE_0}.
+   * Some prayers can be replaced with alternative prayers which changes how the server sets its bits.
+   *
+   * @return A unified bitset of the server prayer state
+   * @see PrayerInfo#PRAYER_TO_BIT
+   */
+  private int unifiedPrayerState() {
+    return client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE) | client.getServerVarpValue(VarPlayerID.PRAYER_ALLACTIVE_ALTERNATE_0);
+  }
+
   @Override
   public void resetAll() {
     assert client.isClientThread();
-    serverPrayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    serverPrayerState = unifiedPrayerState();
     prayerState = serverPrayerState;
     // Keep to record of last state on reset
     lastPrayerState = serverPrayerState;
@@ -82,7 +96,7 @@ public class PrayerState implements FeatureState {
   @Override
   public void validateAll() {
     assert client.isClientThread();
-    serverPrayerState = client.getServerVarbitValue(VarbitID.PRAYER_ALLACTIVE);
+    serverPrayerState = unifiedPrayerState();
     if (shouldRevalidate()) {
       lastPrayerState = prayerState;
       prayerState = serverPrayerState;

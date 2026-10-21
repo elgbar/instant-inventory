@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fix UI update broke instant special bar
+* Fix game update broke alternative prayers
 * Fix wrong color for inactive special bar
 * Fix clicking multiple times in the same tick mispredicted the special bar state
 
