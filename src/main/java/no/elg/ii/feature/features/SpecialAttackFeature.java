@@ -71,13 +71,15 @@ public class SpecialAttackFeature implements StatelessFeature {
 
   @Inject
   @VisibleForTesting
-  private Client client;
+  Client client;
 
   @Inject
-  private VarService varService;
+  @VisibleForTesting
+  VarService varService;
 
   @Inject
-  private InstantInventoryConfig config;
+  @VisibleForTesting
+  InstantInventoryConfig config;
 
   /**
    * Predicted SA_ATTACK after the last spec click, or {@code null} when the server value should be trusted.
