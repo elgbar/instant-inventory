@@ -123,9 +123,13 @@ public class TestSetup {
   }
 
   public static InventoryState newInventoryState(Client client) {
+    return newInventoryState(client, mock(InventoryService.class));
+  }
+
+  public static InventoryState newInventoryState(Client client, InventoryService inventoryService) {
     InstantInventoryConfig config = spy(new InstantInventoryConfig() {
     });
-    return new InventoryState(config, client, mock(InventoryService.class));
+    return new InventoryState(config, client, inventoryService);
   }
 
   private static void setupHideFeature(HideFeature feature) {

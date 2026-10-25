@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Elg
+ * Copyright (c) 2025-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,10 +48,10 @@ import net.runelite.client.eventbus.Subscribe;
 public class DisallowModifiedWidgetInteractionService {
 
   @Inject
-  private InventoryService inventoryService;
+  InventoryService inventoryService;
 
   @Inject
-  private Client client;
+  Client client;
 
   @Subscribe(priority = Integer.MAX_VALUE)
   public void onMenuOptionClicked(final MenuOptionClicked event) {
