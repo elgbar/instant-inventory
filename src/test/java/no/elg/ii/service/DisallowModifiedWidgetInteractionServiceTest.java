@@ -33,7 +33,10 @@ import static net.runelite.api.gameval.ItemID.BRONZE_SQ_SHIELD;
 import static net.runelite.api.gameval.ItemID.BRONZE_SWORD;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.withSettings;
 
 import java.util.ArrayList;
@@ -176,6 +179,29 @@ public class DisallowModifiedWidgetInteractionServiceTest {
 
     boolean droppedDagger = !drop.isConsumed() && drop.getItemId() == BRONZE_DAGGER;
     assertFalse("The dagger would be dropped in the tick it is taken off", droppedDagger);
+  }
+
+  @Test
+  public void onWidgetDrag_between_slots_that_are_not_predicted_does_not_reset_them() {
+    // Other plugins may hide slots, which a reset would undo
+    Widget firstSlot = itemInSlot(0, BRONZE_SWORD);
+    Widget secondSlot = itemInSlot(1, BRONZE_SQ_SHIELD);
+
+    dragInGame(firstSlot, secondSlot);
+
+    verify(firstSlot, never()).setHidden(anyBoolean());
+    verify(secondSlot, never()).setHidden(anyBoolean());
+  }
+
+  @Test
+  public void onWidgetDrag_onto_the_same_slot_keeps_its_prediction() {
+    // Nothing moves, so the prediction is still right
+    Widget slot = itemInSlot(0, BRONZE_SWORD);
+    showWhatEquippingTakesOff(slot, BRONZE_DAGGER);
+
+    dragInGame(slot, slot);
+
+    assertTrue(state.isActiveSlot(0));
   }
 
   /**

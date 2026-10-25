@@ -149,6 +149,11 @@ public class InventoryState implements FeatureState {
     return slots[index];
   }
 
+  public boolean isActiveSlot(int index) {
+    InventorySlot slot = getSlot(index);
+    return slot != null && slot.hasValidItemId();
+  }
+
   public static boolean isValidIndex(int index) {
     return index >= 0 && index < INVENTORY_SIZE;
   }
