@@ -78,11 +78,6 @@ public class DisallowModifiedWidgetInteractionService {
     }
   }
 
-  /**
-   * When an item is dragged onto another slot, the game shows each slot's item in the other, taking the items from what
-   * the slots show. A predicted item would then end up in a slot that is not tracked, where it can be used before the
-   * server has it (issue #22). So when either slot is predicted, both are reset to what the server has
-   */
   @Subscribe
   public void onWidgetDrag(WidgetDrag event) {
     // Posted every cycle of a drag. The mouse button is let go in the last one, before the client handles the drop
