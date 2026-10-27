@@ -196,6 +196,20 @@ public class DisallowModifiedWidgetInteractionServiceTest {
   }
 
   @Test
+  public void onMenuOptionClicked_drop_of_what_equipping_takes_off_after_another_item_is_dragged_onto_it_is_not_sent_for_it() {
+    Widget firstSlot = itemInSlot(0, BRONZE_SQ_SHIELD);
+    Widget secondSlot = itemInSlot(1, BRONZE_SWORD);
+    showWhatEquippingTakesOff(secondSlot, BRONZE_DAGGER);
+    dragInGame(firstSlot, secondSlot);
+
+    MenuOptionClicked drop = click("Drop", firstSlot);
+    eventBus.post(drop);
+
+    boolean droppedDagger = !drop.isConsumed() && drop.getItemId() == BRONZE_DAGGER;
+    assertFalse("The dagger would be dropped in the tick it is taken off", droppedDagger);
+  }
+
+  @Test
   public void onWidgetDrag_between_slots_that_are_not_predicted_does_not_reset_them() {
     // Other plugins may hide slots, which a reset would undo
     Widget firstSlot = itemInSlot(0, BRONZE_SWORD);
