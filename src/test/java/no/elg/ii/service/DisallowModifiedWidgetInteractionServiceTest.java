@@ -167,8 +167,7 @@ public class DisallowModifiedWidgetInteractionServiceTest {
 
   @Test
   public void onMenuOptionClicked_drop_of_what_equipping_takes_off_dragged_to_an_empty_slot_is_not_sent_for_it() {
-    // Issue #22 through a drag into an empty slot, as reproduced in game. The second slot stays empty on the server until
-    // it has handled the move
+    // Issue #22 through a drag into an empty slot. The second slot stays empty on the server until it has handled the move
     Widget firstSlot = itemInSlot(0, BRONZE_SWORD);
     Widget secondSlot = emptySlot(1);
     showWhatEquippingTakesOff(firstSlot, BRONZE_DAGGER);
@@ -179,6 +178,21 @@ public class DisallowModifiedWidgetInteractionServiceTest {
 
     boolean droppedDagger = !drop.isConsumed() && drop.getItemId() == BRONZE_DAGGER;
     assertFalse("The dagger would be dropped in the tick it is taken off", droppedDagger);
+  }
+
+  @Test
+  public void onMenuOptionClicked_drop_of_what_equipping_an_item_dragged_to_an_empty_slot_takes_off_is_disallowed() {
+    // Issue #22 as reproduced in game: the item is dragged to an empty slot and equipped there in the same tick. The
+    // server has that slot empty until it handles the move, and then the wield puts the dagger there
+    Widget firstSlot = itemInSlot(0, BRONZE_SWORD);
+    Widget secondSlot = emptySlot(1);
+    dragInGame(firstSlot, secondSlot);
+    showWhatEquippingTakesOff(secondSlot, BRONZE_DAGGER);
+
+    MenuOptionClicked dropDagger = click("Drop", secondSlot);
+    eventBus.post(dropDagger);
+
+    assertTrue(dropDagger.isConsumed());
   }
 
   @Test

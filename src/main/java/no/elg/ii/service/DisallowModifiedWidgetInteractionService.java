@@ -28,6 +28,7 @@
 package no.elg.ii.service;
 
 
+import static no.elg.ii.inventory.slot.InventorySlot.INVALID_ITEM_ID;
 import static no.elg.ii.util.InventoryUtil.INVENTORY_ITEMS_CONTAINERS;
 
 import javax.annotation.Nullable;
@@ -67,7 +68,9 @@ public class DisallowModifiedWidgetInteractionService {
       ItemContainer currentInventoryContainer = inventoryService.getCurrentInventoryContainer();
       if (currentInventoryContainer != null) {
         Item item = currentInventoryContainer.getItem(widget.getIndex());
-        if (item != null && item.getId() != widget.getItemId()) {
+        // The slot is empty on the server when an item was dragged there and equipped before the server moved it
+        int actualItemId = item == null ? INVALID_ITEM_ID : item.getId();
+        if (actualItemId != widget.getItemId()) {
           log.debug("Widget item in slot {} is not the same as the item in the inventory. Disallowing interaction", widget.getIndex());
           event.consume();
         }
@@ -88,8 +91,7 @@ public class DisallowModifiedWidgetInteractionService {
     }
     Widget dragged = client.getDraggedWidget();
     Widget draggedOn = client.getDraggedOnWidget();
-    if (dragged == null || draggedOn == null || dragged.getId() != draggedOn.getId()
-      || !INVENTORY_ITEMS_CONTAINERS.contains(dragged.getId())) {
+    if (dragged == null || draggedOn == null || dragged.getId() != draggedOn.getId() || !INVENTORY_ITEMS_CONTAINERS.contains(dragged.getId())) {
       return;
     }
     int from = dragged.getIndex();

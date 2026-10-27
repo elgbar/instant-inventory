@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * [#34](https://github.com/elgbar/instant-inventory/issues/34) Fix dragging an item then dropping it on the same tick
   was disallowed
+* [#22](https://github.com/elgbar/instant-inventory/issues/22) Fix advanced equip-drag and drop issue
+
 ### Removed
 
 ---
