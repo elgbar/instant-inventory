@@ -34,7 +34,7 @@ java {
 }
 
 group = 'no.elg'
-version = '1.6.4'
+version = '1.6.5'
 
 tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'

@@ -15,15 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* [#45](https://github.com/elgbar/instant-inventory/issues/45) Fix items recently added into the game not working with equip prediction
-* Fix Rondache implementation
-* Fix Special attack prediction never resetting on misprediction
-
 ### Removed
 
 ---
 
+## 1.6.5 - 2026-10-30
+
+### Fixed
+
+* [#45](https://github.com/elgbar/instant-inventory/issues/45) Fix items recently added into the game not working with equip prediction
+* Fix Rondache implementation
+* Fix Special attack prediction never resetting on misprediction
+
+---
+
 ## 1.6.4 - 2026-10-27
+
+### Fixed
 
 * [#34](https://github.com/elgbar/instant-inventory/issues/34) Fix dragging an item then dropping it on the same tick was disallowed
 * [#22](https://github.com/elgbar/instant-inventory/issues/22) Fix advanced equip-drag and drop issue
