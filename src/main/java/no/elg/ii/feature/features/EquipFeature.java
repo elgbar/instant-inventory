@@ -150,9 +150,10 @@ public class EquipFeature implements StatefulFeature {
    * equipped
    */
   private void learnEquipSlots(@Nonnull ItemContainer equipmentContainer) {
+    assert client.isClientThread();
     for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()) {
       Item item = equipmentContainer.getItem(slot.getSlotIdx());
-      if (item != null && !hasEquipmentStats(item.getId())) {
+      if (item != null && missingEquipmentStats(item.getId())) {
         //only record the items we don't know about
         seenWornSlot.put(item.getId(), slot.getSlotIdx());
       }
@@ -160,7 +161,7 @@ public class EquipFeature implements StatefulFeature {
 
     Item weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
     boolean wearsShield = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx()) != null;
-    if (weaponItem != null) {
+    if (weaponItem != null && missingEquipmentStats(weaponItem.getId())) {
       if (wearsShield) {
         // A two-handed weapon cannot be worn together with a shield
         seenTwoHanded.put(weaponItem.getId(), false);
@@ -311,9 +312,9 @@ public class EquipFeature implements StatefulFeature {
   /**
    * @return Whether RuneLite's item stats say where the item is worn
    */
-  private boolean hasEquipmentStats(int itemId) {
+  private boolean missingEquipmentStats(int itemId) {
     ItemStats itemStats = itemManager.getItemStats(itemId);
-    return itemStats != null && itemStats.getEquipment() != null;
+    return itemStats == null || itemStats.getEquipment() == null;
   }
 
   /**
