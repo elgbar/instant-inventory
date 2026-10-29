@@ -241,6 +241,46 @@ public class SpecialAttackFeatureTest {
   }
 
   @Test
+  public void clicking_the_offhand_bar_moves_the_active_orb_from_the_mainhand() {
+    SpecialAttackFeature feature = dualBarFeature(MAINHAND, RONDACHE_SPEC_COST);
+
+    feature.onMenuOptionClicked(click(CombatInterface.SPECIAL_ATTACK_OFFHAND));
+
+    assertEquals(SpriteID.OrbFiller._9, sprite(CombatInterface.SP_ORB_MAINHAND));
+    assertEquals(SpriteID.OrbFiller._10, sprite(CombatInterface.SP_ORB_OFFHAND));
+  }
+
+  @Test
+  public void clicking_the_active_offhand_bar_deactivates_its_orb() {
+    SpecialAttackFeature feature = dualBarFeature(OFFHAND, RONDACHE_SPEC_COST);
+
+    feature.onMenuOptionClicked(click(CombatInterface.SPECIAL_ATTACK_OFFHAND));
+
+    assertEquals(SpriteID.OrbFiller._9, sprite(CombatInterface.SP_ORB_MAINHAND));
+    assertEquals(SpriteID.OrbFiller._9, sprite(CombatInterface.SP_ORB_OFFHAND));
+  }
+
+  @Test
+  public void clicking_the_offhand_bar_without_enough_rondache_charges_keeps_its_empty_orb() {
+    SpecialAttackFeature feature = dualBarFeature(OFF, RONDACHE_SPEC_COST - 1);
+
+    feature.onMenuOptionClicked(click(CombatInterface.SPECIAL_ATTACK_OFFHAND));
+
+    assertEquals(SpriteID.OrbFiller._16, sprite(CombatInterface.SP_ORB_OFFHAND));
+  }
+
+  @Test
+  public void clicking_the_mainhand_bar_keeps_the_empty_orb_of_a_rondache_without_enough_charges() {
+    SpecialAttackFeature feature = dualBarFeature(OFF, RONDACHE_SPEC_COST - 1);
+
+    feature.onMenuOptionClicked(click(CombatInterface.SPECIAL_ATTACK_MAINHAND));
+
+    assertEquals(SpriteID.OrbFiller._10, sprite(CombatInterface.SP_ORB_MAINHAND));
+    // The game only redraws it when a var changes, so the inactive sprite could stick
+    assertEquals(SpriteID.OrbFiller._16, sprite(CombatInterface.SP_ORB_OFFHAND));
+  }
+
+  @Test
   public void clicking_another_widget_does_nothing() {
     SpecialAttackFeature feature = newFeature(Integer.MAX_VALUE);
     Widget bar = widget(CombatInterface.SP_INDICATOR);
@@ -365,6 +405,11 @@ public class SpecialAttackFeatureTest {
     hiddenWidget(CombatInterface.SP_INDICATOR);
     widget(CombatInterface.SP_INDICATOR_MAINHAND);
     widget(CombatInterface.SP_INDICATOR_OFFHAND);
+    // As script10148 draws them, with full special attack energy
+    orbWidget(CombatInterface.SP_ORB_MAINHAND, saAttack == MAINHAND ? SpriteID.OrbFiller._10 : SpriteID.OrbFiller._9);
+    orbWidget(CombatInterface.SP_ORB_OFFHAND, rondacheCharges < RONDACHE_SPEC_COST
+      ? SpriteID.OrbFiller._16
+      : saAttack == OFFHAND ? SpriteID.OrbFiller._10 : SpriteID.OrbFiller._9);
     widget(Orbs.SPECENERGY_INDICATOR);
     return feature;
   }
@@ -374,6 +419,8 @@ public class SpecialAttackFeatureTest {
     widget(CombatInterface.SP_INDICATOR);
     hiddenWidget(CombatInterface.SP_INDICATOR_MAINHAND);
     hiddenWidget(CombatInterface.SP_INDICATOR_OFFHAND);
+    hiddenWidget(CombatInterface.SP_ORB_MAINHAND);
+    hiddenWidget(CombatInterface.SP_ORB_OFFHAND);
     widget(Orbs.SPECENERGY_INDICATOR);
   }
 
@@ -433,6 +480,28 @@ public class SpecialAttackFeatureTest {
   private void hiddenWidget(int id) {
     widgets.put(id, mock(Widget.class, withSettings().defaultAnswer(invocation ->
       "isHidden".equals(invocation.getMethod().getName()) ? true : Mockito.RETURNS_DEFAULTS.answer(invocation))));
+  }
+
+  /**
+   * An orb of the split bar, which keeps the sprite it was last given as a widget does
+   */
+  private void orbWidget(int id, int spriteId) {
+    int[] sprite = {spriteId};
+    widgets.put(id, mock(Widget.class, withSettings().defaultAnswer(invocation -> {
+      switch (invocation.getMethod().getName()) {
+        case "getSpriteId":
+          return sprite[0];
+        case "setSpriteId":
+          sprite[0] = invocation.getArgument(0);
+          return invocation.getMock();
+        default:
+          return Mockito.RETURNS_DEFAULTS.answer(invocation);
+      }
+    })));
+  }
+
+  private int sprite(int id) {
+    return widgets.get(id).getSpriteId();
   }
 
   private static MenuOptionClicked click(int widgetId) {

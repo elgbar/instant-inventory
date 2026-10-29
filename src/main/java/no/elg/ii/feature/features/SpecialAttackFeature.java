@@ -72,6 +72,10 @@ public class SpecialAttackFeature implements StatelessFeature {
    * @see net.runelite.api.SpriteID#MINIMAP_ORB_SPECIAL_ACTIVATED
    */
   private static final int SPRITE_ID_SPEC_ORB_FILLER_ACTIVE = SpriteID.OrbFiller._10;
+  /**
+   * Shown by an orb of the split bar while its hand lacks the energy or charges to spec
+   */
+  private static final int SPRITE_ID_SPEC_ORB_FILLER_EMPTY = SpriteID.OrbFiller._16;
 
   private static final int TOGGLE_QUICK_SPECIAL_ATTACK_SCRIPT_ID = 2793;
 
@@ -176,17 +180,17 @@ public class SpecialAttackFeature implements StatelessFeature {
     if (parentSpecWidget != null && !parentSpecWidget.isHidden()) {
       if (newSpecState == SPEC_STATE_OFF) {
         colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_INACTIVE_COLOR);
-        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_INACTIVE_COLOR);
-        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_INACTIVE_COLOR);
+        colorHandBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, InterfaceID.CombatInterface.SP_ORB_MAINHAND, SPEC_INACTIVE_COLOR);
+        colorHandBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, InterfaceID.CombatInterface.SP_ORB_OFFHAND, SPEC_INACTIVE_COLOR);
       } else if (newSpecState == SPEC_STATE_MAINHAND) {
         colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_ACTIVE_COLOR);
-        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_ACTIVE_COLOR);
-        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_INACTIVE_COLOR);
+        colorHandBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, InterfaceID.CombatInterface.SP_ORB_MAINHAND, SPEC_ACTIVE_COLOR);
+        colorHandBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, InterfaceID.CombatInterface.SP_ORB_OFFHAND, SPEC_INACTIVE_COLOR);
       } else if (newSpecState == SPEC_STATE_OFFHAND) {
-        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_INACTIVE_COLOR);
+        colorHandBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, InterfaceID.CombatInterface.SP_ORB_MAINHAND, SPEC_INACTIVE_COLOR);
         if (canUseRondache() && hasRondacheEquipped()) {
           colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_ACTIVE_COLOR);
-          colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_ACTIVE_COLOR);
+          colorHandBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, InterfaceID.CombatInterface.SP_ORB_OFFHAND, SPEC_ACTIVE_COLOR);
         }
       }
     }
@@ -196,6 +200,18 @@ public class SpecialAttackFeature implements StatelessFeature {
     Widget specWidget = client.getWidget(interfaceId);
     if (specWidget != null && !specWidget.isHidden()) {
       specWidget.setTextColor(color);
+    }
+  }
+
+  /**
+   * Color a bar of the split special attack bar, and give its orb the matching sprite
+   */
+  private void colorHandBar(int indicatorId, int orbId, int color) {
+    colorSpecBar(indicatorId, color);
+    Widget orb = client.getWidget(orbId);
+    // Like the game, keep the empty sprite as a click does not give the hand the energy or charges to spec
+    if (orb != null && !orb.isHidden() && orb.getSpriteId() != SPRITE_ID_SPEC_ORB_FILLER_EMPTY) {
+      orb.setSpriteId(color == SPEC_ACTIVE_COLOR ? SPRITE_ID_SPEC_ORB_FILLER_ACTIVE : SPRITE_ID_SPEC_ORB_FILLER_INACTIVE);
     }
   }
 
