@@ -47,6 +47,7 @@ import no.elg.ii.overlay.OverlayOpacityRectifier;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
 import no.elg.ii.service.InventoryService;
+import no.elg.ii.service.ItemEquipmentService;
 import no.elg.ii.service.RedrawHiddenInventoryService;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -72,6 +73,8 @@ public abstract class IntegrationTestHelper {
   protected OverlayOpacityRectifier overlayOpacityRectifier;
   @Mock
   protected RedrawHiddenInventoryService redrawHiddenInventoryService;
+  @Mock
+  protected ItemEquipmentService itemEquipmentService;
 
   /**
    * Created in {@link #setUp()} rather than with {@link Mock} so the JUnit thread counts as the
@@ -119,6 +122,6 @@ public abstract class IntegrationTestHelper {
     cleanHerbFeature.state = inventoryState;
     depositFeature.state = inventoryState;
 
-    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService, overlayOpacityRectifier, redrawHiddenInventoryService));
+    plugin = spy(new InstantInventoryPlugin(client, eventBus, instantInventoryConfig, featureManager, inventoryState, clientThread, ensureWidgetStateService, disallowModifiedWidgetInteractionService, overlayOpacityRectifier, redrawHiddenInventoryService, itemEquipmentService));
   }
 }

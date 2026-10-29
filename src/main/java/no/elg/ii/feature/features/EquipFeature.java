@@ -100,7 +100,8 @@ public class EquipFeature implements StatefulFeature {
   private InstantInventoryConfig config;
 
   @Inject
-  private ItemEquipmentService itemEquipmentService;
+  @VisibleForTesting
+  ItemEquipmentService itemEquipmentService;
 
   /**
    * The last tick each slot was equipped

@@ -27,13 +27,18 @@
 
 package no.elg.ii;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import net.runelite.api.GameState;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.events.ConfigChanged;
 import no.elg.ii.test.IntegrationTestHelper;
 import org.junit.Test;
@@ -134,5 +139,21 @@ public class InstantInventoryPluginTest extends IntegrationTestHelper {
     plugin.onConfigChanged(configChanged);
 
     verify(featureManager, never()).updateAllFeatureStatus();
+  }
+
+  @Test
+  public void onItemContainerChanged_learns_where_items_are_worn_from_what_is_worn() {
+    ItemContainer worn = mock(ItemContainer.class);
+
+    plugin.onItemContainerChanged(new ItemContainerChanged(InventoryID.WORN, worn));
+
+    verify(itemEquipmentService).learnEquipSlots(worn);
+  }
+
+  @Test
+  public void onItemContainerChanged_does_not_learn_from_other_item_containers() {
+    plugin.onItemContainerChanged(new ItemContainerChanged(InventoryID.INV, mock(ItemContainer.class)));
+
+    verify(itemEquipmentService, never()).learnEquipSlots(any());
   }
 }

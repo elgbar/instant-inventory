@@ -50,15 +50,13 @@ import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.MenuEntry;
-import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.client.game.ItemEquipmentStats;
-import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemStats;
 import no.elg.ii.inventory.slot.SlotChange;
+import no.elg.ii.model.EquipSlot;
 import no.elg.ii.service.InventoryService;
+import no.elg.ii.service.ItemEquipmentService;
 import no.elg.ii.service.WidgetService;
 import no.elg.ii.test.StatefulFeatureTestMother;
 import no.elg.ii.test.TestSetup;
@@ -74,17 +72,16 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   private static final Item SWORD = new Item(BRONZE_SWORD, 1);
   private static final Item SHIELD = new Item(BRONZE_SQ_SHIELD, 1);
 
-  /*
-   * Items without item stats, as when RuneLite has not yet updated them after a game update
-   */
   private static final Item NEW_WEAPON = new Item(OBLIGATOR, 1);
-  private static final Item NEW_SHIELD = new Item(RONDACHE, 1);
 
-  private static final Map<Integer, ItemStats> ITEM_STATS = Map.of(
-    BRONZE_2H_SWORD, equipable(EquipmentInventorySlot.WEAPON, true),
-    BRONZE_SWORD, equipable(EquipmentInventorySlot.WEAPON, false),
-    BRONZE_SQ_SHIELD, equipable(EquipmentInventorySlot.SHIELD, false)
-  );
+  /**
+   * Where the item equipment service says items are worn, by item id
+   */
+  private final Map<Integer, EquipSlot> equipSlots = new HashMap<>(Map.of(
+    BRONZE_2H_SWORD, new EquipSlot(EquipmentInventorySlot.WEAPON.getSlotIdx(), true),
+    BRONZE_SWORD, new EquipSlot(EquipmentInventorySlot.WEAPON.getSlotIdx(), false),
+    BRONZE_SQ_SHIELD, new EquipSlot(EquipmentInventorySlot.SHIELD.getSlotIdx(), false)
+  ));
 
   /**
    * What the server says is worn, by equipment slot
@@ -187,7 +184,7 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   }
 
   @Test
-  public void onMenuOptionClicked_item_without_stats_never_seen_worn_is_not_equipped() {
+  public void onMenuOptionClicked_item_not_known_where_it_is_worn_is_not_equipped() {
     EquipFeature feature = createWiredInstance();
     worn.put(EquipmentInventorySlot.SHIELD.getSlotIdx(), SHIELD);
     Widget newShield = inventoryItem(OFF_HAND_INDEX, RONDACHE);
@@ -200,10 +197,11 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   }
 
   @Test
-  public void onMenuOptionClicked_item_without_stats_seen_worn_replaces_what_is_worn_in_its_slot() {
+  public void onMenuOptionClicked_shield_not_known_to_be_two_handed_replaces_the_worn_shield() {
     EquipFeature feature = createWiredInstance();
-    serverWears(feature, null, NEW_SHIELD);
-    serverWears(feature, null, SHIELD);
+    // Only weapons can be two-handed, so not knowing it does not matter for a shield
+    knownOnlyWhereWorn(RONDACHE, EquipmentInventorySlot.SHIELD);
+    worn.put(EquipmentInventorySlot.SHIELD.getSlotIdx(), SHIELD);
     Widget newShield = inventoryItem(OFF_HAND_INDEX, RONDACHE);
 
     feature.onMenuOptionClicked(equip(newShield));
@@ -215,8 +213,8 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   @Test
   public void onMenuOptionClicked_weapon_not_known_to_be_two_handed_without_a_shield_replaces_the_wielded_weapon() {
     EquipFeature feature = createWiredInstance();
-    serverWears(feature, NEW_WEAPON, null);
-    serverWears(feature, SWORD, null);
+    knownOnlyWhereWorn(OBLIGATOR, EquipmentInventorySlot.WEAPON);
+    worn.put(EquipmentInventorySlot.WEAPON.getSlotIdx(), SWORD);
     Widget mainHand = inventoryItem(MAIN_HAND_INDEX, OBLIGATOR);
 
     feature.onMenuOptionClicked(equip(mainHand));
@@ -228,8 +226,9 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   @Test
   public void onMenuOptionClicked_weapon_not_known_to_be_two_handed_while_wearing_a_shield_is_not_equipped() {
     EquipFeature feature = createWiredInstance();
-    serverWears(feature, NEW_WEAPON, null);
-    serverWears(feature, SWORD, SHIELD);
+    knownOnlyWhereWorn(OBLIGATOR, EquipmentInventorySlot.WEAPON);
+    worn.put(EquipmentInventorySlot.WEAPON.getSlotIdx(), SWORD);
+    worn.put(EquipmentInventorySlot.SHIELD.getSlotIdx(), SHIELD);
     Widget mainHand = inventoryItem(MAIN_HAND_INDEX, OBLIGATOR);
 
     feature.onMenuOptionClicked(equip(mainHand));
@@ -242,7 +241,8 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   @Test
   public void onMenuOptionClicked_shield_while_wielding_a_weapon_not_known_to_be_two_handed_is_not_equipped() {
     EquipFeature feature = createWiredInstance();
-    serverWears(feature, NEW_WEAPON, null);
+    knownOnlyWhereWorn(OBLIGATOR, EquipmentInventorySlot.WEAPON);
+    worn.put(EquipmentInventorySlot.WEAPON.getSlotIdx(), NEW_WEAPON);
     Widget offHand = inventoryItem(OFF_HAND_INDEX, BRONZE_SQ_SHIELD);
 
     feature.onMenuOptionClicked(equip(offHand));
@@ -253,11 +253,9 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   }
 
   @Test
-  public void onMenuOptionClicked_shield_while_wielding_a_weapon_seen_with_a_shield_empties_the_slot() {
+  public void onMenuOptionClicked_shield_while_wielding_a_one_handed_weapon_empties_the_slot() {
     EquipFeature feature = createWiredInstance();
-    // Worn together with a shield, so it is one-handed
-    serverWears(feature, NEW_WEAPON, SHIELD);
-    serverWears(feature, NEW_WEAPON, null);
+    worn.put(EquipmentInventorySlot.WEAPON.getSlotIdx(), SWORD);
     Widget offHand = inventoryItem(OFF_HAND_INDEX, BRONZE_SQ_SHIELD);
 
     feature.onMenuOptionClicked(equip(offHand));
@@ -267,32 +265,15 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   }
 
   @Test
-  public void onMenuOptionClicked_shield_while_wielding_a_weapon_seen_taking_off_a_shield_replaces_it_with_the_weapon() {
+  public void onMenuOptionClicked_shield_while_wielding_a_two_handed_weapon_replaces_it_with_the_weapon() {
     EquipFeature feature = createWiredInstance();
-    serverWears(feature, SWORD, SHIELD);
-    // Wielding it took off the shield, so it is two-handed
-    serverWears(feature, NEW_WEAPON, null);
+    worn.put(EquipmentInventorySlot.WEAPON.getSlotIdx(), TWO_HANDED);
     Widget offHand = inventoryItem(OFF_HAND_INDEX, BRONZE_SQ_SHIELD);
 
     feature.onMenuOptionClicked(equip(offHand));
 
-    verify(feature.widgetService).setFakeWidgetItem(offHand, NEW_WEAPON, SlotChange.REPLACE);
+    verify(feature.widgetService).setFakeWidgetItem(offHand, TWO_HANDED, SlotChange.REPLACE);
     assertEquals(SlotChange.REPLACE, feature.getState().getSlot(OFF_HAND_INDEX).getChange());
-  }
-
-  @Test
-  public void onMenuOptionClicked_shield_while_wielding_a_weapon_seen_with_a_shield_empties_the_slot_after_the_shield_was_removed_as_it_was_wielded() {
-    EquipFeature feature = createWiredInstance();
-    serverWears(feature, NEW_WEAPON, SHIELD);
-    serverWears(feature, SWORD, SHIELD);
-    // Removing the shield the same tick the weapon is wielded looks like wielding it took off the shield
-    serverWears(feature, NEW_WEAPON, null);
-    Widget offHand = inventoryItem(OFF_HAND_INDEX, BRONZE_SQ_SHIELD);
-
-    feature.onMenuOptionClicked(equip(offHand));
-
-    verify(feature.widgetService, never()).setFakeWidgetItem(eq(offHand), any(Item.class), any());
-    assertTrue(feature.getState().getSlot(OFF_HAND_INDEX).isEmptying());
   }
 
   private EquipFeature createWiredInstance() {
@@ -302,10 +283,13 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
         ? tick
         : Mockito.RETURNS_DEFAULTS.answer(invocation));
     feature.clientThread = TestSetup.inlineClientThread();
-    feature.itemManager = mock(ItemManager.class, withSettings().defaultAnswer(invocation ->
-      "getItemStats".equals(invocation.getMethod().getName())
-        ? ITEM_STATS.get(invocation.<Integer>getArgument(0))
-        : Mockito.RETURNS_DEFAULTS.answer(invocation)));
+    feature.itemEquipmentService = new ItemEquipmentService() {
+      @Nullable
+      @Override
+      public EquipSlot getEquipSlot(int itemId) {
+        return equipSlots.get(itemId);
+      }
+    };
     feature.state = TestSetup.newInventoryState(feature.client);
     feature.widgetService = mock(WidgetService.class);
     feature.inventoryService = mock(InventoryService.class);
@@ -319,21 +303,11 @@ public class EquipFeatureTest extends StatefulFeatureTestMother<EquipFeature> {
   }
 
   /**
-   * The server tells the client what is worn, as it does when logging in and after equipping
+   * The item equipment service knows where the item is worn, but not whether it is two-handed, as for an item without
+   * item stats it has seen worn
    */
-  private void serverWears(EquipFeature feature, @Nullable Item weapon, @Nullable Item shield) {
-    worn.clear();
-    if (weapon != null) {
-      worn.put(EquipmentInventorySlot.WEAPON.getSlotIdx(), weapon);
-    }
-    if (shield != null) {
-      worn.put(EquipmentInventorySlot.SHIELD.getSlotIdx(), shield);
-    }
-    feature.onItemContainerChanged(new ItemContainerChanged(InventoryID.WORN, feature.client.getItemContainer(InventoryID.WORN)));
-  }
-
-  private static ItemStats equipable(EquipmentInventorySlot slot, boolean twoHanded) {
-    return new ItemStats(true, 0, 0, ItemEquipmentStats.builder().slot(slot.getSlotIdx()).isTwoHanded(twoHanded).build());
+  private void knownOnlyWhereWorn(int itemId, EquipmentInventorySlot slot) {
+    equipSlots.put(itemId, new EquipSlot(slot.getSlotIdx(), null));
   }
 
   private static Widget inventoryItem(int index, int itemId) {
