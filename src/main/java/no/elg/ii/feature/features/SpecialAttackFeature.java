@@ -36,13 +36,19 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.events.BeforeRender;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptPostFired;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.SpriteID;
 import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import no.elg.ii.InstantInventoryConfig;
@@ -125,6 +131,7 @@ public class SpecialAttackFeature implements StatelessFeature {
   private void predict(int newSpecState) {
     predictedSpecState = newSpecState;
     lastManuallyModified = System.currentTimeMillis();
+    log.debug("Updating spec state to {}", debugSpecState(newSpecState));
     updateSpecBar(newSpecState);
     updateSpecOrb(newSpecState);
   }
@@ -140,13 +147,14 @@ public class SpecialAttackFeature implements StatelessFeature {
     if (widget != null) {
       int hand;
       int id = widget.getId();
-      if (id == InterfaceID.CombatInterface.SPECIAL_ATTACK_OFFHAND) {
+      if (id == InterfaceID.CombatInterface.SPECIAL_ATTACK_OFFHAND || (id == InterfaceID.CombatInterface.SPECIAL_ATTACK && hasRondacheEquipped())) {
         hand = SPEC_STATE_OFFHAND;
       } else if (id == InterfaceID.CombatInterface.SPECIAL_ATTACK || id == InterfaceID.CombatInterface.SPECIAL_ATTACK_MAINHAND) {
         hand = SPEC_STATE_MAINHAND;
       } else {
         return;
       }
+      log.debug("Bar clicked {}", debugSpecState(hand));
       // Bars are resolved server side, so predict: clicking the active hand turns it off, otherwise switches to it
       predict(currentSpecState() == hand ? SPEC_STATE_OFF : hand);
     }
@@ -156,7 +164,9 @@ public class SpecialAttackFeature implements StatelessFeature {
     assert client.isClientThread();
     Widget specWidget = client.getWidget(InterfaceID.Orbs.SPECENERGY_INDICATOR);
     if (specWidget != null) {
-      specWidget.setSpriteId(newSpecState == SPEC_STATE_OFF ? SPRITE_ID_SPEC_ORB_FILLER_INACTIVE : SPRITE_ID_SPEC_ORB_FILLER_ACTIVE);
+      boolean active = newSpecState == SPEC_STATE_MAINHAND
+        || newSpecState == SPEC_STATE_OFFHAND && canUseRondache() && hasRondacheEquipped();
+      specWidget.setSpriteId(active ? SPRITE_ID_SPEC_ORB_FILLER_ACTIVE : SPRITE_ID_SPEC_ORB_FILLER_INACTIVE);
     }
   }
 
@@ -173,9 +183,11 @@ public class SpecialAttackFeature implements StatelessFeature {
         colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_ACTIVE_COLOR);
         colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_INACTIVE_COLOR);
       } else if (newSpecState == SPEC_STATE_OFFHAND) {
-        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_INACTIVE_COLOR);
         colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_MAINHAND, SPEC_INACTIVE_COLOR);
-        colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_ACTIVE_COLOR);
+        if (canUseRondache() && hasRondacheEquipped()) {
+          colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR, SPEC_ACTIVE_COLOR);
+          colorSpecBar(InterfaceID.CombatInterface.SP_INDICATOR_OFFHAND, SPEC_ACTIVE_COLOR);
+        }
       }
     }
   }
@@ -187,6 +199,22 @@ public class SpecialAttackFeature implements StatelessFeature {
     }
   }
 
+  /**
+   * @return whether we have Rondache equipped and have enough changes.
+   */
+  public boolean canUseRondache() {
+    return varService.varbitValue(VarbitID.RONDACHE_CHARGES) >= 10;
+  }
+
+  public boolean hasRondacheEquipped() {
+    ItemContainer worn = client.getItemContainer(InventoryID.WORN);
+    if (worn == null) {
+      return false;
+    }
+    Item shieldEquipped = worn.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx());
+    return shieldEquipped != null && shieldEquipped.getId() == ItemID.RONDACHE;
+  }
+
   @Override
   public @NonNull String getConfigKey() {
     return SPEC_CONFIG_KEY;
@@ -195,6 +223,20 @@ public class SpecialAttackFeature implements StatelessFeature {
   @Override
   public boolean isEnabledInConfig() {
     return config.instantSpec();
+  }
+
+  @NonNull
+  public static String debugSpecState(int specState) {
+    switch (specState) {
+      case SPEC_STATE_OFF:
+        return "Off";
+      case SPEC_STATE_MAINHAND:
+        return "Mainhand";
+      case SPEC_STATE_OFFHAND:
+        return "Offhand";
+      default:
+        return "Unknown";
+    }
   }
 
   private final static int SPEC_STATE_OFF = 0;
