@@ -44,6 +44,7 @@ import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStats;
 import no.elg.ii.model.EquipSlot;
+import no.elg.ii.util.WidgetUtils;
 
 @Slf4j
 @Singleton
@@ -105,6 +106,7 @@ public class ItemEquipmentService {
     for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()) {
       Item item = equipmentContainer.getItem(slot.getSlotIdx());
       if (item != null && missingEquipmentStats(item.getId())) {
+        log.debug("Unknown worn item {} goes into slot {}", WidgetUtils.debugInfo(item), slot.name());
         //only record the items we don't know about
         seenWornSlot.put(item.getId(), slot.getSlotIdx());
       }
@@ -114,11 +116,13 @@ public class ItemEquipmentService {
     boolean wearsShield = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx()) != null;
     if (weaponItem != null && missingEquipmentStats(weaponItem.getId())) {
       if (wearsShield) {
+        log.debug("Unknown weapon item {} is not a 2h", WidgetUtils.debugInfo(weaponItem));
         // A two-handed weapon cannot be worn together with a shield
         seenTwoHanded.put(weaponItem.getId(), false);
       } else if (lastWoreShield) {
         // Wielding the weapon took off the shield, unless the shield was removed the same tick. Either way, a weapon
         // already seen together with a shield is known to be one-handed
+        log.debug("Unknown weapon item {} is maybe a 2h", WidgetUtils.debugInfo(weaponItem));
         seenTwoHanded.putIfAbsent(weaponItem.getId(), true);
       }
     }
