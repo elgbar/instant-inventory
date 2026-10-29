@@ -47,6 +47,7 @@ import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
@@ -109,6 +110,21 @@ public class EquipFeature implements StatefulFeature {
    */
   private final Map</*slotIdx*/ Integer, WornPrediction> predictedWorn = new HashMap<>(EquipmentInventorySlot.values().length);
 
+  /**
+   * Where items have been seen worn, for items RuneLite has no item stats for yet, such as items from a recent game update
+   */
+  private final Map</*itemId*/ Integer, /*slotIdx*/ Integer> seenWornSlot = new HashMap<>(0);
+
+  /**
+   * Whether weapons have been seen to be two-handed, for items RuneLite has no item stats for yet
+   */
+  private final Map</*itemId*/ Integer, /*is2h*/ Boolean> seenTwoHanded = new HashMap<>(0);
+
+  /**
+   * Whether a shield was worn the last time the server said what is worn, to see if wielding a weapon took it off
+   */
+  private boolean lastWoreShield;
+
   @Subscribe
   public void onMenuOptionClicked(final MenuOptionClicked event) {
     Widget widget = event.getWidget();
@@ -119,6 +135,41 @@ public class EquipFeature implements StatefulFeature {
         clientThread.invokeAtTickEnd(() -> equip(widget));
       }
     }
+  }
+
+  @Subscribe
+  public void onItemContainerChanged(final ItemContainerChanged event) {
+    if (event.getContainerId() == InventoryID.WORN) {
+      learnEquipSlots(event.getItemContainer());
+    }
+  }
+
+  /**
+   * Learn where items are worn from what the server says is worn, so items RuneLite has no item stats for yet can be
+   * equipped
+   */
+  private void learnEquipSlots(@Nonnull ItemContainer equipmentContainer) {
+    for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()) {
+      Item item = equipmentContainer.getItem(slot.getSlotIdx());
+      if (item != null && !hasEquipmentStats(item.getId())) {
+        //only record the items we don't know about
+        seenWornSlot.put(item.getId(), slot.getSlotIdx());
+      }
+    }
+
+    Item weaponItem = equipmentContainer.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
+    boolean wearsShield = equipmentContainer.getItem(EquipmentInventorySlot.SHIELD.getSlotIdx()) != null;
+    if (weaponItem != null) {
+      if (wearsShield) {
+        // A two-handed weapon cannot be worn together with a shield
+        seenTwoHanded.put(weaponItem.getId(), false);
+      } else if (lastWoreShield) {
+        // Wielding the weapon took off the shield, unless the shield was removed the same tick. Either way, a weapon
+        // already seen together with a shield is known to be one-handed
+        seenTwoHanded.putIfAbsent(weaponItem.getId(), true);
+      }
+    }
+    lastWoreShield = wearsShield;
   }
 
   private static final String TOO_LOW_LEVEL_MESSAGE = "You are not a high enough level to use this item.";
@@ -181,51 +232,89 @@ public class EquipFeature implements StatefulFeature {
   @VisibleForTesting
   @Nullable
   public Pair<Item, Item> getEquipmentToReplace(Widget widget) {
-    final ItemStats itemStats = itemManager.getItemStats(widget.getItemId());
-    if (itemStats == null || !itemStats.isEquipable()) {
-      log.debug("Item has not status or is not equipable, will not equip it: {}", itemStats);
+    final EquipSlot clickedEquipment = getEquipSlot(widget.getItemId());
+    if (clickedEquipment == null) {
+      log.debug("Not known where the item is worn, will not equip it: {}", WidgetUtils.debugInfo(widget));
       return null;
     }
     Item toReplace = null;
     Item extra = null;
 
-    final ItemEquipmentStats clickedEquipment = itemStats.getEquipment();
-
     ItemContainer equipmentContainer = client.getItemContainer(InventoryID.WORN);
-    if (clickedEquipment != null && equipmentContainer != null) {
+    if (equipmentContainer != null) {
       if (lastEquipped.getOrDefault(clickedEquipment.getSlot(), 0) == client.getTickCount()) {
         log.debug("We have already equipped an item in the same slot this tick, will not replace it");
         return null;
       }
       final int slotOfClickedItem = clickedEquipment.getSlot();
       toReplace = getWornItem(equipmentContainer, slotOfClickedItem);
-      predictWorn(slotOfClickedItem, new Item(widget.getItemId(), widget.getItemQuantity()), widget);
 
-      if (isWeaponSlot(slotOfClickedItem)) {
-        if (clickedEquipment.isTwoHanded()) {
-          extra = getWornItem(equipmentContainer, EquipmentInventorySlot.SHIELD.getSlotIdx());
+      if (clickedEquipment.isWeaponSlot()) {
+        Item shieldItem = getWornItem(equipmentContainer, EquipmentInventorySlot.SHIELD.getSlotIdx());
+        Boolean twoHanded = clickedEquipment.getTwoHanded();
+        if (twoHanded == null && shieldItem != null) {
+          log.debug("Not known whether the weapon is two-handed and takes off the shield, will not equip it: {}", shieldItem.getId());
+          return null;
+        } else if (Boolean.TRUE.equals(twoHanded)) {
+          extra = shieldItem;
           predictWorn(EquipmentInventorySlot.SHIELD.getSlotIdx(), null, widget);
         }
-      } else if (isShieldSlot(slotOfClickedItem)) {
+      } else if (clickedEquipment.isShieldSlot()) {
         var weaponItem = getWornItem(equipmentContainer, EquipmentInventorySlot.WEAPON.getSlotIdx());
         if (weaponItem != null) {
-          ItemStats weaponStat = itemManager.getItemStats(weaponItem.getId());
-          if (weaponStat != null && weaponStat.isEquipable()) {
-            ItemEquipmentStats weaponStatEquipment = weaponStat.getEquipment();
-            if (weaponStatEquipment != null && weaponStatEquipment.isTwoHanded()) {
-              //If we click a shield while have a two-handed weapon equipped, the weapon get unequipped
-              extra = weaponItem;
-              predictWorn(EquipmentInventorySlot.WEAPON.getSlotIdx(), null, widget);
-            }
+          EquipSlot weaponEquipment = getEquipSlot(weaponItem.getId());
+          if (weaponEquipment == null) {
+            log.debug("The wielded weapon has no item stats and has not been seen worn, will not equip the shield: {}", weaponItem.getId());
+            return null;
+          }
+          Boolean weaponTwoHanded = weaponEquipment.getTwoHanded();
+          if (weaponTwoHanded == null) {
+            log.debug("Not known whether the wielded weapon is two-handed and is taken off, will not equip the shield: {}", weaponItem.getId());
+            return null;
+          } else if (weaponTwoHanded) {
+            //If we click a shield while have a two-handed weapon equipped, the weapon get unequipped
+            extra = weaponItem;
+            predictWorn(EquipmentInventorySlot.WEAPON.getSlotIdx(), null, widget);
           }
         }
       }
-      lastEquipped.put(clickedEquipment.getSlot(), client.getTickCount());
+      predictWorn(slotOfClickedItem, new Item(widget.getItemId(), widget.getItemQuantity()), widget);
+      lastEquipped.put(slotOfClickedItem, client.getTickCount());
     }
     if (extra != null && toReplace == null) {
       return Pair.of(extra, null);
     }
     return Pair.of(toReplace, extra);
+  }
+
+  /**
+   * RuneLite's item stats only cover items some time after they are released, so for newer items it is what they have
+   * been seen worn as
+   *
+   * @return Where the item is worn, or null if it is not equipable or that is not known
+   */
+  @Nullable
+  private EquipSlot getEquipSlot(int itemId) {
+    ItemStats itemStats = itemManager.getItemStats(itemId);
+    if (itemStats != null) {
+      if (!itemStats.isEquipable()) {
+        return null;
+      }
+      ItemEquipmentStats equipment = itemStats.getEquipment();
+      if (equipment != null) {
+        return new EquipSlot(equipment.getSlot(), equipment.isTwoHanded());
+      }
+    }
+    Integer slotIdx = seenWornSlot.get(itemId);
+    return slotIdx == null ? null : new EquipSlot(slotIdx, seenTwoHanded.get(itemId));
+  }
+
+  /**
+   * @return Whether RuneLite's item stats say where the item is worn
+   */
+  private boolean hasEquipmentStats(int itemId) {
+    ItemStats itemStats = itemManager.getItemStats(itemId);
+    return itemStats != null && itemStats.getEquipment() != null;
   }
 
   /**
@@ -254,14 +343,6 @@ public class EquipFeature implements StatefulFeature {
     return equipmentContainer.getItem(slotIdx);
   }
 
-  private static boolean isShieldSlot(int index) {
-    return index == EquipmentInventorySlot.SHIELD.getSlotIdx();
-  }
-
-  private static boolean isWeaponSlot(int index) {
-    return index == EquipmentInventorySlot.WEAPON.getSlotIdx();
-  }
-
   @NonNull
   @Override
   public String getConfigKey() {
@@ -271,6 +352,24 @@ public class EquipFeature implements StatefulFeature {
   @Override
   public boolean isEnabledInConfig() {
     return config.instantEquip();
+  }
+
+  @Value
+  private static class EquipSlot {
+    int slot;
+    /**
+     * Whether the item is two-handed, or null if that is not known
+     */
+    @Nullable
+    Boolean twoHanded;
+
+    boolean isShieldSlot() {
+      return slot == EquipmentInventorySlot.SHIELD.getSlotIdx();
+    }
+
+    boolean isWeaponSlot() {
+      return slot == EquipmentInventorySlot.WEAPON.getSlotIdx();
+    }
   }
 
   @Value
