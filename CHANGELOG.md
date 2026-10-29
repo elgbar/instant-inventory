@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * [#45](https://github.com/elgbar/instant-inventory/issues/45) Fix items recently added into the game not working with equip prediction
+* Fix Rondache implementation
+* Fix Special attack prediction never resetting on misprediction
 
 ### Removed
 
