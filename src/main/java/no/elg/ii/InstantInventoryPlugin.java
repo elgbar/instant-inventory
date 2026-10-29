@@ -38,6 +38,8 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
@@ -50,6 +52,7 @@ import no.elg.ii.feature.state.InventoryState;
 import no.elg.ii.overlay.OverlayOpacityRectifier;
 import no.elg.ii.service.DisallowModifiedWidgetInteractionService;
 import no.elg.ii.service.EnsureWidgetStateService;
+import no.elg.ii.service.ItemEquipmentService;
 import no.elg.ii.service.RedrawHiddenInventoryService;
 
 @Slf4j
@@ -93,6 +96,9 @@ public class InstantInventoryPlugin extends Plugin {
 
   @Inject
   RedrawHiddenInventoryService redrawHiddenInventoryService;
+
+  @Inject
+  ItemEquipmentService itemEquipmentService;
 
   @Override
   protected void startUp() {
@@ -149,7 +155,17 @@ public class InstantInventoryPlugin extends Plugin {
           featureManager.updateAllFeatureStatus();
         }
       );
+    }
+  }
 
+  @Subscribe
+  public void onItemContainerChanged(final ItemContainerChanged event) {
+    if (event.getContainerId() == InventoryID.WORN) {
+      //Due to a shortcoming in runelite plugin enabling code we only get events when the plugin is enabled while logged
+      // in if the subscriber is registered in ths plugin class
+      //
+      // see https://github.com/runelite/runelite/blob/71250e778a9f3c6e8abc06abc9a4112f7051743a/runelite-client/src/main/java/net/runelite/client/plugins/PluginManager.java#L430
+      itemEquipmentService.learnEquipSlots(event.getItemContainer());
     }
   }
 

@@ -40,9 +40,6 @@ import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.gameval.InventoryID;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.ItemStats;
@@ -99,19 +96,11 @@ public class ItemEquipmentService {
     return slotIdx == null ? null : new EquipSlot(slotIdx, seenTwoHanded.get(itemId));
   }
 
-
-  @Subscribe
-  public void onItemContainerChanged(final ItemContainerChanged event) {
-    if (event.getContainerId() == InventoryID.WORN) {
-      learnEquipSlots(event.getItemContainer());
-    }
-  }
-
   /**
    * Learn where items are worn from what the server says is worn, so items RuneLite has no item stats for yet can be
    * equipped
    */
-  private void learnEquipSlots(@Nonnull ItemContainer equipmentContainer) {
+  public void learnEquipSlots(@Nonnull ItemContainer equipmentContainer) {
     assert client.isClientThread();
     for (EquipmentInventorySlot slot : EquipmentInventorySlot.values()) {
       Item item = equipmentContainer.getItem(slot.getSlotIdx());
