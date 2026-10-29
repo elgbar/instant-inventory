@@ -75,6 +75,7 @@ public class EquipFeature implements StatefulFeature {
 
   public static final Set<String> EQUIP_OPTIONS = Set.of("Wear", "Wield", "Equip");
   public static final String EQUIP_CONFIG_KEY = "instantEquip";
+  private static final String TOO_LOW_LEVEL_MESSAGE = "You are not a high enough level to use this item.";
 
   @Inject
   @VisibleForTesting
@@ -172,8 +173,6 @@ public class EquipFeature implements StatefulFeature {
     lastWoreShield = wearsShield;
   }
 
-  private static final String TOO_LOW_LEVEL_MESSAGE = "You are not a high enough level to use this item.";
-
   @Subscribe
   public void onChatMessage(ChatMessage event) {
     if (event.getType() == ChatMessageType.GAMEMESSAGE && TOO_LOW_LEVEL_MESSAGE.equals(event.getMessage())) {
@@ -253,7 +252,7 @@ public class EquipFeature implements StatefulFeature {
         Item shieldItem = getWornItem(equipmentContainer, EquipmentInventorySlot.SHIELD.getSlotIdx());
         Boolean twoHanded = clickedEquipment.getTwoHanded();
         if (twoHanded == null && shieldItem != null) {
-          log.debug("Not known whether the weapon is two-handed and takes off the shield, will not equip it: {}", shieldItem.getId());
+          log.debug("Not known whether the weapon is two-handed and takes off the shield, will not equip it: {}", WidgetUtils.debugInfo(shieldItem));
           return null;
         } else if (Boolean.TRUE.equals(twoHanded)) {
           extra = shieldItem;
@@ -264,12 +263,12 @@ public class EquipFeature implements StatefulFeature {
         if (weaponItem != null) {
           EquipSlot weaponEquipment = getEquipSlot(weaponItem.getId());
           if (weaponEquipment == null) {
-            log.debug("The wielded weapon has no item stats and has not been seen worn, will not equip the shield: {}", weaponItem.getId());
+            log.debug("The wielded weapon has no item stats and has not been seen worn, will not equip the shield: {}", WidgetUtils.debugInfo(weaponItem));
             return null;
           }
           Boolean weaponTwoHanded = weaponEquipment.getTwoHanded();
           if (weaponTwoHanded == null) {
-            log.debug("Not known whether the wielded weapon is two-handed and is taken off, will not equip the shield: {}", weaponItem.getId());
+            log.debug("Not known whether the wielded weapon is two-handed and is taken off, will not equip the shield: {}", WidgetUtils.debugInfo(weaponItem));
             return null;
           } else if (weaponTwoHanded) {
             //If we click a shield while have a two-handed weapon equipped, the weapon get unequipped
