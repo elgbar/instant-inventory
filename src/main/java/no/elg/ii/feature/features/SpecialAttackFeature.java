@@ -127,8 +127,12 @@ public class SpecialAttackFeature implements StatelessFeature {
   public void onGameTick(final GameTick event) {
     assert client.isClientThread();
     if (predictedSpecState != null && System.currentTimeMillis() - lastManuallyModified >= config.minChangedMs()) {
-      // Stop overriding, the game has already drawn what the server says
+      // Stop overriding. The prediction was drawn over the game's redraw for the server update, so draw what the server
+      // says once in case the prediction was wrong
       predictedSpecState = null;
+      int serverSpecState = varService.varpValue(VarPlayerID.SA_ATTACK);
+      updateSpecBar(serverSpecState);
+      updateSpecOrb(serverSpecState);
     }
   }
 

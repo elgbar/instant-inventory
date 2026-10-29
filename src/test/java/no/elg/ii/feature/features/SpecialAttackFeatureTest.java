@@ -182,10 +182,10 @@ public class SpecialAttackFeatureTest {
 
   @Test
   public void orb_click_with_only_a_rondache_colors_the_bar_from_the_clientside_value() {
-    // The orb script has already written SA_ATTACK clientside, the offhand as it is the only spec item
-    SpecialAttackFeature feature = rondacheBarFeature(OFFHAND, RONDACHE_SPEC_COST);
+    SpecialAttackFeature feature = rondacheBarFeature(OFF, RONDACHE_SPEC_COST);
 
-    feature.onScriptPostFired(new ScriptPostFired(TOGGLE_SPEC_ORB_SCRIPT_ID));
+    // The offhand, as it is the only spec item
+    orbClick(feature, OFFHAND);
 
     assertEquals(ACTIVE, lastColor(CombatInterface.SP_INDICATOR));
   }
@@ -321,8 +321,20 @@ public class SpecialAttackFeatureTest {
     feature.onGameTick(new GameTick());
     feature.onBeforeRender(new BeforeRender());
 
-    // Only the click colored the bar, after the tick the game's own drawing is left alone
-    assertEquals(List.of(ACTIVE), colors(CombatInterface.SP_INDICATOR));
+    // After the tick the bar is drawn once from the server, then the game's own drawing is left alone
+    assertEquals(List.of(ACTIVE, INACTIVE), colors(CombatInterface.SP_INDICATOR));
+  }
+
+  @Test
+  public void misprediction_is_reverted_to_the_server_state_when_the_prediction_is_dropped() {
+    SpecialAttackFeature feature = singleBarFeature(OFF, 0);
+    feature.onMenuOptionClicked(click(CombatInterface.SPECIAL_ATTACK));
+
+    // The server rejected the click, e.g., for too little energy, and the game's redraw was drawn over by the prediction
+    feature.onGameTick(new GameTick());
+
+    assertEquals(INACTIVE, lastColor(CombatInterface.SP_INDICATOR));
+    verify(widgets.get(Orbs.SPECENERGY_INDICATOR)).setSpriteId(SpriteID.OrbFiller._9);
   }
 
   @Test
@@ -334,23 +346,22 @@ public class SpecialAttackFeatureTest {
     // The server rejected the click, so it is still off
     feature.onMenuOptionClicked(click(CombatInterface.SPECIAL_ATTACK));
 
-    assertEquals(List.of(ACTIVE, ACTIVE), colors(CombatInterface.SP_INDICATOR));
+    assertEquals(List.of(ACTIVE, INACTIVE, ACTIVE), colors(CombatInterface.SP_INDICATOR));
   }
 
   @Test
   public void orb_click_colors_the_bar_from_the_clientside_value() {
-    SpecialAttackFeature feature = singleBarFeature(MAINHAND, Integer.MAX_VALUE);
+    SpecialAttackFeature feature = singleBarFeature(OFF, Integer.MAX_VALUE);
 
-    // The orb script has already written SA_ATTACK clientside
-    feature.onScriptPostFired(new ScriptPostFired(TOGGLE_SPEC_ORB_SCRIPT_ID));
+    orbClick(feature, MAINHAND);
 
     assertEquals(ACTIVE, lastColor(CombatInterface.SP_INDICATOR));
   }
 
   @Test
   public void bar_click_after_orb_click_toggles_from_the_orb_state() {
-    SpecialAttackFeature feature = singleBarFeature(MAINHAND, Integer.MAX_VALUE);
-    feature.onScriptPostFired(new ScriptPostFired(TOGGLE_SPEC_ORB_SCRIPT_ID));
+    SpecialAttackFeature feature = singleBarFeature(OFF, Integer.MAX_VALUE);
+    orbClick(feature, MAINHAND);
 
     feature.onMenuOptionClicked(click(CombatInterface.SPECIAL_ATTACK));
 
@@ -502,6 +513,14 @@ public class SpecialAttackFeatureTest {
 
   private int sprite(int id) {
     return widgets.get(id).getSpriteId();
+  }
+
+  /**
+   * Click the orb, whose script has written {@code saAttack} clientside when the plugin sees it end
+   */
+  private void orbClick(SpecialAttackFeature feature, int saAttack) {
+    varps.put(VarPlayerID.SA_ATTACK, saAttack);
+    feature.onScriptPostFired(new ScriptPostFired(TOGGLE_SPEC_ORB_SCRIPT_ID));
   }
 
   private static MenuOptionClicked click(int widgetId) {
