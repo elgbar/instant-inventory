@@ -50,8 +50,9 @@ public class UtilTest {
   @Test
   public void getNumberFromMenuOption_fixed_quantity() {
     assertEquals(1, getNumberFromMenuOption("Withdraw-1", widget));
-    assertEquals(5, getNumberFromMenuOption("Withdraw-5", widget));
-    assertEquals(10, getNumberFromMenuOption("Withdraw-10", widget));
+    assertEquals(5, getNumberFromMenuOption("Use-5", widget));
+    assertEquals(10, getNumberFromMenuOption("Deposit-10", widget));
+    assertEquals(10, getNumberFromMenuOption("Blah-10", widget));
   }
 
   @Test
