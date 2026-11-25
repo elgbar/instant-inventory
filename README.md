@@ -20,16 +20,7 @@ Or explained by someone who can write:
 
 SoupRS is a "big fan" of the instant inventory plugin in [RuneLite Plugins I Can't Live Without (You Need Them)](https://www.youtube.com/watch?v=ZeBeu6oHYgI&t=314s)
 
-
 ## Features
-
-### Clean herbs and drop
-
-[clean_and_drop.webm](https://github.com/elgbar/instant-inventory/assets/1556738/7a97dbf5-8ff6-49e7-b92f-0bcd64fe66db)
-
-### Instantly equip items
-
-[equipment_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/5e5bf832-e335-4a6a-b8a7-2e2aa4a6c785)
 
 ### Instantly interact with the bank
 
@@ -37,9 +28,17 @@ The "extra" inventory view is what you would have seen without the plugin
 
 [bank_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/ffb93f2d-f57c-445a-b47d-1de9eab34f74)
 
+### Instantly equip items
+
+[equipment_feature.webm](https://github.com/elgbar/instant-inventory/assets/1556738/5e5bf832-e335-4a6a-b8a7-2e2aa4a6c785)
+
 ### Toggle prayers instantly
 
 [prayer-feature.webm](https://github.com/user-attachments/assets/2b936926-5bd8-4184-86c7-e8ecb2720e9c)
+
+### Clean herbs and drop
+
+[clean_and_drop.webm](https://github.com/elgbar/instant-inventory/assets/1556738/7a97dbf5-8ff6-49e7-b92f-0bcd64fe66db)
 
 ### Toggle special attack bar instantly
 
