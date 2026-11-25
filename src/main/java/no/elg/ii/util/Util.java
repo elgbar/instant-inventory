@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Elg
+ * Copyright (c) 2023-2026 Elg
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,8 +47,11 @@ public final class Util {
       } else {
         quantity = Integer.parseInt(substring);
       }
-      assert quantity > 0;
-      return quantity;
+      if (quantity > 0) {
+        return quantity;
+      } else {
+        return NO_MENU_OPTION_NUMBER;
+      }
     } catch (NumberFormatException | IndexOutOfBoundsException e) {
       return NO_MENU_OPTION_NUMBER;
     }

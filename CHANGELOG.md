@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fix returning 0 when withdrawing single item in bank with `All-but-1`
+
 ### Removed
 
 ---
